@@ -61,6 +61,25 @@ GEM
     annotate (3.1.1)
       activerecord (>= 3.2, < 7.0)
       rake (>= 10.4, < 14.0)
+    aws-eventstream (1.1.0)
+    aws-partitions (1.407.0)
+    aws-sdk-core (3.110.0)
+      aws-eventstream (~> 1, >= 1.0.2)
+      aws-partitions (~> 1, >= 1.239.0)
+      aws-sigv4 (~> 1.1)
+      jmespath (~> 1.0)
+    aws-sdk-kms (1.39.0)
+      aws-sdk-core (~> 3, >= 3.109.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-lambda (1.57.0)
+      aws-sdk-core (~> 3, >= 3.109.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-s3 (1.86.2)
+      aws-sdk-core (~> 3, >= 3.109.0)
+      aws-sdk-kms (~> 1.26)
+      aws-sigv4 (~> 1.1)
+    aws-sigv4 (1.2.2)
+      aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.16)
     better_errors (2.9.1)
       coderay (>= 1.0.0)
@@ -112,7 +131,11 @@ GEM
       tilt
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
+    jbuilder (2.10.1)
+      activesupport (>= 5.0.0)
+    jmespath (1.4.0)
     json (2.4.0)
+    jwt (2.2.2)
     launchy (2.5.0)
       addressable (~> 2.7)
     letter_opener (1.7.0)
@@ -268,6 +291,8 @@ PLATFORMS
 
 DEPENDENCIES
   annotate
+  aws-sdk-lambda
+  aws-sdk-s3
   bcrypt
   better_errors
   binding_of_caller
@@ -278,6 +303,8 @@ DEPENDENCIES
   faker
   geocoder
   guard-rspec
+  jbuilder (~> 2.7)
+  jwt
   launchy
   letter_opener
   listen (~> 3.2)
@@ -292,7 +319,6 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   spring-watcher-listen (~> 2.0.0)
-  tzinfo-data
 
 RUBY VERSION
    ruby 2.7.0p0
