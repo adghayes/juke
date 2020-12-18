@@ -41,5 +41,8 @@ module Noisepuff
         :routing_specs => false
       g.helper false
     end
+
+    config.middleware.use ActionDispatch::Cookies
+    config.middleware.use ActionDispatch::Session::CookieStore
   end
 end

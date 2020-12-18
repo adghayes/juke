@@ -19,7 +19,9 @@ class User < ApplicationRecord
 
   attr_reader :password
 
-  has_many :sessions
+  has_many :sessions,
+    dependent: :destroy
+    
   has_one_attached :avatar
 
   def self.find_by_credentials(email, password)

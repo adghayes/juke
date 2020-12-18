@@ -1,43 +1,46 @@
 class ApplicationController < ActionController::API
-  before_action :authorized
+  include ActionController::Cookies
+  include ActionController::RequestForgeryProtection
 
-  def encode_token(payload)
-    JWT.encode payload, Rails.application.credentials.jwt[:key], 'HS256'
-  end
+  before_action :identify_session
+  before_action :require_logged_in
 
-  def auth_header
-    # { Authorization: 'Bearer <token>' }
-    request.headers['Authorization']
-  end
-
-  def decoded_token
-    if auth_header
-      token = auth_header.split(' ')[1]
-      # header: { 'Authorization': 'Bearer <token>' }
-      begin
-        JWT.decode token, Rails.application.credentials.jwt[:key], true, { algorithm: 'HS256' }
-      rescue JWT::DecodeError
-        nil
-      end
-    end
-  end
-
-  def set_user
-    if decoded_token
-      user_id = decoded_token[0]['sub']
-      @user = User.find_by(id: user_id)
-    end
-  end
-
-  def logged_in_user
-    @user || set_user
-  end
+  attr_reader :current_session, :current_user
 
   def logged_in?
-    !!logged_in_user
+    @current_session
   end
 
-  def authorized
-    render json: { message: 'Please log in' }, status: :unauthorized unless logged_in?
+  def log_in_user(user)
+    client = DeviceDetector.new(request.user_agent)
+    device = client.device_name || client.os_name
+    browser = client.name
+
+    new_session = Session.for(user, device: device, browser: browser)
+    new_session.save ? new_session.token : nil
+  end
+
+  private
+
+  def bearer_token
+    auth_header = request.headers['Authorization']
+    return nil unless auth_header
+
+    auth_header.split(' ')[1]
+  end
+
+  def identify_session
+    if bearer_token
+      @current_session = Session.find_by(token: bearer_token, active: true)
+      @current_user = (@current_session ? @current_session.user : nil)
+    end
+  end
+  
+  def require_logged_in
+    render json: { error: 'login required'}, status: :unauthorized unless current_session
+  end
+
+  def require_logged_out
+    render json: { message: 'already logged in' } if current_user
   end
 end

@@ -38,6 +38,7 @@ ActiveRecord::Schema.define(version: 2020_12_17_002013) do
   end
 
   create_table "sessions", force: :cascade do |t|
+    t.string "token", null: false
     t.bigint "user_id", null: false
     t.boolean "active", default: true, null: false
     t.string "device"
@@ -45,6 +46,7 @@ ActiveRecord::Schema.define(version: 2020_12_17_002013) do
     t.string "location"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["token"], name: "index_sessions_on_token", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
