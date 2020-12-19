@@ -7,6 +7,8 @@ class ApplicationController < ActionController::API
 
   attr_reader :current_session, :current_user
 
+  helper_method :current_user
+
   def logged_in?
     @current_session
   end

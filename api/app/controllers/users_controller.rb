@@ -8,18 +8,38 @@ class UsersController < ApplicationController
       @token = log_in_user(@user)
       render 'sessions/show'
     else
-      render json: {errors: @user.errors.messages}, status: :unprocessable_entity
+      puts @user.errors.details
+      render json: @user.errors.messages, status: :unprocessable_entity
     end
   end
 
   def show
-    @user = current_user
-    render :show
+    if params[:id]
+      @user = User.find(id)
+      render :show
+    elsif current_user
+      @user = current_user
+      render :show
+    else
+      head :unauthorized
+    end
+  end
+
+  def exists
+    if ['email', 'display_name'].include? params[:field]
+      render json: { 
+        field: params[:field],
+        value: params[:value],
+        exists: User.exists?(params[:field] => params[:value])
+      }
+    else
+      head :unprocessable_entity 
+    end
   end
 
   private
 
   def user_params
-    params.require(:user).permit(:email, :password, :display_name)
+    params.permit(:email, :password, :display_name)
   end
 end

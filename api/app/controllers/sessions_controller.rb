@@ -16,7 +16,7 @@ class SessionsController < ApplicationController
   def destroy
     current_session.deactivate!
     session[:session_token] = nil
-    render json: { message: 'logged out' }
+    head :ok
   end
 
 end

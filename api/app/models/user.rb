@@ -10,12 +10,12 @@
 #  updated_at      :datetime         not null
 #
 class User < ApplicationRecord
-  validates :email, presence: true, uniqueness: true,
-    format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :display_name, presence: true, uniqueness: true,
-    length: { minimum: 3 }
-  validates :password_digest, presence: { message: "Password can't be blank" }
-  validates :password, length: { minimum: 8, allow_nil: true }
+  validates :email, presence: { message: "Can't be empty"}, uniqueness: { message: "That's already taken"},
+    format: { with: URI::MailTo::EMAIL_REGEXP, message: "Invalid email address" }
+  validates :display_name, presence: { message: "Can't be blank"}, uniqueness: { message: "That's already taken"},
+    length: { minimum: 3, message: "Minimum length: 3" }
+  validates :password_digest, presence: { message: "Can't be blank" }
+  validates :password, length: { minimum: 8, allow_nil: true , message: "Minimum length: 8"}
 
   attr_reader :password
 

@@ -1,3 +1,5 @@
 json.display_name user.display_name
-json.email user.email
 json.id user.id
+if user == current_user
+  json.email user.email
+end
