@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSoundcloud } from '@fortawesome/free-brands-svg-icons'
 import { useState, useEffect } from 'react'
+import useUser from '../data/useUser'
+import { logout } from '../lib/auth'
 
 function Header(props){
     return (
@@ -35,7 +37,7 @@ function SearchBar(props){
     let [query, setQuery] = useState('')
 
     function handleChange(e){
-        setQuery(e.value)
+        setQuery(e.target.value)
     }
 
     return (
@@ -45,45 +47,36 @@ function SearchBar(props){
 }
 
 function ProfileNav(props){
-    const upload = (
-        <li className="link">
-            <Link href="/">
-                <a>Upload</a>
-            </Link>
-        </li>
-        )
+    const { user, loggedOut, loadingUser } = useUser()
 
     return (
-        <ul className="page">
+        <ul className="h-full flex">
             <NavLink label="Upload" href="/" padding="px-4" border="border-l-2 border-r-2"/>
             {
-                props.loggedIn ? (
+                loggedOut ? (
                     <>
-                        <NavLink label="Profile" href="/" padding="px-4" border="border-r-2"/>
-                        <NavLink label="Log Out" href="/" padding="px-4" border="border-r-2"/>
+                        <NavLink label="Sign Up" href="/register" padding="px-4" border="border-r-2"/>
+                        <NavLink label="Log In" href="/login" padding="px-4" border="border-r-2"/>
                     </>
                 ) : (
-                    <NavLink label="Log In" href="/login" padding="px-4" border="border-r-2"/> 
-            )}
-            <style jsx>{`
-                ul {
-                    height: 100%;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-            `}</style>
+                    <>
+                        <NavLink label="Profile" href="/" padding="px-4" border="border-r-2"/>
+                        <NavLink onClick={logout} label="Log Out" href="/" padding="px-4" border="border-r-2"/>
+                    </>
+                )
+            }
         </ul>
     )
 }
 
-function NavLink({label, href, padding, border}){
+function NavLink({label, onClick, href, padding, border}){
     return (
         <li className="link h-full">
             <Link href={href}>
                 <a className={`block h-full text-gray-200 hover:text-white 
                     text-center text-sm align-middle leading-none py-4 ${padding}
-                    whitespace-nowrap ${border} border-gray-900`}>
+                    whitespace-nowrap ${border} border-gray-900`}
+                    onClick={onClick}>
                     {label}</a>
             </Link>
         </li>

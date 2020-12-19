@@ -1,16 +1,12 @@
+import { getToken } from './auth'
 
 const API = {
-    setToken(token){
-        window.localStorage.setItem('sessionToken', token)
-    },
+    BACKEND: 'http://localhost:3000/',
 
-    getToken(){
-        window.localStorage.getItem('sessionToken')
-    },
+    authHeader: () => ({ 'Authorization': 'bearer ' + getToken() }),
 
-    loggedIn(){
-        return !!this.getToken()
-    }
+    contentHeader: { 'Content-Type': 'application/json'}
 }
 
 export default API
+
