@@ -6,8 +6,12 @@ export default function useUser() {
         shouldRetryOnError: false
     });
 
+    const loading = !data && !error
+    const loggedOut = error && !data
+
     return {
-        loggedOut: !data,
+        loggedOut,
+        userLoading: loading,
         user: data,
         mutateUser: mutate
     };

@@ -5,10 +5,6 @@ export function setToken(token){
     window.localStorage.setItem('sessionToken', token)
 }
 
-export function clearToken(){
-    window.localStorage.removeItem('sessionToken')
-}
-
 export function getToken(){
     if(this){
         return this.localStorage.getItem('sessionToken')
@@ -17,14 +13,8 @@ export function getToken(){
     }
 }
 
-export function hasToken(){
-    return !!getToken()
-}
-
 export async function login(email, password){
-    console.log('login')
     const payload = { user: { email: email, password: password } }
-    console.log(JSON.stringify(payload))
     return fetch(API.BACKEND + 'session', {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -51,7 +41,6 @@ export async function logout(){
         }
     }).then(res => {
         if(res.ok){
-            clearToken()
             mutate('user', null, false)
         }
         return res.ok
@@ -76,8 +65,6 @@ export async function register(user){
             if(res.ok){
                 return res.json()
             }
-            
-            console.log('error on create')
             const error = new Error('registration failed')
             error.status = res.status
             error.info = await res.json()

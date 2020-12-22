@@ -6,15 +6,13 @@ import "tailwindcss/tailwind.css";
 
 function App({ Component, pageProps }) {
   return (
-    <div id="app" className="bg-gray-200">
+    <div id="app" className="bg-gray-200 min-h-screen w-screen relative">
       <Head>
         <title>Noisepuff</title>
         <link rel="icon" href="/favicon.ico" /> 
       </Head>
       <Header />
-      <div id="main" className="max-w-screen-lg mx-auto mt-11 h-screen bg-white">
-        <Component {...pageProps}/>
-      </div>
+      <Component {...pageProps}/>
       <GlobalPlayer/>
     </div>
   )

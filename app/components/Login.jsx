@@ -1,58 +1,57 @@
 import { login } from '../lib/auth'
-import { useState, useEffect } from 'react'
+import { useState, useReducer, useLayoutEffect } from 'react'
 import useUser from '../data/useUser'
 import Router from 'next/router'
 import Link from 'next/link'
+import { TextField, SubmitButton, inputReducer } from './FormHelpers'
 
-const inputClass = 'pl-1 mt-2 pb-0.5 pt-1 border-b-2 border-gray-300 mb-2 text-sm focus:border-black hover:border-black w-56'
-const labelClass = 'flex flex-col text-sm py-3 font-medium'
-const submitClass = "rounded bg-purple-500 text-white px-8 py-2 whitespace-nowrap w-min mx-auto"
-const formClass = "absolute left-1/2 top-1/4 transform -translate-x-1/2 bg-white rounded border-2 border-black flex flex-col px-8 py-4"
-const errorClass = "text-red-700 font-medium text-xs whitespace-wrap w-56"
+const initialInput = {
+    email: '',
+    password: '',
+}
 
 function Login(props) {
     const { user } = useUser();
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (user) {
         Router.replace("/");
       }
     }, [user]);
 
+    const [input, inputDispatch] = useReducer(inputReducer, initialInput)
+    const { email, password } = input
+    console.log(input)
     const [error, setError] = useState(false)
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
 
     function handleSubmit(e){
         e.preventDefault()
         login(email, password)
-            .then(user => {
+            .then(() => {
                 Router.replace('/')
             })
-            .catch(err => {
+            .catch(() => {
                 setError(true)
             })
     }
+
     return (
-        <form className={formClass} onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={`flex flex-col items-center px-8 py-4 bg-white rounded-xl`} >
+            <h1 className='text-3xl py-4 font-medium'>Log In</h1>
             {error ? 
-                <strong className={errorClass}> 
-                    We don't recognize that combination of email and password :(
+                <strong className='text-center text-red-700 font-medium text-xs whitespace-wrap w-56 pb-2'> 
+                    We don't recognize that combination of email and password...
                 </strong> 
             : null }
-          <label htmlFor="email" className={labelClass}>Email
-            <input id="email" type="text" value={email} className={inputClass}
-                onChange={e => setEmail(e.target.value)}/>
-          </label>
-          <label htmlFor="password" className={labelClass}>Password
-            <input id="password" type="password" value={password} className={inputClass}
-                onChange={e => setPassword(e.target.value)}/>
-          </label>
-          <input type="submit" className={submitClass} value="Log In"/>
-          <span className="text-sm pt-6 text-center">No Account?
-              <Link href='/register'>
-                  <a className="px-3 underline hover:font-bold">Sign Up</a>
-              </Link>
-          </span>
+            <TextField type='text' name='email' label='Email'
+                value={email} inputDispatch={inputDispatch}/>
+            <TextField type='password' name='password' label='Password'
+                value={password} inputDispatch={inputDispatch}/>
+            <SubmitButton disabled={false} value='Log In' />
+            <span className='text-sm pt-6 text-center'>No Account?
+                <Link href='/register'>
+                    <a className='px-3 hover:underline focus:underline focus:outline-none font-bold whitespace-nowrap'>Sign Up</a>
+                </Link>
+            </span>
         </form>
     )
 }
