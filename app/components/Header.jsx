@@ -5,6 +5,8 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import useUser from '../data/useUser'
 import { logout } from '../lib/auth'
+import API from '../lib/api'
+import Logo from './Logo'
 
 function Header(props){
     return (
@@ -23,13 +25,13 @@ function PageNav(props){
         <ul className="h-full flex">
             <li className="h-full logo bg-gradient-to-t from-purple-500 to-pink-500">
                 <Link href="/">
-                    <a className="block h-full text-white w-16 p-1.5 pt-0">
-                        <FontAwesomeIcon icon={faSoundcloud} size="5x"/>
+                    <a className="block h-full text-white  p-1.5 pt-0">
+                        <Logo className="fill-current text-white h-11 w-14"/>
                     </a>
                 </Link>
             </li>
-            <NavLink label="Stream" href="/" addClass="px-6 border-r"/>
-            <NavLink label="Library" href="/" addClass="px-6 border-r"/>
+            <NavLink label="Stream" action="/" addClass="px-6 border-r"/>
+            <NavLink label="Library" action="/" addClass="px-6 border-r"/>
         </ul>
     )
 }
@@ -51,21 +53,21 @@ function SearchBar(props){
 }
 
 function ProfileNav(props){
-    const { user, loggedOut, loadingUser } = useUser()
+    const { loggedOut, loading, user } = useUser()
 
     return (
         <ul className="h-full flex border-l border-gray-900">
-            <NavLink label="Upload" href="/" addClass="px-4 border-r hidden md:block"/>
+            <NavLink label="Upload" action="/" addClass="px-4 border-r hidden md:block"/>
             {
-                loggedOut ? (
+                loggedOut || loading ? (
                     <>
-                        <NavLink label="Sign Up" href="/register" addClass="px-4 border-r"/>
-                        <NavLink label="Log In" href="/login" addClass="px-4 border-r"/>
+                        <NavLink label="Sign Up" action="/register" addClass="px-4 border-r"/>
+                        <NavLink label="Log In" action="/login" addClass="px-4 border-r"/>
                     </>
                 ) : (
                     <>
-                        <NavLink label="Profile" href="/" addClass="px-4 border-r"/>
-                        <NavLink onClick={logout} label="Log Out" href="/" addClass="px-4 border-r"/>
+                        <NavLink label={<ProfileLabel user={user}/>} action='/' addClass="px-4 border-r"/>
+                        <NavLink label="Log Out" action={logout} addClass="px-4 border-r cursor-pointer"/>
                     </>
                 )
             }
@@ -73,17 +75,37 @@ function ProfileNav(props){
     )
 }
 
-function NavLink({label, onClick, href, padding, border, addClass}){
+
+const navLinkBaseClass = 'block h-full text-gray-200 hover:text-white text-center ' + 
+    'text-sm align-middle leading-none py-4 whitespace-nowrap border-gray-900 ' + 
+    'flex items-center'
+
+function NavLink({label, action, addClass}){
+    const navLinkClass = `${navLinkBaseClass} ${addClass}`
+
     return (
-        <li className="link h-full">
-            <Link href={href}>
-                <a className={`block h-full text-gray-200 hover:text-white 
-                    text-center text-sm align-middle leading-none py-4 
-                    whitespace-nowrap border-gray-900 ${addClass}`}
-                    onClick={onClick}>
-                    {label}</a>
-            </Link>
+        <li className="h-full">
+        { typeof(action) === 'function' ? (
+                <a className={navLinkClass} onClick={action}>
+                    {label}
+                </a>
+        ) : (
+                <Link href={action}>
+                    <a className={navLinkClass}>
+                        {label}
+                    </a>
+                </Link>
+        )}
         </li>
+    )
+}
+
+function ProfileLabel({user}){
+    return (
+        <span className="inline-flex items-center justify-center">
+            <img src={API.avatar(user.avatar)} alt="Your user avatar" width='24' height='24' className="rounded-full" />
+            <span className="pl-2">{user.display_name}</span>
+        </span>
     )
 }
 

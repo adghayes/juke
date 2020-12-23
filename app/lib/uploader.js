@@ -1,5 +1,6 @@
 import API from './api'
-const directUploadUrl = API.BACKEND + 'rails/active_storage/direct_uploads'
+import { getToken } from './auth'
+const directUploadUrl = API.url('rails/active_storage/direct_uploads')
 
 class Uploader {
     constructor(file, progressHandler) {
@@ -21,9 +22,13 @@ class Uploader {
         })
     }
 
-    directUploadWillStoreFileWithXHR(request) {
+    directUploadWillCreateBlobWithXHR(xhr) {
+        xhr.setRequestHeader("Authorization", `bearer ${getToken()}`)
+    }
+
+    directUploadWillStoreFileWithXHR(xhr) {
         if(this.progressHandler){
-            request.upload.addEventListener("progress",
+            xhr.upload.addEventListener("progress",
                 event => this.progressHandler(event))
         }
     }

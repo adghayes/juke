@@ -1,23 +1,18 @@
 import AvatarEditor from 'react-avatar-editor'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { Info } from './FormHelpers'
 
 const size = 192
 const defaultScale = 1
-const buttonClass = "relative text-xs my-1 py-0.5 px-1 bg-purple-500 overflow-hidden text-white font-light " +
-   "rounded hover:bg-purple-700"
+const buttonClass = "relative text-xs my-1 py-0.5 px-1 bg-blue-400 overflow-hidden text-white font-light " +
+   "hover:bg-blue-600 focus:bg-blue-600"
 
-function Thumbnailer({thumbnail, placeholder, inputDispatch}){
+function Thumbnailer({thumbnail, placeholder, inputDispatch, info}){
 
     const [editing, setEditing] = useState(false)
     const [scale, setScale] = useState(defaultScale)
-    const [border, setBorder] = useState(2)
     const fileInput = useRef(null)
     const editor = useRef(null)
-
-    useEffect(() => {
-        setBorder(0)
-    }, [])
 
     function reset(e){
         inputDispatch({thumbnail: null})
@@ -30,19 +25,23 @@ function Thumbnailer({thumbnail, placeholder, inputDispatch}){
     }
 
     function confirm(){
+        const name = fileInput.current.files[0].name
         editor.current.getImageScaledToCanvas().toBlob(blob => {
+            blob.name = name
             inputDispatch({
                 thumbnail: blob
             })
-        })
-        setEditing(false)
+            setEditing(false)
+        }) 
     }
 
     return (
         <div className="flex flex-col items-center">
-            <p className="self-start font-medium">Thumbnail</p>
+            <span className="self-start font-medium inline-flex">
+                <span>Thumbnail</span> 
+                <Info info={info}/>
+            </span>
             <div className="flex flex-row">
-
                 <div className="flex flex-col items-center">
                     <div className={`relative w-min m-1 ${editing ? '' : 'rounded-full overflow-hidden'}`}>
                         <AvatarEditor
@@ -50,7 +49,7 @@ function Thumbnailer({thumbnail, placeholder, inputDispatch}){
                             image={ editing || thumbnail ? fileInput.current.files[0]  : placeholder }
                             width={size}
                             height={size}
-                            border={border}
+                            border={0}
                             borderRadius={size / 2}
                             color={[255, 255, 255, 0.6]} // RGBA
                             scale={scale}
@@ -80,7 +79,7 @@ function Thumbnailer({thumbnail, placeholder, inputDispatch}){
                         <div className={`flex flex-col items-center ${editing ? '' : 'hidden'}`} >
                             <label htmlFor="imageScale" className="text-xs font-medium">Scale</label>
                             <input id="imageScale" type="range" min='0' max='2' step='0.01'  value={scale}
-                                onChange={e => setScale(e.target.value)}
+                                onChange={e => setScale(e.target.valueAsNumber)}
                                 className="w-16"/>
                         </div>
                     </div>

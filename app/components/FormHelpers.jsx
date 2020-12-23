@@ -53,7 +53,7 @@ export function Info({ info }){
             </i>
             <p className={`absolute text-xs z-30 left-16 -top-2 bg-white shadow-lg 
                 w-48 h-max p-4 rounded-xl border-2 border-gray-300 border 
-                transition transform duration-700 ease-in-out ${open ? 'opacity-100 scale-1 text-black' : 'opacity-0 scale-0 text-white'}`}>
+                transition transform duration-700 ease-in-out ${open ? 'opacity-100 scale-1 text-black' : 'opacity-0 scale-0 text-white -translate-x-1/2 -translate-y-1/2'}`}>
                 {info}
             </p>
         </div>
@@ -79,8 +79,8 @@ export function Errors({messages}){
 
 export function SubmitButton({ disabled, value }){
     return (
-        <input className={'rounded text-white px-8 py-2 whitespace-nowrap w-min ' + (disabled ? 'bg-gray-200' : 
-            'bg-purple-500 transition transform duration-300 hover:bg-purple-600 hover:scale-105 focus:scale-105 cursor-pointer')} 
+        <input className={'text-sm text-white font-medium px-6 py-2 whitespace-nowrap w-min ' + (disabled ? 'bg-gray-200' : 
+            'bg-blue-400 transition duration-300 hover:bg-blue-600 focus:bg-blue-600 hover:shadow cursor-pointer')} 
         type='submit' value={value} disabled={disabled}/>
     )
 }

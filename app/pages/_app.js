@@ -6,7 +6,7 @@ import "tailwindcss/tailwind.css";
 
 function App({ Component, pageProps }) {
   return (
-    <div id="app" className="bg-gray-200 min-h-screen w-screen relative">
+    <div id="app" className="bg-gray-200 min-h-screen w-full relative">
       <Head>
         <title>Noisepuff</title>
         <link rel="icon" href="/favicon.ico" /> 

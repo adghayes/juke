@@ -2,17 +2,16 @@ import useSWR from "swr";
 import userFetcher from "../lib/userFetcher";
 
 export default function useUser() {
-    const { data, mutate, error } = useSWR('user', userFetcher, {
+    const { data, error } = useSWR('user', userFetcher, {
         shouldRetryOnError: false
     });
 
     const loading = !data && !error
-    const loggedOut = error && !data
+    const loggedOut = !!error 
 
     return {
-        loggedOut,
-        userLoading: loading,
+        loading: loading,
+        loggedOut: loggedOut,
         user: data,
-        mutateUser: mutate
     };
 }

@@ -2,17 +2,17 @@ import API from './api'
 import { mutate } from 'swr'
 
 async function patchUser(payload){
-    fetch(API.BACKEND + 'user', {
+    fetch(API.url('user'), {
         method: 'PATCH',
         body: JSON.stringify(payload),
         headers: {
-            ...API.authHeader,
+            ...API.authHeader(),
             ...API.contentHeader
         }
     })
     .then(response => response.json())
     .then(user => {
-        mutate('user', user, false)
+        mutate('user', user, true)
     })
 }
 

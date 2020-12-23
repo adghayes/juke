@@ -1,17 +1,12 @@
 import Card from '../components/Card'
 import Register from '../components/Register'
 import CompleteProfile from '../components/CompleteProfile'
-import { useState, useLayoutEffect } from 'react'
-import Router from 'next/router'
-import useUser from '../data/useUser'
+import { useState } from 'react'
+import Link from 'next/link'
+import Logo from '../components/Logo'
+
 
 export default function RegisterPage(props) {
-  const { user } = useUser();
-  useLayoutEffect(() => {
-    if (user) {
-      Router.replace("/");
-    }
-  }, []);
 
   const [visible, setVisible] = useState(true)
   const [phaseIndex, setPhaseIndex] = useState(0)
@@ -22,13 +17,14 @@ export default function RegisterPage(props) {
       setPhaseIndex(phaseIndex)
       setTimeout(() => {
         setVisible(true)
-      }, 500)
-    }, 1000)
+      }, 100)
+    }, 700)
   }
 
   const phases = [
     <Register callback={ transitionTo(1) }/>,
-    <CompleteProfile callback={() => null}/>
+    <CompleteProfile callback={ transitionTo(2) }/>,
+    <GetStarted />
   ]
 
   return (
@@ -39,3 +35,24 @@ export default function RegisterPage(props) {
     </main>
   )
 }
+
+function GetStarted(){
+  return (
+    <div className="flex flex-col justify-center items-center">
+      
+      <Link href="/stream">
+        <a className={`z-50 relative text-5xl px-8 py-4 text-black font-bold flex flex-row items-center ` +
+          `bg-white px-4 py-2 rounded-xl transition transform hover:scale-110 ring-2 ring-black`}>
+            <Logo className="fill-current text-pink-500 w-24 h-16 pr-8"/>
+          Get Listening
+        </a>
+      </Link>
+    </div>
+  )
+}
+
+
+
+
+
+
