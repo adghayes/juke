@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-  skip_before_action :require_logged_in, only: :create
+  wrap_parameters false
+  skip_before_action :require_logged_in, only: [:create, :show]
   before_action :require_logged_out, only: :create
 
   def create
@@ -8,7 +9,6 @@ class UsersController < ApplicationController
       @token = log_in_user(@user)
       render 'sessions/show'
     else
-      puts @user.errors.details
       render json: @user.errors.messages, status: :unprocessable_entity
     end
   end
@@ -17,14 +17,22 @@ class UsersController < ApplicationController
     if params[:id]
       @user = User.find(id)
       render :show
-    elsif current_user
+    else
+      require_logged_in
       @user = current_user
       render :show
-    else
-      head :unauthorized
     end
   end
 
+  def update
+    if current_user.update(user_params)
+      @user = current_user
+      render :show
+    else
+      render json: current_user.errors.messages, status: :unprocessable_entity
+    end
+  end
+    
   def exists
     if ['email', 'display_name'].include? params[:field]
       render json: { 
@@ -40,6 +48,6 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.permit(:email, :password, :display_name)
+    params.permit(:email, :password, :display_name, :bio, :avatar)
   end
 end

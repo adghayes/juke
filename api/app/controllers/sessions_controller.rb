@@ -3,7 +3,7 @@ class SessionsController < ApplicationController
   before_action :require_logged_out, only: :create
 
   def create
-    @user = User.find_by_credentials(params[:user][:email], params[:user][:password])
+    @user = User.find_by_credentials(params[:email], params[:password])
 
     if @user
       @token = log_in_user(@user)
@@ -18,5 +18,4 @@ class SessionsController < ApplicationController
     session[:session_token] = nil
     head :ok
   end
-
 end

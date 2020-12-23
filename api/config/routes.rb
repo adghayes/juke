@@ -5,6 +5,7 @@ Rails.application.routes.draw do
       get 'exists'
     end
   end
-  resource 'user', only: [:show]
+  resource 'user', only: [:show, :update]
   resource 'session', only: [:create, :destroy]
+  post '/rails/active_storage/direct_uploads' => 'direct_uploads#create'
 end

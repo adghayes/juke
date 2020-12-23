@@ -9,13 +9,23 @@
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #
+# Indexes
+#
+#  index_users_on_display_name  (display_name) UNIQUE
+#  index_users_on_email         (email) UNIQUE
+#
 class User < ApplicationRecord
+  extend FriendlyId
+  friendly_id :display_name, :use => :slugged
+
   validates :email, presence: { message: "Can't be empty"}, uniqueness: { message: "That's already taken"},
     format: { with: URI::MailTo::EMAIL_REGEXP, message: "Invalid email address" }
   validates :display_name, presence: { message: "Can't be blank"}, uniqueness: { message: "That's already taken"},
     length: { minimum: 3, message: "Minimum length: 3" }
   validates :password_digest, presence: { message: "Can't be blank" }
   validates :password, length: { minimum: 8, allow_nil: true , message: "Minimum length: 8"}
+  validates :slug, presence: true
+  validates :bio, length: { maximum: 160 }
 
   attr_reader :password
 
