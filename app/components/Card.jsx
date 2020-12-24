@@ -3,7 +3,7 @@ const transitionOpacity = 'transition-opacity duration-700 ease-in-out'
 
 function Card({ visible, children }){
     return (
-        <div className={`${center}  rounded-lg shadow-2xl
+        <div className={`${center} 
             ${transitionOpacity} ${visible ? 'opacity-100' : 'opacity-0'}`}>
             { children }
         </div>

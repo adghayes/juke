@@ -3,10 +3,11 @@ import { getToken } from './auth'
 const directUploadUrl = API.url('rails/active_storage/direct_uploads')
 
 class Uploader {
-    constructor(file, progressHandler) {
+    constructor(file, handlers) {
         const DirectUpload = require('@rails/activestorage').DirectUpload
         this.upload = new DirectUpload(file, directUploadUrl, this)
-        this.progressHandler = progressHandler
+        this.onUploadProgress = handlers.onUploadProgress
+        this.onUploadSuccess = handlers.onUploadSuccess
     }
 
     async start() {
@@ -27,9 +28,14 @@ class Uploader {
     }
 
     directUploadWillStoreFileWithXHR(xhr) {
-        if(this.progressHandler){
+        if(this.onUploadProgress){
             xhr.upload.addEventListener("progress",
-                event => this.progressHandler(event))
+                event => this.onUploadProgress(event))
+        }
+
+        if(this.onUploadSuccess){
+            xhr.upload.addEventListener("load",
+                event => this.onUploadSuccess(event))
         }
     }
 }

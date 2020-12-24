@@ -57,7 +57,7 @@ function ProfileNav(props){
 
     return (
         <ul className="h-full flex border-l border-gray-900">
-            <NavLink label="Upload" action="/" addClass="px-4 border-r hidden md:block"/>
+            <NavLink label="Upload" action="/upload" addClass="px-4 border-r hidden md:block"/>
             {
                 loggedOut || loading ? (
                     <>

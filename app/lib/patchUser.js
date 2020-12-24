@@ -2,7 +2,7 @@ import API from './api'
 import { mutate } from 'swr'
 
 async function patchUser(payload){
-    fetch(API.url('user'), {
+    return fetch(API.url('user'), {
         method: 'PATCH',
         body: JSON.stringify(payload),
         headers: {
