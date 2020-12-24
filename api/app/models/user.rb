@@ -8,6 +8,8 @@
 #  password_digest :string           not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  bio             :text
+#  slug            :string
 #
 # Indexes
 #
@@ -30,6 +32,9 @@ class User < ApplicationRecord
   attr_reader :password
 
   has_many :sessions,
+    dependent: :destroy
+
+  has_many :tracks,
     dependent: :destroy
     
   has_one_attached :avatar
