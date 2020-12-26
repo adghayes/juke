@@ -1,7 +1,10 @@
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
-
-  resources 'tracks', only: [:create, :show, :update]
+  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.htmlno
+  resources 'tracks', only: [:create, :show, :update] do
+    member do 
+      post :streams, to: 'tracks#streams'
+    end
+  end
 
   resources 'users', only: [:create, :show] do
     collection do 

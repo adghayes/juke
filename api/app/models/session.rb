@@ -18,19 +18,19 @@
 #  index_sessions_on_user_id  (user_id)
 #
 class Session < ApplicationRecord
-  validates :token, presence: true, uniqueness: true
+  validates :token, presence: true
 
   belongs_to :user
 
   def self.generate_token
-    SecureRandom.base64(16)
+    SecureRandom.base64(24)
   end
 
-  def self.for(user, about = nil)
-    if about
-      self.new(user_id: user.id, token: generate_token, active: true, **about)
-    else
-      self.new(user_id: user.id, token: generate_token, active: true)
+  def self.for(user, about = {})
+    begin
+      self.create!(user: user, token: generate_token, active: true, **about)
+    rescue ActiveRecord::RecordNotUnique
+      retry
     end
   end
 

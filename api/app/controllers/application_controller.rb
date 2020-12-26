@@ -1,7 +1,5 @@
 class ApplicationController < ActionController::API
   include Auth
-
-  before_action :require_logged_in
   helper_method :current_user
 
   def log_in_user(user)
@@ -9,7 +7,6 @@ class ApplicationController < ActionController::API
     device = client.device_name || client.os_name
     browser = client.name
 
-    new_session = Session.for(user, device: device, browser: browser)
-    new_session.save ? new_session.token : nil
+    Session.for(user, device: device, browser: browser).token
   end
 end

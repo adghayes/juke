@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
-  wrap_parameters false
-  skip_before_action :require_logged_in, only: [:create, :show]
+  before_action :require_logged_in, only: :update
   before_action :require_logged_out, only: :create
 
   def create
@@ -34,11 +33,11 @@ class UsersController < ApplicationController
   end
     
   def exists
-    if ['email', 'display_name'].include? params[:field]
+    query = params.require(:user).permit(:email, :display_name)
+    if query.length > 0
       render json: { 
-        field: params[:field],
-        value: params[:value],
-        exists: User.exists?(params[:field] => params[:value])
+        user: query,
+        exists: User.exists?(query)
       }
     else
       head :unprocessable_entity 
@@ -48,6 +47,6 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.permit(:email, :password, :display_name, :bio, :avatar)
+    params.require(:user).permit(:email, :password, :display_name, :bio, :avatar)
   end
 end

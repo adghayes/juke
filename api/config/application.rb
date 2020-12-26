@@ -42,6 +42,8 @@ module Noisepuff
       g.helper false
     end
 
+    config.transcoder = config_for(:transcoder)
+
     config.middleware.use ActionDispatch::Cookies
     config.middleware.use ActionDispatch::Session::CookieStore
   end
