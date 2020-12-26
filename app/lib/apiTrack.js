@@ -3,7 +3,7 @@ import API from './api'
 export async function notifyUploadStart(blobId){
     return fetch(API.url('tracks'), {
         method: 'POST',
-        body: JSON.stringify({original: blobId}),
+        body: JSON.stringify({ track: {original: blobId}}),
         headers: {
             ...API.authHeader(),
             ...API.contentHeader
@@ -15,7 +15,7 @@ export async function notifyUploadStart(blobId){
 export async function notifyUploadSuccess(trackId){
     return fetch(API.url(['tracks', trackId]), {
         method: 'PATCH',
-        body: JSON.stringify({uploaded: true}),
+        body: JSON.stringify({ track: {uploaded: true}}),
         headers: {
             ...API.authHeader(),
             ...API.contentHeader

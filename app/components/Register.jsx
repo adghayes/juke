@@ -50,7 +50,7 @@ function Register({ callback }) {
         return newErrors.length > 0
     }
 
-    function handleSubmit(e){
+    async function handleSubmit(e){
         e.preventDefault()
         register(input)
             .then(() => {

@@ -40,12 +40,17 @@ function CompleteProfile({ callback }){
             return callback()
         }
 
-        const payload = { bio: input.bio }
+        const payload = { 
+            user: {
+                bio: input.bio 
+            }
+        }
+
         if(input.thumbnail){
             const avatarUpload = new Uploader(input.thumbnail, e => {
                 console.log('progress ' + e.loaded / e.total)
             })
-            payload.avatar = await avatarUpload.start()
+            payload.user.avatar = await avatarUpload.start()
         }
         patchUser(payload)
         if(callback) callback()

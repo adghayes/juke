@@ -22,7 +22,13 @@ export function clearToken(){
 }
 
 export async function login(email, password){
-    const payload = { email: email, password: password }
+    const payload = { 
+        user: {
+            email: email, 
+            password: password 
+        }
+    }
+
     return fetch(API.url('session'), {
         method: 'POST',
         body: JSON.stringify(payload),
@@ -65,9 +71,11 @@ export async function logout(){
 
 export async function register(user){
     const payload = {
-        email: user.email,
-        display_name: user.displayName,
-        password: user.password
+        user: {
+            email: user.email,
+            display_name: user.displayName,
+            password: user.password
+        }
     }
 
     return fetch(API.url('users'), {
