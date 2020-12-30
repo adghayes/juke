@@ -1,6 +1,4 @@
-import { inputReducer } from './FormHelpers'
-import { SubmitButton } from './FormHelpers'
-import Bio from './Bio'
+import { inputReducer, SubmitButton, TextArea } from './FormHelpers'
 import Thumbnailer from './Thumbnailer'
 
 import Router from 'next/router'
@@ -31,7 +29,7 @@ function CompleteProfile({ callback }){
     }, [loggedOut, user])
     if(loggedOut) return 'redirecting...'
     if(loading) return (
-        <p className="font-bold text-lg">loading...</p>
+        <p className="font-bold text-2xl animate-pulse">loading...</p>
     )
 
     async function onSubmit(e){
@@ -41,16 +39,14 @@ function CompleteProfile({ callback }){
         }
 
         const payload = { 
-            user: {
-                bio: input.bio 
-            }
+            bio: input.bio 
         }
 
         if(input.thumbnail){
             const avatarUpload = new Uploader(input.thumbnail, e => {
                 console.log('progress ' + e.loaded / e.total)
             })
-            payload.user.avatar = await avatarUpload.start()
+            payload.avatar = await avatarUpload.start()
         }
         patchUser(payload)
         if(callback) callback()
@@ -62,13 +58,17 @@ function CompleteProfile({ callback }){
             <h1 className="text-3xl py-2">Complete Profile</h1>
             <div className="flex flex-col items-center space-between divide-x-8 divide-white">
                 <Thumbnailer 
+                    label="Avatar"
                     thumbnail={input.thumbnail} 
                     placeholder={API.avatar(user.avatar)} 
                     inputDispatch={inputDispatch}
                     info={thumbnailInfo}
                     />
-                <Bio 
-                    bio={input.bio} 
+                <TextArea 
+                    label="Bio"
+                    name="bio"
+                    value={input.bio}
+                    placeholder="tell everyone a little about you or your music..."
                     inputDispatch={inputDispatch} 
                     />
             </div>

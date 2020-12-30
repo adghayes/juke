@@ -16,7 +16,8 @@ export function errorReducer(state, { fieldError, inputError }) {
 }
 
 export function TextField({type, name, label, info, value, inputDispatch, errors, syncErrors}){
-    const [strict, setStrict] = useState(false)
+    const [touch, setTouch] = useState(false)
+
 
     return (
         <label className='flex flex-col font-medium'>
@@ -29,12 +30,13 @@ export function TextField({type, name, label, info, value, inputDispatch, errors
                     focus:border-black hover:border-gray-500 w-56 text-sm`} 
                 onChange={ e => {
                     inputDispatch({ [name]: e.target.value })
-                    if(strict) setStrict(syncErrors(e.target.value))
+                    if(touch && syncErrors) syncErrors(e.target.value)
                 }}
                 onBlur={ e => {
-                    if(syncErrors) setStrict(syncErrors(e.target.value))
+                    if(syncErrors) syncErrors(e.target.value)
+                    setTouch(true)
                 }}/>
-            <Errors messages={value && errors} /> 
+            <Errors messages={touch && errors ? errors : [] } /> 
         </label>
     )
 }
@@ -61,6 +63,7 @@ export function Info({ info }){
 }
 
 export function Errors({messages}){
+
     return (
         <ul className='h-8 pl-2'>
             { messages ? messages.map((message, idx) => {
@@ -82,5 +85,26 @@ export function SubmitButton({ disabled, value }){
         <input className={'text-sm text-white font-medium px-6 py-2 whitespace-nowrap w-min ' + (disabled ? 'bg-gray-200' : 
             'bg-blue-400 transition duration-300 hover:bg-blue-600 focus:bg-blue-600 hover:shadow cursor-pointer')} 
         type='submit' value={value} disabled={disabled}/>
+    )
+}
+
+const maxLength = 160
+
+export function TextArea({ label, name, value, placeholder, inputDispatch }){
+
+    return (
+        <label className="flex flex-col">
+            <span className="inline-flex items-center py-1 font-medium">
+                {label}
+            </span>
+            <textarea  value={value} cols="30" rows="6" placeholder={placeholder}
+                className={"resize-none border border-gray-500 px-2 py-1 hover:bg-white bg-gray-100 rounded-xl " + 
+                    "text-xs focus:outline-none focus:border-black focus:bg-white mx-1"}
+                onChange={e => inputDispatch({[name]: e.target.value})} 
+                maxLength={maxLength}/>
+            <span className="self-end text-xs">
+                {value.length}/{maxLength}
+            </span>
+        </label>
     )
 }

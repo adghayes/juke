@@ -18,7 +18,7 @@ export default function RegisterPage(props) {
       setTimeout(() => {
         setVisible(true)
       }, 100)
-    }, 700)
+    }, 500)
   }
 
   const phases = [

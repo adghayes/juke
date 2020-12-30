@@ -1,5 +1,5 @@
 import AvatarEditor from 'react-avatar-editor'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Info } from './FormHelpers'
 
 const size = 192
@@ -7,15 +7,22 @@ const defaultScale = 1
 const buttonClass = "relative text-xs my-1 py-0.5 px-1 bg-blue-400 overflow-hidden text-white font-light " +
    "hover:bg-blue-600 focus:bg-blue-600"
 
-function Thumbnailer({thumbnail, placeholder, inputDispatch, info}){
+function Thumbnailer({label, thumbnail, inputDispatch, info, placeholder}){
 
     const [editing, setEditing] = useState(false)
+    const [border, setBorder] = useState(1)
     const [scale, setScale] = useState(defaultScale)
     const fileInput = useRef(null)
     const editor = useRef(null)
 
+    useEffect(() => {
+        setBorder(0)
+
+    }, [])
+
+
     function reset(e){
-        inputDispatch({thumbnail: null})
+        inputDispatch({ thumbnail: blob})        
         setScale(defaultScale)
     }
 
@@ -28,9 +35,7 @@ function Thumbnailer({thumbnail, placeholder, inputDispatch, info}){
         const name = fileInput.current.files[0].name
         editor.current.getImageScaledToCanvas().toBlob(blob => {
             blob.name = name
-            inputDispatch({
-                thumbnail: blob
-            })
+            inputDispatch({ thumbnail: blob})
             setEditing(false)
         }) 
     }
@@ -38,8 +43,8 @@ function Thumbnailer({thumbnail, placeholder, inputDispatch, info}){
     return (
         <div className="flex flex-col items-center">
             <span className="self-start font-medium inline-flex">
-                <span>Thumbnail</span> 
-                <Info info={info}/>
+                <span>{label}</span> 
+                {info ? <Info info={info}/> : null}
             </span>
             <div className="flex flex-row">
                 <div className="flex flex-col items-center">
@@ -49,7 +54,7 @@ function Thumbnailer({thumbnail, placeholder, inputDispatch, info}){
                             image={ editing || thumbnail ? fileInput.current.files[0]  : placeholder }
                             width={size}
                             height={size}
-                            border={0}
+                            border={border}
                             borderRadius={size / 2}
                             color={[255, 255, 255, 0.6]} // RGBA
                             scale={scale}

@@ -4,7 +4,7 @@ import { mutate } from 'swr'
 async function patchUser(payload){
     return fetch(API.url('user'), {
         method: 'PATCH',
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ user }),
         headers: {
             ...API.authHeader(),
             ...API.contentHeader

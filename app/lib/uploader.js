@@ -16,7 +16,6 @@ class Uploader {
                     if (error) {
                         reject(error)
                     } else {
-                        console.log(blob)
                         resolve(blob.signed_id)
                     }
                 })

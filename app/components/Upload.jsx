@@ -6,8 +6,7 @@ const accept = ['.wav', '.flac', '.aiff', '.aif', '.alac', '.mp3', '.aac', '.ogg
 
 function Upload({ fileSelected }){
     const [disabled, setDisabled] = useState(false)
-    function onDropAccepted(acceptedFiles){
-        setDisabled(true)
+    function onDropAccepted(acceptedFiles){ 
         fileSelected(acceptedFiles[0])
     }
 

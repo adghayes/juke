@@ -22,8 +22,9 @@ module.exports = {
   },
   variants: {
     extend: {
-      fontWeight: ['hover', 'focus'],
-    },
+      backgroundColor: ['checked'],
+      borderColor: ['checked'],
+    }
   },
   plugins: [],
 }
