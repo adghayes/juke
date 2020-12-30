@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   include Auth
   helper_method :current_user
+  before_action :identify_bearer
 
   def log_in_user(user)
     client = DeviceDetector.new(request.user_agent)

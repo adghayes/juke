@@ -62,7 +62,7 @@ module Auth
 
   def verify_jwt(jwt)
     payload = decode_jwt(jwt)
-    @valid_jwt = payload.exp < Time.now.to_i
+    @valid_jwt = payload["exp"] > Time.now.to_i
   end
 
   def decode_jwt(token)

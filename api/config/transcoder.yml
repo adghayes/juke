@@ -1,27 +1,27 @@
 default: &default
-  specs: [
-    {
-      format: webm,
-      bitrate: 96,
-      options: ['-dash 1']
-    },
-    {
-      format: aac,
-      bitrate: 96
-    },
-    {
-      format: mp3,
-      bitrate: 64
-    }
-  ]
-  metadata: {
+  peaks:
+    count: 600
+    quality: 0.5
+  specs: 
+    - format: webm
+      audio: 
+        bitrate: 96
+      video: false
+      options: 
+        - "-dash 1"
+      extension: weba
+    - format: mp3
+      audio:
+        bitrate: 128
+      video: false
+      extension: mp3
+  metadata:
     platform: noisepuff
-  }
-  client: {
-    endpoint: http://localhost:3001,
-    ssl_verify_peer: false,
+  client:
+    endpoint: http://localhost:3002
     max_attempts: 1
-  }
+  function: ffmpeg-dev-transcode
+  host: http://docker.for.mac.localhost:3000
 
 development:
   <<: *default

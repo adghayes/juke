@@ -14,7 +14,7 @@ class UsersController < ApplicationController
 
   def show
     if params[:id]
-      @user = User.find(id)
+      @user = User.find(params[:id])
       render :show
     else
       require_logged_in
