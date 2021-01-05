@@ -5,6 +5,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
 import { getAvatar, getThumbnail } from '../lib/thumbnails'
 
+function normalize(num){
+    return Math.max(Math.min(num, 1), 0)
+}
+
+function rgba(color){
+    return `rgba(${color.toString()})`
+}
+
+function rgbaMidpoint(color1, color2, ratio){
+    const [r1, g1, b1, a1] = color1
+    const [r2, g2, b2, a2] = color2
+    const r = r1 * (1 - ratio) + r2 * ratio
+    const g = g1 * (1 - ratio) + g2 * ratio
+    const b = b1 * (1 - ratio) + b2 * ratio
+    const a = a1 * (1 - ratio) + a2 * ratio
+    return [r, g, b, a]
+}
+
 function Player({ track }){
     const jukebox = useContext(JukeboxContext)
     let active = jukebox.track && jukebox.track.id === track.id
@@ -44,7 +62,9 @@ function Player({ track }){
                             <span className="font-bold">{track.title}</span>
                     </div>
                 </div>
-                    <Waves track={track} scaleY={1} active={active}/>
+                    <Waves track={track} scaleY={1} active={active}
+                        upperBarMinHeight={2} lowerBarMinHeight={1} upperBarMaxHeight={44} lowerBarMaxHeight={22}
+                    />
                 </div>
             </div>
         </div>
@@ -55,51 +75,82 @@ export default Player
 
 const base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 
-function Waves({ track, scaleY, active }){
+const playedColor = [219, 39, 119, 1]
+const selectedColor = [131, 24, 67, 1]
+const unplayedColor = [107, 114, 128, 1]
+const inactiveColor = [107, 114, 128, 0.8]
+
+function Waves({ track, active, upperBarMaxHeight, upperBarMinHeight, lowerBarMaxHeight, lowerBarMinHeight }){
+    console.log('render')
     const jukebox = useContext(JukeboxContext)
     const innerWidth = useContext(WindowContext)
-    const [id, setId] = useState('waves')
-    const [barCount, setBarCount] = useState(0)
-    const [peaks, setPeaks] = useState([])
-    const [bars, setBars] = useState([])
+
     const canvasElement = useRef(null)
+    const [ctx, setCtx] = useState(null)
+    
+    const [peaks, setPeaks] = useState([])
+    const [barCount, setBarCount] = useState(0)
+    const [bars, setBars] = useState([])
+
     const [hover, setHover] = useState(false)
+    const hoverPosition = useRef(null)
+    const playPosition = useRef(0)
+    const animationId = useRef(null)
+
+    const height = lowerBarMaxHeight + upperBarMaxHeight + 1
+    const width = barCount * 3
+
+    useEffect(() => {
+        setCtx(canvasElement.current.getContext('2d'))
+    }, [])
 
     useEffect(() => {
         if(track) {
-            setId(`waves-${track.id}`)
             setPeaks(track.peaks.split('').map(char => base64.indexOf(char)))
         }
     }, [track])
 
     useEffect(() => {
-        console.log(innerWidth)
         let newBarCount
         if(innerWidth > 1024){
-            newBarCount = 200
+            newBarCount = 192
         } else if (innerWidth > 768) {
-            newBarCount = 150
+            newBarCount = 144
         } else if (innerWidth > 640) {
-            newBarCount = 100
+            newBarCount = 96
         } else {
-            newBarCount = 50
+            newBarCount = 48
         }
         setBarCount(newBarCount)
     }, [innerWidth])
 
     useEffect(() => {
         if(track && barCount){
-            refreshBars()
+            recalculateBars()
         }
     }, [track, barCount])
 
     useEffect(() => {
-        if(bars){
-            draw()
+        if(ctx && bars){
+            if(active && (hover || jukebox.playing)){
+                animationId.current = window.requestAnimationFrame(animationStep)
+            } else {
+                draw()
+            }
         }
-    }, [bars, hover])
 
-    function refreshBars(){
+        return () => {
+            cancelAnimationFrame(animationId.current)
+        }
+    }, [active, ctx, bars, hover, jukebox.playing])
+
+    function animationStep() {
+        playPosition.current = jukebox.seek()
+        draw()
+        animationId.current = window.requestAnimationFrame(animationStep)
+    }
+
+    function recalculateBars(){
         const step = peaks.length / barCount
         let i = 0
         const bars = []
@@ -111,40 +162,95 @@ function Waves({ track, scaleY, active }){
         setBars(bars)
     }
 
+    function drawBar(y, index){
+        ctx.fillRect(3 * index, upperBarMaxHeight, 2, -(upperBarMinHeight + (upperBarMaxHeight - upperBarMinHeight) * y / 63 ))
+        ctx.beginPath()
+        ctx.moveTo(3 * index, upperBarMaxHeight + 1)
+        ctx.lineTo(3 * index + 1, upperBarMaxHeight + 1 + lowerBarMinHeight + (lowerBarMaxHeight - lowerBarMinHeight) * y / 63)
+        ctx.lineTo(3 * index + 2, upperBarMaxHeight + 1)
+        ctx.closePath()
+        ctx.fill()
+    }
+
+    function drawBars(colors, breakpoints){ 
+        let barIndex = 0
+        let colorIndex = 0
+        ctx.fillStyle = rgba(colors[0])
+        
+        while (barIndex < barCount){
+            if(barIndex >= breakpoints[colorIndex]){
+                colorIndex += 1
+                ctx.fillStyle = rgba(colors[colorIndex])
+            }
+            drawBar(bars[barIndex], barIndex)
+            barIndex += 1
+        }
+    }
+
+    function drawTime(){
+        ctx.fillStyle = rgba([0,0,0,.9])
+        ctx.fillRect(0, upperBarMaxHeight, 24, -12)
+        ctx.fillRect(width, upperBarMaxHeight, -24, -12)
+    }
+
+
     function draw(){
-        const canvas = document.getElementById(id)
-        const ctx = canvas.getContext('2d')
-        ctx.clearRect(0, 0, 1024, 1024)
-        ctx.fillStyle = `rgba(107, 114, 128, ${hover ? '1' : '0.8'})`
-        bars.forEach((y, index) => {
-            ctx.fillRect(3 * index, 42, 2, -(3 + y * 2 / 3))
-            // ctx.fillRect(3 * index, 43, 2, y /4)
-            ctx.beginPath()
-            ctx.moveTo(3 * index, 43)
-            ctx.lineTo(3 * index + 1, 43 + y / 3)
-            ctx.lineTo(3 * index + 2, 43)
-            ctx.closePath()
-            ctx.fill()
-        })
+        ctx.clearRect(0, 0, width, height)
+        if (!active){
+            drawBars([hover ? unplayedColor : inactiveColor], [barCount])
+        } else {
+            const currentBar = Math.floor(playPosition.current / track.duration * barCount)
+            const currentBarRatio = playPosition.current / track.duration * barCount - currentBar
+            let colors, breakpoints
+            if(!!hoverPosition.current){
+                const hoverBar = Math.round(hoverPosition.current * barCount)
+                if(hoverBar < currentBar){
+                    const currentBarColor = rgbaMidpoint(unplayedColor, selectedColor, currentBarRatio)
+                    colors = [playedColor, selectedColor, currentBarColor, unplayedColor]
+                    breakpoints = [hoverBar, currentBar, currentBar + 1, barCount]
+                } else {
+                    const currentBarColor = rgbaMidpoint(selectedColor, playedColor, currentBarRatio)
+                    colors = [playedColor, currentBarColor, selectedColor, unplayedColor]
+                    breakpoints = [currentBar, currentBar + 1, hoverBar + 1, barCount]
+                }
+            } else {
+                const currentBarColor = rgbaMidpoint(unplayedColor, playedColor, currentBarRatio)
+                colors = [playedColor, currentBarColor, unplayedColor]
+                breakpoints = [currentBar, currentBar + 1, barCount]
+            }
+            drawBars(colors, breakpoints)
+            drawTime()
+        }
     }
 
-    function onMouseEnter(e){
-        setHover(true)
+    function getRatio(e){
+        const {left, right} = canvasElement.current.getBoundingClientRect()
+        const ratio = normalize((e.clientX - left) / (right - left))
+        return ratio
     }
 
-    function onMouseLeave(e){
-        setHover(false)
+    function onClick(e){
+        if(active){
+            jukebox.seek(getRatio(e))
+        } else {
+            jukebox.play(track)
+        }
     }
 
     return (
         <canvas 
-            className="waves px-1 cursor-pointer" 
-            id={id} 
-            height={`${64 * scaleY + 4}`} 
-            width={`${barCount * 3}`} 
+            className="waves cursor-pointer" 
+            height={height} 
+            width={width}
+            style={{height, width}}
             ref={canvasElement}
-            onMouseEnter={onMouseEnter}
-            onMouseLeave={onMouseLeave}
+            onMouseEnter={() => setHover(true)}
+            onMouseMove={(e) => hoverPosition.current = getRatio(e)}
+            onMouseLeave={() => {
+               setHover(false)
+               hoverPosition.current = null
+            }}
+            onClick={onClick}
         />
     )
 

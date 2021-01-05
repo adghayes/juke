@@ -27,7 +27,7 @@ function GlobalPlayer(props){
 
     useEffect(() => {
         if(jukebox.playing){
-            setIntervalId(window.setInterval(() =>{
+            setIntervalId(window.setInterval(() => {
                 setCurrent(jukebox.seek())
             }, 250))
         }
@@ -90,7 +90,7 @@ function GlobalPlayer(props){
                 </button>
             </div>
             <div className="flex-row items-center justify-center w-7/12 hidden sm:flex">
-                <span className="text-xs w-8">{jukebox.track && readableCurrent}</span>
+                <span className="text-xs w-8 select-none">{jukebox.track && readableCurrent}</span>
                 <div 
                     className="flex flex-row px-2 py-4  w-full cursor-pointer" 
                     onMouseEnter={() => setHover(true)}
@@ -110,7 +110,7 @@ function GlobalPlayer(props){
                         />
                     </div>
                 </div>   
-                <span className="text-xs">{jukebox.track && jukebox.readableDuration()}</span>
+                <span className="text-xs select-none">{jukebox.track && jukebox.readableDuration()}</span>
             </div>                                                                                                                           
             <div className="flex flex-row items-center">
                 <img src={getThumbnail(jukebox.track && jukebox.track.thumbnail)} 
