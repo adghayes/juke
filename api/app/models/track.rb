@@ -6,7 +6,7 @@
 #  description  :text
 #  downloadable :boolean          default(FALSE)
 #  duration     :float
-#  peaks        :integer          is an Array
+#  peaks        :text
 #  processing   :string
 #  slug         :string
 #  submitted    :boolean          default(FALSE)
@@ -58,6 +58,10 @@ class Track < ApplicationRecord
 
   def processed?
     processing == 'done'
+  end
+
+  def self.live 
+    where(submitted: true, processing: "done")
   end
 
   private

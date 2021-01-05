@@ -1,10 +1,12 @@
 test:
   service: Disk
   root: <%= Rails.root.join("tmp/storage") %>
+  public: true
 
 local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
+  public: true
 
 amazon:
   service: S3
@@ -12,6 +14,7 @@ amazon:
   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
   region: ca-central-1
   bucket: noisepuff
+  public: true
 
 # Remember not to checkin your GCS keyfile to a repository
 # google:

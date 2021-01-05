@@ -14,4 +14,6 @@ Rails.application.routes.draw do
   resource 'user', only: [:show, :update]
   resource 'session', only: [:create, :destroy]
   post '/rails/active_storage/direct_uploads' => 'direct_uploads#create'
+
+  get :spotlight, to: 'feed#spotlight'
 end

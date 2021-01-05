@@ -37,7 +37,7 @@ class TracksController < ApplicationController
       head :ok
     end
 
-    @track.peaks = scale_peaks(params[:peaks])
+    @track.peaks = encode_peaks(params[:peaks])
     @track.duration = params[:input][:metadata][:format][:duration]
 
     signed_blob_ids = []
@@ -61,13 +61,19 @@ class TracksController < ApplicationController
     @track = Track.find(params[:id])
   end
 
-  def scale_peaks(raw)
-    scaled = []
-    (raw.length / 2).times do |i|
-      scaled.push (raw[i].abs + raw[i + 1].abs)
+  def encode_peaks(peaks)
+    base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    amplitudes = []
+    (peaks.length / 2).times do |i|
+      amplitudes.push (peaks[i].abs + peaks[i + 1].abs)
     end
-    max = scaled.max
-    scaled.map { |peak| (256.0 / max * peak).floor }
+    max = amplitudes.max
+    min = amplitudes.min
+    char_array = amplitudes.map do |amp|
+      normalized = (amp.to_f - min) / (max - min)
+      base64[(normalized * 63.9).floor]
+    end
+    char_array.join('')
   end
 
   def parse_duration(duration)

@@ -9,7 +9,7 @@ default: &default
       video: false
       options: 
         - "-dash 1"
-      extension: weba
+      extension: webm
     - format: mp3
       audio:
         bitrate: 128
