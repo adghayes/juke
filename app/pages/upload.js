@@ -4,7 +4,7 @@ import Card from '../components/Card'
 import Upload from '../components/Upload'
 import SubmitTrack from '../components/SubmitTrack'
 import Uploader from '../lib/uploader'
-import { postTrack, notifyUploadSuccess, getTrack } from '../lib/apiTrack'
+import { postTrack, notifyUploadSuccess, getTrack } from '../lib/api-track'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'

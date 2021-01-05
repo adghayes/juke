@@ -2,9 +2,11 @@ import { useReducer, useState } from 'react'
 import { TextField, TextArea, SubmitButton, inputReducer, Info } from './FormHelpers'
 import Thumbnailer from './Thumbnailer'
 import Uploader from '../lib/uploader'
-import { patchTrack } from '../lib/apiTrack'
+import { patchTrack } from '../lib/api-track'
 
-const processingInfo = `We transcode your music into formats suitable ` +
+
+
+const processingInfo = `We convert your music into formats suitable ` +
     `for streaming. If you enable downloads on your track, however, it is the ` +
     `original that will be downloaded.`
 

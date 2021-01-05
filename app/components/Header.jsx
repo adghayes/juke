@@ -1,11 +1,10 @@
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSoundcloud } from '@fortawesome/free-brands-svg-icons'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import useUser from '../data/useUser'
 import { logout } from '../lib/auth'
-import API from '../lib/api'
+import { getAvatar } from '../lib/thumbnails'
 import Logo from './Logo'
 
 function Header(props){
@@ -103,7 +102,7 @@ function NavLink({label, action, addClass}){
 function ProfileLabel({user}){
     return (
         <span className="inline-flex items-center justify-center">
-            <img src={API.avatar(user.avatar)} alt="Your user avatar" width='24' height='24' className="rounded-full" />
+            <img src={getAvatar(user.avatar)} alt="Your user avatar" width='24' height='24' className="rounded-full" />
             <span className="pl-2">{user.display_name}</span>
         </span>
     )

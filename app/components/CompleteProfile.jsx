@@ -6,8 +6,8 @@ import useUser from '../data/useUser'
 import { useEffect, useReducer } from 'react'
 
 import Uploader from '../lib/uploader'
-import patchUser from '../lib/patchUser'
-import API from '../lib/api'
+import { patchUser } from '../lib/api-user'
+import { getAvatar } from '../lib/thumbnails'
 
 const thumbnailInfo = 'Your thumbnail is what people see on your profile page, when you post ' +
     "tracks without their own thumbnail, or when you comment on other artist's tracks"
@@ -60,7 +60,7 @@ function CompleteProfile({ callback }){
                 <Thumbnailer 
                     label="Avatar"
                     thumbnail={input.thumbnail} 
-                    placeholder={API.avatar(user.avatar)} 
+                    placeholder={getAvatar(user.avatar)} 
                     inputDispatch={inputDispatch}
                     info={thumbnailInfo}
                     />
