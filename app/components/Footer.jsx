@@ -2,23 +2,26 @@ import { useContext, useState, useRef, useEffect } from 'react'
 import { JukeboxContext } from '../pages/_app'
 import { getThumbnail } from '../lib/thumbnails'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause, faStepForward, faStepBackward } from '@fortawesome/free-solid-svg-icons'
+import { faPlay, faPause, faStepForward, faStepBackward, faHeart } from '@fortawesome/free-solid-svg-icons'
 
-const buttonClass = "w-8 sm:w-5 mx-3 sm:mx-2 focus:outline-none"
+const buttonClass = "w-5 mx-3"
+const frameInterval = 12
 
 function normalize(num){
     return Math.max(Math.min(num, 1), 0)
 }
 
-function GlobalPlayer(props){
+function Footer(){
     const jukebox = useContext(JukeboxContext)
 
-    // const [nobAnimated, setNobAnimated] = useState(true)
     const [current, setCurrent] = useState(0)
-    const [intervalId, setIntervalId] = useState(null)
     const [hover, setHover] = useState(false)
     const [drag, setDrag] = useState(false)
     const [nobPercent, setNobPercent] = useState(0)
+    const [liked, setLiked] = useState(false)
+
+    const animationId = useRef(null)
+    const frameIndex = useRef(0)
     const nob = useRef(null)
     const bar = useRef(null)
 
@@ -26,16 +29,24 @@ function GlobalPlayer(props){
     const readableCurrent = jukebox.composeDuration(current)
 
     useEffect(() => {
-        if(jukebox.playing){
-            setIntervalId(window.setInterval(() => {
+        const animationStep = () => {
+            if(frameIndex.current === 0){
                 setCurrent(jukebox.seek())
-            }, 250))
+            }
+            frameIndex.current = (frameIndex.current + 1) % frameInterval
+            animationId.current = requestAnimationFrame(animationStep)
+        }
+
+        if(jukebox.playing){
+            animationId.current = requestAnimationFrame(animationStep)
+        } else {
+            setCurrent(jukebox.seek())
         }
 
         return () => {
-            clearInterval(intervalId)
+            cancelAnimationFrame(animationId.current)
         }
-    }, [jukebox.playing])
+    }, [jukebox, jukebox.playing])
 
     function togglePlay(){
         if (jukebox.track){
@@ -73,8 +84,13 @@ function GlobalPlayer(props){
         }
     }
 
+    function toggleLike(){
+        setLiked(!liked)
+    }
+
     return (
-        <footer className="fixed bottom-0 w-full h-24 sm:h-12 bg-gray-700 flex justify-around items-center text-white py-2">
+        <footer className={`z-30 fixed bottom-0 w-full h-16 sm:h-12 bg-gray-700 flex justify-around items-center text-white py-2` +
+            'transition transform-gpu duration-1000 ' + (jukebox.track ? '' : 'translate-y-full')}>
             <div className="flex flex-row justify-center">
                 <button type="button" className={buttonClass}>
                     <FontAwesomeIcon icon={faStepBackward}/>
@@ -115,15 +131,18 @@ function GlobalPlayer(props){
             <div className="flex flex-row items-center">
                 <img src={getThumbnail(jukebox.track && jukebox.track.thumbnail)} 
                     alt=""
-                    className="w-16 h-16 mx-3 sm:w-8 sm:h-8 sm:mx-2"
+                    className="w-12 h-12 mx-3 sm:w-8 sm:h-8 sm:mx-2 rounded"
                     />
                 <div className="flex flex-col">
-                    <span className="text-gray-200 text-lg sm:text-xs">{jukebox.track && jukebox.track.owner.display_name}</span>
-                    <span className="text-white text-lg sm:text-xs">{jukebox.track && jukebox.track.title}</span>
+                    <span className="text-gray-200 sm:text-xs">{jukebox.track && jukebox.track.owner.display_name}</span>
+                    <span className="text-white sm:text-xs">{jukebox.track && jukebox.track.title}</span>
                 </div>
+                <button  type="button" className={`${buttonClass} ${liked ? "text-pink-500" : "text-white"}`} onClick={toggleLike}>
+                    <FontAwesomeIcon icon={faHeart} />
+                </button>
             </div>
         </footer>
     )
 }
 
-export default GlobalPlayer
+export default Footer

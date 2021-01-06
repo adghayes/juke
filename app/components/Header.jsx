@@ -1,41 +1,47 @@
 import Link from 'next/link'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faSearch, faBars } from '@fortawesome/free-solid-svg-icons'
 import { useState } from 'react'
 import useUser from '../data/useUser'
 import { logout } from '../lib/auth'
 import { getAvatar } from '../lib/thumbnails'
 import Logo from './Logo'
 
-function Header(props){
+function Header(){
+    const { loggedOut, loading, user } = useUser()
+
     return (
         <header className="fixed w-full h-11 top-0 z-30 bg-gray-700">
-            <nav className="h-full max-w-screen-lg mx-auto flex justify-between items-center">
-                <PageNav/>
-                <SearchBar/>
-                <ProfileNav {...props}/>
+            <nav className="h-full max-w-screen-lg mx-auto flex justify-center items-center">
+                <HeaderLogo/>
+                <ul className="hidden md:flex h-full divide-x divide-gray-900 border-r border-gray-900 text-sm">
+                    <NavLink label="Stream" action="/" addClass="px-6"/>
+                    <NavLink label="Library" action="/" addClass="px-6"/>
+                </ul>
+                    <SearchBar/>
+                <ul className="hidden md:flex h-full items-center divide-x divide-gray-900 border-l border-r border-gray-900 text-sm">
+                    <NavLink label="Upload" action="/upload" addClass="px-4"/>
+                    <ProfileLinks padding="px-4"/>
+                </ul>
+                <div className="md:hidden">
+                    <Dropdown/>
+                </div>
             </nav>
         </header>
     )
 }
 
-function PageNav(props){
-    return (
-        <ul className="h-full flex">
-            <li className="h-full logo bg-gradient-to-t from-purple-500 to-pink-500">
-                <Link href="/">
-                    <a className="block h-full text-white  p-1.5 pt-0">
-                        <Logo className="fill-current text-white h-11 w-14"/>
-                    </a>
-                </Link>
-            </li>
-            <NavLink label="Stream" action="/" addClass="px-6 border-r"/>
-            <NavLink label="Library" action="/" addClass="px-6 border-r"/>
-        </ul>
+function HeaderLogo(){
+    return (    
+        <Link href="/">
+            <a className="block h-full bg-gradient-to-t from-purple-500 to-pink-500 text-white  p-1.5 pt-0">
+                <Logo className="fill-current text-white h-11 w-14"/>
+            </a>
+        </Link>
     )
 }
 
-function SearchBar(props){
+function SearchBar(){
     let [query, setQuery] = useState('')
 
     function handleChange(e){
@@ -45,39 +51,33 @@ function SearchBar(props){
     return (
         <div className="flex flex-grow justify-center items-center relative">
             <input type="text" placeholder="Search" value={query} onChange={handleChange}
-                className="w-max text-sm flex-grow mx-8 px-3 py-0.5 bg-gray-200 rounded focus:bg-white hidden sm:block"/>
-            <FontAwesomeIcon icon={faSearch} fixedWidth size="xs" color="lightgray" className="absolute h-4 right-10 hidden sm:block"/>
+                className="text-sm flex-grow mx-6 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white"/>
+            <FontAwesomeIcon icon={faSearch} fixedWidth className="text-gray-500 absolute h-4 right-10"/>
         </div>
     )
 }
 
-function ProfileNav(props){
+function ProfileLinks({padding}){
     const { loggedOut, loading, user } = useUser()
 
-    return (
-        <ul className="h-full flex border-l border-gray-900">
-            <NavLink label="Upload" action="/upload" addClass="px-4 border-r hidden md:block"/>
-            {
-                loggedOut || loading ? (
-                    <>
-                        <NavLink label="Sign Up" action="/register" addClass="px-4 border-r"/>
-                        <NavLink label="Log In" action="/login" addClass="px-4 border-r"/>
-                    </>
-                ) : (
-                    <>
-                        <NavLink label={<ProfileLabel user={user}/>} action='/' addClass="px-4 border-r"/>
-                        <NavLink label="Log Out" action={logout} addClass="px-4 border-r cursor-pointer"/>
-                    </>
-                )
-            }
-        </ul>
-    )
+    if (loggedOut || loading) {
+        return (
+        <>
+            <NavLink label="Sign Up" action="/register" addClass={padding}/>
+            <NavLink label="Log In" action="/login" addClass={padding}/>
+        </>
+    )} else {
+        return  (
+        <>
+            <NavLink label={<ProfileLabel user={user}/>} action='/' addClass={padding}/>
+            <NavLink label="Log Out" action={logout} addClass={padding}/>
+        </>
+    )}
 }
 
-
 const navLinkBaseClass = 'block h-full text-gray-200 hover:text-white text-center ' + 
-    'text-sm align-middle leading-none py-4 whitespace-nowrap border-gray-900 ' + 
-    'flex items-center'
+    'align-middle leading-none py-4 whitespace-nowrap border-gray-900 ' + 
+    'flex items-center cursor-pointer flex justify-center items-center select-none'
 
 function NavLink({label, action, addClass}){
     const navLinkClass = `${navLinkBaseClass} ${addClass}`
@@ -85,7 +85,7 @@ function NavLink({label, action, addClass}){
     return (
         <li className="h-full">
         { typeof(action) === 'function' ? (
-                <a className={navLinkClass} onClick={action}>
+                <a className={navLinkClass} onClick={action} href="#">
                     {label}
                 </a>
         ) : (
@@ -105,6 +105,26 @@ function ProfileLabel({user}){
             <img src={getAvatar(user.avatar)} alt="Your user avatar" width='24' height='24' className="rounded-full" />
             <span className="pl-2">{user.display_name}</span>
         </span>
+    )
+}
+
+function Dropdown(props){
+    const [open, setOpen] = useState(false)
+
+    return (
+        <div className="relative flex items-center h-full">
+            <button className="mr-4" onClick={() => setOpen(state => !state)}>
+                <FontAwesomeIcon icon={faBars} fixedWidth className="text-white w-5 h-full right-10"/>
+            </button>
+            {open ? (
+            <ul className={`bg-gray-700 flex flex-col absolute right-0 top-8 text-lg divide-y border-l border-b border-gray-900 divide-gray-900`}>
+                <NavLink label="Stream" action="/" addClass="px-6"/>
+                <NavLink label="Library" action="/"/>
+                <NavLink label="Upload" action="/upload"/>
+                <ProfileLinks/>
+            </ul>
+            ) : null }
+        </div>
     )
 }
 

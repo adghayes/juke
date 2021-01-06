@@ -4,10 +4,10 @@ import Dropzone from 'react-dropzone'
 const accept = ['.wav', '.flac', '.aiff', '.aif', '.alac', '.mp3', '.aac', '.ogg', '.vorbis',
     '.mp4', '.mp2', '.m4a', '.3gp', '.3g2', '.mj2', '.amr', '.wma']
 
-function Upload({ fileSelected }){
+function Upload({ onFileSelect }){
     const [disabled, setDisabled] = useState(false)
     function onDropAccepted(acceptedFiles){ 
-        fileSelected(acceptedFiles[0])
+        onFileSelect(acceptedFiles[0])
     }
 
     return (
@@ -36,6 +36,7 @@ function Upload({ fileSelected }){
                         </section>
                 )}
             </Dropzone>
+            <p className="text-xs px-6 pb-1 italic text-center">We accept most types of audio files, although we recommend you upload in a lossless format like FLAC or ALAC.</p>
         </div>
     )
 }

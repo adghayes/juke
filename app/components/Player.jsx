@@ -1,33 +1,27 @@
 
-import { useContext, useEffect, useState, useRef } from 'react'
+import { useContext, useEffect, useState, useRef, useMemo } from 'react'
 import { JukeboxContext, WindowContext } from '../pages/_app'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
-import { getAvatar, getThumbnail } from '../lib/thumbnails'
-
-function normalize(num){
-    return Math.max(Math.min(num, 1), 0)
-}
-
-function rgba(color){
-    return `rgba(${color.toString()})`
-}
-
-function rgbaMidpoint(color1, color2, ratio){
-    const [r1, g1, b1, a1] = color1
-    const [r2, g2, b2, a2] = color2
-    const r = r1 * (1 - ratio) + r2 * ratio
-    const g = g1 * (1 - ratio) + g2 * ratio
-    const b = b1 * (1 - ratio) + b2 * ratio
-    const a = a1 * (1 - ratio) + a2 * ratio
-    return [r, g, b, a]
-}
+import { faPlay, faPause, faHeart } from '@fortawesome/free-solid-svg-icons'
+import { getThumbnail } from '../lib/thumbnails'
 
 function Player({ track }){
     const jukebox = useContext(JukeboxContext)
+    const innerWidth = useContext(WindowContext)
+
+    const [liked, setLiked] = useState(false)
+    const barCount = useMemo(() => calculateBarCount(innerWidth), [innerWidth])
+
     let active = jukebox.track && jukebox.track.id === track.id
     let playing = active && jukebox.playing
 
+    function calculateBarCount(innerWidth){
+        if (innerWidth > 1024) { return 192 } else 
+        if (innerWidth > 768) { return 144 } else 
+        if (innerWidth > 640) { return 96} else 
+        if (innerWidth > 480) { return 48 } else
+            { return 48 }
+    }
 
     function togglePlay(){
         if (!active || !playing) {
@@ -37,35 +31,53 @@ function Player({ track }){
         }
     }
 
-    return (
-        
-        <div className="rounded">
-            <div className="flex inline-flex py-1">
-                <img src={getAvatar(track.owner.avatar)} alt="Your user avatar" width='24' height='24' className="rounded-full" />
-                <span className="px-3">{track.owner.display_name} posted a track</span>
-            </div>
-            <div className="flex flex-row items-center">
-                <img src={getThumbnail(track.thumbnail)} alt={`Thumbnail for ${track.title} by ${track.owner.display_name}`} width='192' height = '192' className="rounded"/>
-                <div className="flex flex-col">
+    function toggleLiked(){
+        setLiked(status => !status)
+    }
 
-                <div className="flex flex-row items-center">
+    return (
+        <div className="rounded-xl flex flex-col sm:flex-row items-center border border-gray-300 overflow-hidden relative">
+            <img src={getThumbnail(track.thumbnail)} alt={`Thumbnail for ${track.title} by ${track.owner.display_name}`} className="w-48 h-48"/>
+            <div className="flex flex-col px-4 w-full my-1">
+
+                <div className="flex items-center divide-white flex-col sm:flex-row my-1">
                     <button 
-                        className="text-white text-2xl bg-gray-700 rounded-full text-center w-10 h-10 p-2 mx-1 focus:outline-none"
+                        className="text-white bg-gray-700 rounded-full w-14 h-14 flex items-center justify-center absolute top-16 sm:static"
                         onClick={togglePlay}
                     >
                         {playing ? 
-                            <FontAwesomeIcon icon={faPause}  className="w-5 pl-1"/> : 
-                            <FontAwesomeIcon icon={faPlay}  className="w-5 pl-1.5"/>}
+                            <FontAwesomeIcon icon={faPause}  className="w-6"/> : 
+                            <FontAwesomeIcon icon={faPlay}  className="w-7 pl-1"/>}
                     </button>
-                    <div className="flex flex-col items-start text-sm">
-                            <span className="text-gray-800">{track.owner.display_name}</span>
-                            <span className="font-bold">{track.title}</span>
+                    <div className="flex flex-col sm:flex-col-reverse text-sm self-start sm:text-base  sm:my-0 sm:mx-2 sm:self-auto">
+                        <span className="inline-flex font-bold">
+                            <button onClick={toggleLiked}>
+                                <FontAwesomeIcon icon={faHeart} 
+                                    className={`mr-2 w-4 sm:hidden ${liked ? 'text-pink-500' : 'text-gray-300'}`}/>
+                            </button>
+                            <span>{track.title}</span>
+                        </span>
+                        <span className="text-gray-700">{track.owner.display_name}</span>
                     </div>
                 </div>
-                    <Waves track={track} scaleY={1} active={active}
-                        upperBarMinHeight={2} lowerBarMinHeight={1} upperBarMaxHeight={44} lowerBarMaxHeight={22}
-                    />
-                </div>
+                {barCount ? 
+                <Waves track={track} scaleY={1} active={active}
+                    upperBarMinHeight={2} lowerBarMinHeight={1} upperBarMaxHeight={44} lowerBarMaxHeight={22}
+                    barWidth={2} barSpacing={1} barCount={barCount}
+                /> 
+                : null }
+                <div className="hidden sm:flex flex-row text-xs self-start">
+                        <button type="button" onClick={toggleLiked}
+                            className="py-0.5 px-1.5 border border-gray-200 rounded flex flex-row items-center justify-center divide-x-8 divide-white m-1"
+                            >
+                            <FontAwesomeIcon icon={faHeart}  className={`w-4 ${liked ? 'text-pink-500' : 'text-gray-300'}`}/>
+                            <span className="">12</span>
+                        </button>
+                        <span className="py-0.5 px-1.5  rounded flex flex-row items-center justify-center divide-x-8 divide-white m-1">
+                            <FontAwesomeIcon icon={faPlay}  className={`w-3 text-gray-300`}/>
+                            <span className="">12</span>
+                        </span>
+                    </div>
             </div>
         </div>
     )
@@ -74,125 +86,99 @@ function Player({ track }){
 export default Player
 
 const base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+const frameInterval = 12
 
 const playedColor = [219, 39, 119, 1]
 const selectedColor = [131, 24, 67, 1]
 const unplayedColor = [107, 114, 128, 1]
 const inactiveColor = [107, 114, 128, 0.8]
 
-function Waves({ track, active, upperBarMaxHeight, upperBarMinHeight, lowerBarMaxHeight, lowerBarMinHeight }){
-    console.log('render')
+function Waves({ track, active, upperBarMaxHeight, upperBarMinHeight, lowerBarMaxHeight, lowerBarMinHeight, barWidth, barSpacing, barCount }){
     const jukebox = useContext(JukeboxContext)
-    const innerWidth = useContext(WindowContext)
 
     const canvasElement = useRef(null)
     const [ctx, setCtx] = useState(null)
-    
-    const [peaks, setPeaks] = useState([])
-    const [barCount, setBarCount] = useState(0)
-    const [bars, setBars] = useState([])
+    const peaks = useMemo(() => track && track.peaks.split('').map(char => base64.indexOf(char)), [track])
+    const bars = useMemo(calculateBars, [peaks, barCount])
 
     const [hover, setHover] = useState(false)
+    const [playTime, setPlayTime] = useState(0)
     const hoverPosition = useRef(null)
     const playPosition = useRef(0)
     const animationId = useRef(null)
+    const frameIndex = useRef(0)
 
     const height = lowerBarMaxHeight + upperBarMaxHeight + 1
     const width = barCount * 3
+    const lowerBarScale = (lowerBarMaxHeight - lowerBarMinHeight) / 63
+    const upperBarScale = (upperBarMaxHeight - upperBarMinHeight) / 63
+    const barOffset = barWidth + barSpacing
+
+    function calculateBars(){
+        const step = peaks.length / barCount
+        let i = 0
+        const bars = []
+        while (i < barCount){
+            let slice = peaks.slice(Math.floor(step * i), Math.floor(step * (i + 1)))
+            bars.push(slice.reduce((acc, el) => acc + el) / slice.length)
+            i += 1
+        }
+        return bars
+    }
 
     useEffect(() => {
         setCtx(canvasElement.current.getContext('2d'))
     }, [])
 
     useEffect(() => {
-        if(track) {
-            setPeaks(track.peaks.split('').map(char => base64.indexOf(char)))
-        }
-    }, [track])
-
-    useEffect(() => {
-        let newBarCount
-        if(innerWidth > 1024){
-            newBarCount = 192
-        } else if (innerWidth > 768) {
-            newBarCount = 144
-        } else if (innerWidth > 640) {
-            newBarCount = 96
-        } else {
-            newBarCount = 48
-        }
-        setBarCount(newBarCount)
-    }, [innerWidth])
-
-    useEffect(() => {
-        if(track && barCount){
-            recalculateBars()
-        }
-    }, [track, barCount])
-
-    useEffect(() => {
         if(ctx && bars){
             if(active && (hover || jukebox.playing)){
                 animationId.current = window.requestAnimationFrame(animationStep)
             } else {
-                draw()
+                refresh()
             }
         }
 
         return () => {
             cancelAnimationFrame(animationId.current)
         }
-    }, [active, ctx, bars, hover, jukebox.playing])
+    }, [ctx, bars, hover, active, jukebox, jukebox.playing, active])
+
+    function syncSeek(){
+        playPosition.current = jukebox.seek()
+        setPlayTime(Math.floor(playPosition.current))
+    }
+
+    function refresh(){
+        syncSeek()
+        draw()
+    }
 
     function animationStep() {
-        playPosition.current = jukebox.seek()
-        draw()
-        animationId.current = window.requestAnimationFrame(animationStep)
-    }
-
-    function recalculateBars(){
-        const step = peaks.length / barCount
-        let i = 0
-        const bars = []
-        while (i < barCount){
-            let slice = peaks.slice(Math.floor(step * i), Math.floor(step * (i + 1)))
-            bars.push(Math.min(...slice))
-            i += 1
+        if(frameIndex.current === 0 || hover){
+            refresh()
         }
-        setBars(bars)
+        animationId.current = window.requestAnimationFrame(animationStep)
+        frameIndex.current = (frameIndex.current + 1) % frameInterval
     }
 
-    function drawBar(y, index){
-        ctx.fillRect(3 * index, upperBarMaxHeight, 2, -(upperBarMinHeight + (upperBarMaxHeight - upperBarMinHeight) * y / 63 ))
-        ctx.beginPath()
-        ctx.moveTo(3 * index, upperBarMaxHeight + 1)
-        ctx.lineTo(3 * index + 1, upperBarMaxHeight + 1 + lowerBarMinHeight + (lowerBarMaxHeight - lowerBarMinHeight) * y / 63)
-        ctx.lineTo(3 * index + 2, upperBarMaxHeight + 1)
-        ctx.closePath()
-        ctx.fill()
+    function drawBar(y, index, color){
+        ctx.fillStyle = rgba(color)
+        ctx.fillRect(barOffset * index, upperBarMaxHeight, barWidth, -(upperBarMinHeight + upperBarScale * y))
+        ctx.fillStyle = rgba(color, 0.4)
+        ctx.fillRect(barOffset * index, upperBarMaxHeight + 1, barWidth, lowerBarMinHeight + lowerBarScale * y)
     }
 
     function drawBars(colors, breakpoints){ 
         let barIndex = 0
         let colorIndex = 0
-        ctx.fillStyle = rgba(colors[0])
         
         while (barIndex < barCount){
-            if(barIndex >= breakpoints[colorIndex]){
-                colorIndex += 1
-                ctx.fillStyle = rgba(colors[colorIndex])
-            }
-            drawBar(bars[barIndex], barIndex)
+            if(barIndex >= breakpoints[colorIndex]) colorIndex += 1
+            drawBar(bars[barIndex], barIndex, colors[colorIndex])
             barIndex += 1
         }
     }
-
-    function drawTime(){
-        ctx.fillStyle = rgba([0,0,0,.9])
-        ctx.fillRect(0, upperBarMaxHeight, 24, -12)
-        ctx.fillRect(width, upperBarMaxHeight, -24, -12)
-    }
-
 
     function draw(){
         ctx.clearRect(0, 0, width, height)
@@ -219,7 +205,6 @@ function Waves({ track, active, upperBarMaxHeight, upperBarMinHeight, lowerBarMa
                 breakpoints = [currentBar, currentBar + 1, barCount]
             }
             drawBars(colors, breakpoints)
-            drawTime()
         }
     }
 
@@ -238,20 +223,44 @@ function Waves({ track, active, upperBarMaxHeight, upperBarMinHeight, lowerBarMa
     }
 
     return (
-        <canvas 
-            className="waves cursor-pointer" 
-            height={height} 
-            width={width}
-            style={{height, width}}
-            ref={canvasElement}
-            onMouseEnter={() => setHover(true)}
-            onMouseMove={(e) => hoverPosition.current = getRatio(e)}
-            onMouseLeave={() => {
-               setHover(false)
-               hoverPosition.current = null
-            }}
-            onClick={onClick}
-        />
+        <div className="relative hidden sm:block">
+            <span className={`z-10 text-xs bg-gray-800 text-white text-bold px-0.5 absolute left-0 top-7`}>
+                {active && jukebox.composeDuration(playTime)}
+            </span>
+            <canvas 
+                className="waves cursor-pointer" 
+                height={height} 
+                width={width}
+                ref={canvasElement}
+                onMouseEnter={() => setHover(true)}
+                onMouseMove={(e) => hoverPosition.current = getRatio(e)}
+                onMouseLeave={() => {
+                    setHover(false)
+                    hoverPosition.current = null
+                }}
+                onClick={onClick}
+            />
+            <span className="z-10 text-xs bg-gray-800 text-white text-bold px-0.5 absolute right-0 top-7">
+                {track && jukebox.composeDuration(track.duration)}
+            </span>
+        </div>
     )
+}
 
+function normalize(num){
+    return Math.max(Math.min(num, 1), 0)
+}
+
+function rgba(color, alpha){
+    return `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha ? alpha : color[3]})`
+}
+
+function rgbaMidpoint(color1, color2, ratio){
+    const [r1, g1, b1, a1] = color1
+    const [r2, g2, b2, a2] = color2
+    const r = r1 * (1 - ratio) + r2 * ratio
+    const g = g1 * (1 - ratio) + g2 * ratio
+    const b = b1 * (1 - ratio) + b2 * ratio
+    const a = a1 * (1 - ratio) + a2 * ratio
+    return [r, g, b, a]
 }

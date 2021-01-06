@@ -11,7 +11,7 @@ export default function RegisterPage(props) {
   const [visible, setVisible] = useState(true)
   const [phaseIndex, setPhaseIndex] = useState(0)
 
-  const transitionTo = (phaseIndex) => () => {
+  const transitionTo = (phaseIndex) => {
     setVisible(false)
     setTimeout(() => {
       setPhaseIndex(phaseIndex)
@@ -22,8 +22,8 @@ export default function RegisterPage(props) {
   }
 
   const phases = [
-    <Register callback={ transitionTo(1) }/>,
-    <CompleteProfile callback={ transitionTo(2) }/>,
+    <Register callback={ () => transitionTo(1) }/>,
+    <CompleteProfile callback={ () => transitionTo(2) }/>,
     <GetStarted />
   ]
 

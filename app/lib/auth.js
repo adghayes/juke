@@ -6,11 +6,7 @@ export function setToken(token){
 }
 
 export function getToken(){
-    if(this){
-        return this.localStorage.getItem('sessionToken')
-    } else {
-        return window.localStorage.getItem('sessionToken')
-    }
+    return typeof window === 'undefined' ? null : window.localStorage.getItem('sessionToken')
 }
 
 export function hasToken(){

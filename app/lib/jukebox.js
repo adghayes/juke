@@ -2,10 +2,10 @@ import {Howl, Howler} from 'howler'
 import API from './api'
 
 export default class Jukebox {
-    constructor({sound, track, setJukebox, playing}){
+    constructor({sound, track, mutateJukebox, playing}){
         this.sound = sound
         this.track = track
-        this.setJukebox = setJukebox
+        this.mutateJukebox = mutateJukebox
         this.playing = playing
     }
 
@@ -38,12 +38,14 @@ export default class Jukebox {
     seek(val){
         if(this.sound){
             if(val !== undefined){ 
-                return this.sound.seek(val * this.track.duration)
+                let newPosition = this.sound.seek(val * this.track.duration)
+                if (!this.playing) this.dispatch()
+                return newPosition
             } else {
                 return this.sound.seek()
             }
         } 
-        return -1
+        return 0
     }
 
     volume(level){
@@ -51,11 +53,11 @@ export default class Jukebox {
     }
 
     dispatch(){
-        this.setJukebox(new Jukebox({
+        this.mutateJukebox(new Jukebox({
             sound: this.sound,
             track: this.track,
             playing: this.playing,
-            setJukebox: this.setJukebox
+            mutateJukebox: this.mutateJukebox
         }))
     }
 

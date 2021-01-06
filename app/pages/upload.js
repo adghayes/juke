@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 import Card from '../components/Card'
 import Upload from '../components/Upload'
@@ -14,15 +14,15 @@ export default function UploadPage(props) {
   const [track, setTrack] = useState(null)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadComplete, setUploadComplete] = useState(false)
-  const [poll, setPoll] = useState(null)
 
-  const [phase, setPhase] = useState(0)
   const [visible, setVisible] = useState(true)
+  const [phaseIndex, setPhaseIndex] = useState(0)
+  
 
-  const transitionTo = (phase) => {
+  const transitionTo = (phaseIndex) => {
     setVisible(false)
     setTimeout(() => {
-      setPhase(phase)
+      setPhaseIndex(phaseIndex)
       setTimeout(() => {
         setVisible(true)
       }, 100)
@@ -32,25 +32,12 @@ export default function UploadPage(props) {
   useEffect(async () => {
     if (track){
       if (track.processing === "none" && uploadComplete){
-
         setTrack(await notifyUploadSuccess(track.id))
-
-      } else if (track.processing === "started" && !poll){
-
-        setPoll(setInterval(async () => {
-          console.log('polling')
+      } else if (track.processing === "started"){
+        setTimeout(async () => {
           setTrack(await getTrack(track.id))
-        }, 5000))
-
-      } else if (track.processing !== "started" && poll){
-        console.log('done polling')
-        clearInterval(poll)
-        setPoll(null)
-      }
-    }
-
-    return () => {
-      if(poll) clearInterval(poll)
+        }, 5000)
+      } 
     }
   }, [track, uploadComplete])
 
@@ -64,7 +51,7 @@ export default function UploadPage(props) {
     setUploadProgress(e.loaded / e.total)
   }
 
-  async function fileSelected(file){
+  async function onFileSelect(file){
     const fileUpload = new Uploader(file, { onUploadProgress, onUploadSuccess })
     const blobId = await fileUpload.start()
     console.log('blob created')
@@ -73,23 +60,21 @@ export default function UploadPage(props) {
     console.log('track created')
   }
 
-
+  const phases = [
+    <Upload onFileSelect={onFileSelect}/>,
+    <SubmitTrack 
+      uploadProgress={uploadProgress} 
+      uploadComplete={uploadComplete}
+      track={track || {}}
+      callback={() => transitionTo(2)}
+    />,
+    <TrackStatus track={track || {}}/>
+  ]
 
   return (
     <main className="relative min-h-screen min-w-full bg-gradient-to-tr from-blue-300 via-purple-300 to-red-300">
-        <Card visible={visible} displayNone={phase !== 0}>
-          <Upload fileSelected={fileSelected}/>,
-        </Card>
-        <Card visible={visible} displayNone={phase !== 1}>
-          <SubmitTrack 
-            uploadProgress={uploadProgress} 
-            uploadComplete={uploadComplete}
-            track={track || {}}
-            callback={() => transitionTo(2)}
-            />
-        </Card>
-        <Card visible={visible} displayNone={phase !== 2}>
-          <TrackStatus track={track || {}}/>
+        <Card visible={visible}>
+          { phases[phaseIndex] }
         </Card>
     </main>
   )

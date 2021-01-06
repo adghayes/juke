@@ -68,8 +68,8 @@ export default function SubmitTrack({ uploadProgress, uploadComplete, track, cal
                 <span className={`${uploadComplete ? 'text-gray-500' : 'font-bold text-black'}`}>
                     {uploadComplete ? 'Uploaded' : 'Uploading...' }
                 </span>
-                <span className={`inline-flex ${processingClass[track.processing]}`}>
-                    {processingMessage[track.processing]}
+                <span className={'inline-flex'}>
+                    <span className={processingClass}>{processingMessage[track.processing]}</span>
                     <Info info={processingInfo}/>
                 </span>
             </div>

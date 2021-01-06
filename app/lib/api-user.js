@@ -1,12 +1,8 @@
 import API from './api'
-import { hasToken, clearToken } from './auth'
+import { clearToken } from './auth'
 import { mutate } from 'swr'
 
 export async function userFetcher(key){
-    if(!hasToken()){
-        throw new Error('no session')
-    }
-
     const res = await fetch(API.url(key), {
         headers: {
             ...API.authHeader()
@@ -30,7 +26,7 @@ export async function userFetcher(key){
 export async function patchUser(payload){
     return fetch(API.url('user'), {
         method: 'PATCH',
-        body: JSON.stringify({ user }),
+        body: JSON.stringify({ user: payload }),
         headers: {
             ...API.authHeader(),
             ...API.contentHeader
