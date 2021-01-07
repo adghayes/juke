@@ -3,6 +3,8 @@ Rails.application.routes.draw do
   resources 'tracks', only: [:create, :show, :update] do
     member do 
       post :streams, to: 'tracks#streams'
+      post :like, to: 'tracks#like'
+      delete :like, to: 'tracks#unlike'
     end
   end
 

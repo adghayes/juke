@@ -1,6 +1,6 @@
 default: &default
   peaks:
-    count: 600
+    count: 2304
     quality: 0.5
   specs: 
     - format: webm

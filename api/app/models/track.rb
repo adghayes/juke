@@ -44,6 +44,12 @@ class Track < ApplicationRecord
     primary_key: :id,
     foreign_key: :owner_id
 
+  has_many :likes,
+    dependent: :destroy
+
+  has_many :histories,
+    dependent: :destroy
+
   has_one_attached :thumbnail
   has_one_attached :original
   has_many_attached :streams

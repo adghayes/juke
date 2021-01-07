@@ -30,3 +30,5 @@ if current_user == track.owner
   json.submitted track.submitted
 end
 
+json.created track.created_at
+

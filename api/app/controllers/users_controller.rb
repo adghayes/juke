@@ -18,6 +18,8 @@ class UsersController < ApplicationController
       render :show
     else
       require_logged_in
+      return unless current_user
+  
       @user = current_user
       render :show
     end

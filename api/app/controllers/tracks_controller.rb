@@ -1,6 +1,7 @@
 class TracksController < ApplicationController
-  before_action :require_logged_in, only: [:create, :update]
+  before_action :require_logged_in, only: [:create, :update, :like, :unlike]
   before_action :require_valid_jwt, only: :streams
+  before_action :set_track, only: [:show, :update, :streams]
   
   def create
     @track = Track.new(owner: current_user, **track_params)
@@ -12,12 +13,10 @@ class TracksController < ApplicationController
   end
 
   def show
-    set_track
     render :show
   end
 
   def update
-    set_track
     if @track.owner == current_user
       if @track.update(track_params)
         start_processing if params[:event] == 'uploaded'
@@ -30,24 +29,42 @@ class TracksController < ApplicationController
     end
   end
 
+  def like
+    @like = Like.find_or_create_by({ user: current_user, track_id: params[:id] })
+    if @like.persisted?
+      render :like
+    else
+      render json: @like.errors.messages, status: :unprocessable_entity
+    end
+  end
+
+  def unlike
+    @like = Like.find_by(user: current_user, track_id: params[:id])
+    if !@like
+      head :ok
+    elsif @like.destroy
+      render :like
+    else
+      head :internal_server_error
+    end
+  end
+
   def streams
-    set_track
     if params[:status] != 200
       @track.update(processing: 'error')
       head :ok
     end
 
-    @track.peaks = encode_peaks(params[:peaks])
-    @track.duration = params[:input][:metadata][:format][:duration]
-
     signed_blob_ids = []
     params[:outputs].each do |output|
       signed_blob_ids.push output[:id] if output[:id]
     end
-
     @track.streams.attach signed_blob_ids
 
+    @track.peaks = encode_peaks(params[:peaks])
+    @track.duration = params[:input][:metadata][:format][:duration]
     @track.processing = "done"
+
     if @track.save
       head :ok
     else
@@ -63,17 +80,24 @@ class TracksController < ApplicationController
 
   def encode_peaks(peaks)
     base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-    amplitudes = []
-    (peaks.length / 2).times do |i|
-      amplitudes.push (peaks[i].abs + peaks[i + 1].abs)
+    encoded = ''
+
+    samples = []
+    (peaks.length / 8).times do |i|
+      samples.push (sample_peaks peaks.slice(i * 8, 8))
     end
-    max = amplitudes.max
-    min = amplitudes.min
-    char_array = amplitudes.map do |amp|
-      normalized = (amp.to_f - min) / (max - min)
-      base64[(normalized * 63.9).floor]
+    max = samples.max
+    min = samples.min
+
+    samples.each do |sample|
+      normalized = (sample.to_f - min) / (max - min)
+      encoded += base64[(normalized * 63).floor]
     end
-    char_array.join('')
+    encoded
+  end
+
+  def sample_peaks(slice)
+    slice.map(&:abs).sum / slice.length
   end
 
   def parse_duration(duration)

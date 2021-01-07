@@ -35,6 +35,14 @@ class User < ApplicationRecord
     dependent: :destroy
 
   has_many :tracks,
+    primary_key: :id,
+    foreign_key: :owner_id,
+    dependent: :destroy
+
+  has_many :likes,
+    dependent: :destroy
+
+  has_many :histories,
     dependent: :destroy
     
   has_one_attached :avatar
