@@ -4,9 +4,7 @@ import { mutate } from 'swr'
 
 export async function userFetcher(key){
     const res = await fetch(API.url(key), {
-        headers: {
-            ...API.authHeader()
-        }
+        headers: API.authHeader()
     })
 
     switch(res.status) {
@@ -22,18 +20,14 @@ export async function userFetcher(key){
     }
 }
 
-
 export async function patchUser(payload){
     return fetch(API.url('user'), {
         method: 'PATCH',
         body: JSON.stringify({ user: payload }),
-        headers: {
-            ...API.authHeader(),
-            ...API.contentHeader
-        }
+        headers: API.allHeaders()
     })
     .then(response => response.json())
     .then(user => {
-        mutate('user', user, true)
+        mutate('user', user, false)
     })
 }

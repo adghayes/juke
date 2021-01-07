@@ -39,9 +39,7 @@ export default function SubmitTrack({ uploadProgress, uploadComplete, track, cal
         }
 
         if(input.thumbnail){
-            const thumbnailUpload = new Uploader(input.thumbnail, e => {
-                console.log('progress ' + e.loaded / e.total)
-            })
+            const thumbnailUpload = new Uploader(input.thumbnail)
             payload.thumbnail = await thumbnailUpload.start()
         }
         patchTrack(payload, track.id)

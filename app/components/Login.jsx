@@ -47,9 +47,11 @@ function Login(props) {
                 </strong> 
             : null }
             <TextField type='text' name='email' label='Email'
-                value={email} inputDispatch={inputDispatch}/>
+                value={email} inputDispatch={inputDispatch}
+                autoComplete="email"/>
             <TextField type='password' name='password' label='Password'
-                value={password} inputDispatch={inputDispatch}/>
+                value={password} inputDispatch={inputDispatch}
+                autoComplete="current-password"/>
             <SubmitButton disabled={false} value='Log In' />
             <span className='text-sm pt-6 text-center'>No Account?
                 <Link href='/register'>

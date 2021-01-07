@@ -15,7 +15,7 @@ export function errorReducer(state, { fieldError, inputError }) {
     }
 }
 
-export function TextField({type, name, label, info, value, inputDispatch, errors, syncErrors}){
+export function TextField({type, name, label, info, value, inputDispatch, errors, syncErrors, autoComplete}){
     const [touch, setTouch] = useState(false)
 
 
@@ -26,6 +26,7 @@ export function TextField({type, name, label, info, value, inputDispatch, errors
                 { info ? <Info info={info}/> : null }
             </span>
             <input name={name} type={type} value={value}
+                autoComplete={autoComplete}
                 className={`pl-1 mt-1 border-b-2 border-gray-300 relative
                     focus:border-black hover:border-gray-500 w-56 text-sm`} 
                 onChange={ e => {

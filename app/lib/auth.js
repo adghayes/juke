@@ -18,26 +18,17 @@ export function clearToken(){
 }
 
 export async function login(email, password){
-    const payload = { 
-        user: {
-            email: email, 
-            password: password 
-        }
-    }
+    const payload = { user: { email, password } }
 
     return fetch(API.url('session'), {
         method: 'POST',
         body: JSON.stringify(payload),
-        headers: {
-            ...API.contentHeader
-        }
+        headers: API.contentHeader
     })
     .then(res => {
-        if(res.ok) {
-            return res.json()
-        } else {
-            throw new Error('invalid credentials')
-        }
+        if(res.ok) return res.json()
+        
+        throw new Error('invalid credentials')
     })
     .then(data => {
         setToken(data.token)
@@ -49,19 +40,17 @@ export async function login(email, password){
 export async function logout(){
     return fetch(API.url('session'), {
         method: 'DELETE',
-        headers: {
-            'Authorization': `bearer ${getToken()}`
-        }
+        headers: API.authHeader()
     }).then(res => {
         if(res.status === 200 || res.status === 401){
             clearToken()
-            mutate('user', null, true)
-            return true
-        } else {
-            const error = new Error('logout error')
-            error.status = res.status
-            throw error
+            mutate('user', null, false)
+            return res.status
         }
+
+        const error = new Error('logout error')
+        error.status = res.status
+        throw error
     })
 }
 
@@ -76,20 +65,16 @@ export async function register(user){
 
     return fetch(API.url('users'), {
             method: 'POST',
-            headers: {
-                ...API.contentHeader
-            },
+            headers: API.contentHeader,
             body: JSON.stringify(payload)
         })
         .then(async res => {
-            if(res.ok){
-                return res.json()
-            } else {
-                const error = new Error('registration failed')
-                error.status = res.status
-                error.info = await res.json()
-                throw error
-            }
+            if(res.ok) return res.json()
+
+            const error = new Error('registration failed')
+            error.status = res.status
+            error.info = await res.json()
+            throw error
         })
         .then(data => {
             setToken(data.token)

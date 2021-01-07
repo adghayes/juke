@@ -8,8 +8,6 @@ import { getAvatar } from '../lib/thumbnails'
 import Logo from './Logo'
 
 function Header(){
-    const { loggedOut, loading, user } = useUser()
-
     return (
         <header className="fixed w-full h-11 top-0 z-30 bg-gray-700">
             <nav className="h-full max-w-screen-lg mx-auto flex justify-center items-center">

@@ -34,16 +34,17 @@ export default function UploadPage(props) {
       if (track.processing === "none" && uploadComplete){
         setTrack(await notifyUploadSuccess(track.id))
       } else if (track.processing === "started"){
-        setTimeout(async () => {
+        const pollId = setTimeout(async () => {
           setTrack(await getTrack(track.id))
         }, 5000)
+
+        return () => clearTimeout(pollId)
       } 
     }
   }, [track, uploadComplete])
 
 
   function onUploadSuccess(e){
-    console.log('upload complete')
     setUploadComplete(true)
   }
 
@@ -54,10 +55,8 @@ export default function UploadPage(props) {
   async function onFileSelect(file){
     const fileUpload = new Uploader(file, { onUploadProgress, onUploadSuccess })
     const blobId = await fileUpload.start()
-    console.log('blob created')
     setTrack(await postTrack({ original: blobId }))
     transitionTo(1)
-    console.log('track created')
   }
 
   const phases = [

@@ -42,7 +42,7 @@ function GetStarted(){
       
       <Link href="/stream">
         <a className={`z-50 relative text-5xl px-8 py-4 text-black font-bold flex flex-row items-center ` +
-          `bg-white px-4 py-2 rounded-xl transition transform hover:scale-110 ring-2 ring-black`}>
+          `bg-white px-4 py-2 rounded-xl transition transform hover:scale-110`}>
             <Logo className="fill-current text-pink-500 w-24 h-16 pr-8"/>
           Get Listening
         </a>
@@ -50,9 +50,3 @@ function GetStarted(){
     </div>
   )
 }
-
-
-
-
-
-

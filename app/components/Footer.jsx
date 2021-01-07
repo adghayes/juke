@@ -3,6 +3,8 @@ import { JukeboxContext } from '../pages/_app'
 import { getThumbnail } from '../lib/thumbnails'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause, faStepForward, faStepBackward, faHeart } from '@fortawesome/free-solid-svg-icons'
+import useUser from '../data/useUser'
+import { like, unlike } from '../lib/api-track'
 
 const buttonClass = "w-5 mx-3"
 const frameInterval = 12
@@ -13,12 +15,12 @@ function normalize(num){
 
 function Footer(){
     const jukebox = useContext(JukeboxContext)
+    const { user, loggedOut } = useUser()
 
     const [current, setCurrent] = useState(0)
     const [hover, setHover] = useState(false)
     const [drag, setDrag] = useState(false)
     const [nobPercent, setNobPercent] = useState(0)
-    const [liked, setLiked] = useState(false)
 
     const animationId = useRef(null)
     const frameIndex = useRef(0)
@@ -27,6 +29,7 @@ function Footer(){
 
     const barPercent = jukebox.track && current / jukebox.track.duration * 100
     const readableCurrent = jukebox.composeDuration(current)
+    let liked  = !!user && !!jukebox.track && user.likes.includes(jukebox.track.id) 
 
     useEffect(() => {
         const animationStep = () => {
@@ -84,8 +87,14 @@ function Footer(){
         }
     }
 
-    function toggleLike(){
-        setLiked(!liked)
+    function toggleLiked(){
+        if (loggedOut) console.log('logged out')
+        
+        if(liked){
+            unlike(user, jukebox.track.id)
+        } else {
+            like(user, jukebox.track.id)
+        }
     }
 
     return (
@@ -137,7 +146,7 @@ function Footer(){
                     <span className="text-gray-200 sm:text-xs">{jukebox.track && jukebox.track.owner.display_name}</span>
                     <span className="text-white sm:text-xs">{jukebox.track && jukebox.track.title}</span>
                 </div>
-                <button  type="button" className={`${buttonClass} ${liked ? "text-pink-500" : "text-white"}`} onClick={toggleLike}>
+                <button  type="button" className={`${buttonClass} ${liked ? "text-pink-500" : "text-white"}`} onClick={toggleLiked}>
                     <FontAwesomeIcon icon={faHeart} />
                 </button>
             </div>

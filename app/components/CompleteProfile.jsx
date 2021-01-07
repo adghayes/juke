@@ -43,9 +43,7 @@ function CompleteProfile({ callback }){
         }
 
         if(input.thumbnail){
-            const avatarUpload = new Uploader(input.thumbnail, e => {
-                console.log('progress ' + e.loaded / e.total)
-            })
+            const avatarUpload = new Uploader(input.thumbnail)
             payload.avatar = await avatarUpload.start()
         }
         patchUser(payload)

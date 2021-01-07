@@ -2,6 +2,7 @@ import { register } from '../lib/auth'
 import { useReducer } from 'react'
 import { TextField, SubmitButton, inputReducer, errorReducer } from './FormHelpers'
 import Link from 'next/link'
+import useUser from '../data/useUser'
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
@@ -17,6 +18,7 @@ const initialInput = {
 
 function Register({ callback }) {
     const [input, inputDispatch] = useReducer(inputReducer, initialInput)
+    const { mutate } = useUser()
     const { displayName, email, password, confirmPassword } = input
     
     const [errors, errorDispatch] = useReducer(errorReducer, {})
@@ -69,16 +71,19 @@ function Register({ callback }) {
             <TextField type='text' name='displayName' label='Display Name'
                 value={displayName} inputDispatch={inputDispatch} 
                 errors={errors.displayName} syncErrors={syncErrors('displayName')}
-                info={displayInfo}/>
+                info={displayInfo} autoComplete="username"/>
             <TextField type='text' name='email' label='Email'
                 value={email} inputDispatch={inputDispatch}
-                errors={errors.email} syncErrors={syncErrors('email')}/>
+                errors={errors.email} syncErrors={syncErrors('email')}
+                autoComplete="email"/>
             <TextField type='password' name='password' label='Password'
                 value={password} inputDispatch={inputDispatch} 
-                errors={errors.password} syncErrors={syncErrors('password')}/>
+                errors={errors.password} syncErrors={syncErrors('password')}
+                autoComplete="new-password"/>
             <TextField type='password' name='confirmPassword' label='Confirm Password'
                 value={confirmPassword} inputDispatch={inputDispatch} 
-                errors={errors.confirmPassword} syncErrors={syncErrors('confirmPassword')}/>
+                errors={errors.confirmPassword} syncErrors={syncErrors('confirmPassword')}
+                autoComplete="new-password"/>
             <SubmitButton disabled={!validateInput()} value='Sign Up' />
             <span className='text-sm pt-6 text-center'>Already have an account?
                 <Link href='/login'>

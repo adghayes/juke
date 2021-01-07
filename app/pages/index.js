@@ -31,7 +31,9 @@ export default function Home() {
 
 function Spotlight() {
   const { data: track, error } = useSWR("spotlight", async (key) =>
-    fetch(API.url(key)).then((res) => res.json()), {}
+    fetch(API.url(key)).then((res) => res.json()), {
+      dedupingInterval: 1000 * 60 * 60
+    }
   );
   const isLoading = !track && !error;
   if (isLoading) return null;
