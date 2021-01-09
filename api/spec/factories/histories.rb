@@ -10,8 +10,9 @@
 #
 # Indexes
 #
-#  index_histories_on_track_id  (track_id)
-#  index_histories_on_user_id   (user_id)
+#  index_histories_on_created_at  (created_at)
+#  index_histories_on_track_id    (track_id)
+#  index_histories_on_user_id     (user_id)
 #
 # Foreign Keys
 #

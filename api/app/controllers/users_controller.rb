@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :require_logged_in, only: :update
+  before_action :require_logged_in, only: [:update, :likes]
   before_action :require_logged_out, only: :create
 
   def create
@@ -44,6 +44,16 @@ class UsersController < ApplicationController
     else
       head :unprocessable_entity 
     end
+  end
+
+  def likes
+    @likes = current_user.liked_tracks.includes(:thumbnail_attachment, :streams_attachments)
+    render :likes
+  end
+
+  def history
+    @history = current_user.history_tracks(n)
+    render :history
   end
 
   private

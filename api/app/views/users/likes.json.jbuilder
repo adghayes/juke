@@ -1,0 +1,1 @@
+json.partial! 'tracks/tracks', tracks: @likes

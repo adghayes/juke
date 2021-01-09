@@ -18,8 +18,9 @@
 #
 FactoryBot.define do
   factory :user do
-    email { "" }
-    display_name { "MyString" }
-    password_digest { "MyString" }
+    email { Faker::Internet.unique.safe_email }
+    display_name { Faker::Internet.unique.username }
+    password { 'password' }
+    bio { Random.rand > 0.5 ? Faker::Lorem.sentence : ''}
   end
 end

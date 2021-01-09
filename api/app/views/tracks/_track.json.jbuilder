@@ -30,5 +30,8 @@ if current_user == track.owner
   json.submitted track.submitted
 end
 
+json.num_likes track.stats.likes_count
+json.num_listens track.stats.listens_count
+
 json.created track.created_at
 

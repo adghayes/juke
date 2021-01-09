@@ -11,6 +11,8 @@ if user == current_user
   json.email user.email
 end
 
-json.tracks user.track_ids
-json.likes user.likes.pluck(:track_id)
-json.histories user.histories.pluck(:track_id)
+json.track_ids user.track_ids
+
+json.liked_track_ids user.liked_track_ids
+
+json.history user.history_track_ids(10)

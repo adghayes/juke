@@ -44,6 +44,14 @@ class User < ApplicationRecord
 
   has_many :histories,
     dependent: :destroy
+
+  has_many :liked_tracks,
+    through: :likes,
+    source: :track
+
+  has_many :listened_tracks,
+    through: :histories,
+    source: :track
     
   has_one_attached :avatar
 
@@ -61,5 +69,17 @@ class User < ApplicationRecord
 
   def is_password?(password)
     BCrypt::Password.new(password_digest).is_password?(password)
+  end
+
+  def last_listened?(track_id)
+    histories.order(created_at: :desc).limit(1).pluck(:track_id)[0] == track_id
+  end
+
+  def history_track_ids(n)
+    histories.order(created_at: :desc).pluck(:track_id).uniq.slice(0, n)
+  end
+
+  def history_tracks(n)
+    Track.where(id: histories.order(created_at: :desc).pluck(:track_id).uniq.slice(0, 10)).includes(:thumbnail_attachment, :streams_attachments)
   end
 end

@@ -9,6 +9,7 @@
 #
 # Indexes
 #
+#  index_likes_on_created_at            (created_at)
 #  index_likes_on_track_id              (track_id)
 #  index_likes_on_user_id_and_track_id  (user_id,track_id) UNIQUE
 #

@@ -28,3 +28,6 @@
 
 # Ignore encrypted credentials
 /config/credentials.yml.enc
+
+# Ignore attachment seeds
+/spec/attachments/

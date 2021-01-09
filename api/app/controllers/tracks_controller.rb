@@ -49,6 +49,25 @@ class TracksController < ApplicationController
     end
   end
 
+  def listen
+    if current_user.listened_recently?(params[:id])
+      head :ok
+      return
+    end
+
+    @history = History.new({ user: current_user, track_id: params[:id] })
+    History.transaction do 
+      @history.save
+      current_user.histories.order(:created_at).limit(1).destroy
+    end
+
+    if @history.persisted
+      render :history
+    else
+      render json: @history.errors.messages, status: :unprocessable_entity
+    end
+  end
+
   def streams
     if params[:status] != 200
       @track.update(processing: 'error')

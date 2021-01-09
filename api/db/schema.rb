@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_07_035428) do
+ActiveRecord::Schema.define(version: 2021_01_08_235713) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 2021_01_07_035428) do
     t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["created_at"], name: "index_histories_on_created_at"
     t.index ["track_id"], name: "index_histories_on_track_id"
     t.index ["user_id"], name: "index_histories_on_user_id"
   end
@@ -57,6 +58,7 @@ ActiveRecord::Schema.define(version: 2021_01_07_035428) do
     t.bigint "track_id", null: false
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
+    t.index ["created_at"], name: "index_likes_on_created_at"
     t.index ["track_id"], name: "index_likes_on_track_id"
     t.index ["user_id", "track_id"], name: "index_likes_on_user_id_and_track_id", unique: true
   end
@@ -87,6 +89,7 @@ ActiveRecord::Schema.define(version: 2021_01_07_035428) do
     t.float "duration"
     t.string "processing"
     t.text "peaks"
+    t.index ["created_at"], name: "index_tracks_on_created_at"
     t.index ["owner_id", "title"], name: "index_tracks_on_owner_id_and_title", unique: true
     t.index ["title"], name: "index_tracks_on_title"
   end
@@ -111,4 +114,14 @@ ActiveRecord::Schema.define(version: 2021_01_07_035428) do
   add_foreign_key "likes", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "tracks", "users", column: "owner_id"
+
+  create_view "track_stats", sql_definition: <<-SQL
+      SELECT tracks.id,
+      count(DISTINCT likes.id) AS likes_count,
+      count(DISTINCT histories.id) AS listens_count
+     FROM ((tracks
+       LEFT JOIN likes ON ((tracks.id = likes.track_id)))
+       LEFT JOIN histories ON ((tracks.id = histories.track_id)))
+    GROUP BY tracks.id;
+  SQL
 end

@@ -18,6 +18,7 @@
 #
 # Indexes
 #
+#  index_tracks_on_created_at          (created_at)
 #  index_tracks_on_owner_id_and_title  (owner_id,title) UNIQUE
 #  index_tracks_on_title               (title)
 #
@@ -50,12 +51,29 @@ class Track < ApplicationRecord
   has_many :histories,
     dependent: :destroy
 
+  has_one :stats,
+    class_name: :TrackStats,
+    foreign_key: :id,
+    primary_key: :id
+
   has_one_attached :thumbnail
   has_one_attached :original
   has_many_attached :streams
 
   def should_generate_new_friendly_id?
     changed.include?('title')
+  end
+
+  def like_count
+    Rails.cache.fetch("#{cache_key_with_version}/like_count", expires_in: 1.minute) do
+      likes.count
+    end
+  end
+
+  def listen_count
+    Rails.cache.fetch("#{cache_key_with_version}/listen_count", expires_in: 1.minute) do
+      histories.count
+    end
   end
 
   def live?
