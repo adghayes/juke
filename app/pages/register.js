@@ -7,7 +7,6 @@ import Logo from '../components/Logo'
 
 
 export default function RegisterPage(props) {
-
   const [visible, setVisible] = useState(true)
   const [phaseIndex, setPhaseIndex] = useState(0)
 

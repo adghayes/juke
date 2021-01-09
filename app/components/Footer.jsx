@@ -3,8 +3,8 @@ import { JukeboxContext } from '../pages/_app'
 import { getThumbnail } from '../lib/thumbnails'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause, faStepForward, faStepBackward, faHeart } from '@fortawesome/free-solid-svg-icons'
-import useUser from '../data/useUser'
-import { like, unlike } from '../lib/api-track'
+import useUser from '../hooks/useUser'
+import useLiked from '../hooks/useLiked'
 
 const buttonClass = "w-5 mx-3"
 const frameInterval = 12
@@ -15,7 +15,9 @@ function normalize(num){
 
 function Footer(){
     const jukebox = useContext(JukeboxContext)
-    const { user, loggedOut } = useUser()
+    const track = jukebox.track
+    const { user } = useUser()
+    const [liked, toggleLiked] = useLiked(user, track)
 
     const [current, setCurrent] = useState(0)
     const [hover, setHover] = useState(false)
@@ -27,9 +29,8 @@ function Footer(){
     const nob = useRef(null)
     const bar = useRef(null)
 
-    const barPercent = jukebox.track && current / jukebox.track.duration * 100
+    const barPercent = track && current / track.duration * 100
     const readableCurrent = jukebox.composeDuration(current)
-    let liked  = !!user && !!jukebox.track && user.likes.includes(jukebox.track.id) 
 
     useEffect(() => {
         const animationStep = () => {
@@ -52,7 +53,7 @@ function Footer(){
     }, [jukebox, jukebox.playing])
 
     function togglePlay(){
-        if (jukebox.track){
+        if (track){
            jukebox.playing ? jukebox.pause() : jukebox.play() 
         }
     }
@@ -65,7 +66,7 @@ function Footer(){
 
     function seek(e){
         const ratio = getRatio(e)
-        setCurrent(ratio * jukebox.track.duration)
+        setCurrent(ratio * track.duration)
         jukebox.seek(ratio)
     }
 
@@ -87,21 +88,32 @@ function Footer(){
         }
     }
 
-    function toggleLiked(){
-        if (loggedOut) console.log('logged out')
-        
-        if(liked){
-            unlike(user, jukebox.track.id)
-        } else {
-            like(user, jukebox.track.id)
+    function skip(units){
+        jukebox.seek(normalize(current / track.duration + units / 32))
+    }
+
+    function handleKeyDown(e){
+        switch(e.key){
+            case "ArrowRight":
+                skip(1)
+                break
+            case "ArrowDown":
+                skip(1)
+                break
+            case "ArrowUp":
+                skip(-1)
+                break
+            case "ArrowLeft":
+                skip(-1)
+                break
         }
     }
 
     return (
         <footer className={`z-30 fixed bottom-0 w-full h-16 sm:h-12 bg-gray-700 flex justify-around items-center text-white py-2` +
-            'transition transform-gpu duration-1000 ' + (jukebox.track ? '' : 'translate-y-full')}>
-            <div className="flex flex-row justify-center">
-                <button type="button" className={buttonClass}>
+            'transition transform-gpu duration-1000 ' + (track ? '' : 'translate-y-full')}>
+            <div className="flex flex-row justify-center sm:w-48">
+                <button type="button" className={buttonClass} onClick={() => jukebox.stepBack()}>
                     <FontAwesomeIcon icon={faStepBackward}/>
                 </button>
                 <button type="button" className={buttonClass} onClick={togglePlay}>
@@ -110,19 +122,19 @@ function Footer(){
                     <FontAwesomeIcon icon={faPlay} /> 
                     }
                 </button>
-                <button type="button" className={buttonClass}>
+                <button type="button" className={buttonClass} onClick={() => jukebox.stepForward()}>
                     <FontAwesomeIcon icon={faStepForward} />
                 </button>
             </div>
-            <div className="flex-row items-center justify-center w-7/12 hidden sm:flex">
-                <span className="text-xs w-8 select-none">{jukebox.track && readableCurrent}</span>
+            <div className="flex-row items-center justify-center hidden sm:flex flex-grow">
+                <span className="text-xs w-6 select-none">{track && readableCurrent}</span>
                 <div 
                     className="flex flex-row px-2 py-4  w-full cursor-pointer" 
                     onMouseEnter={() => setHover(true)}
                     onMouseLeave={() => setHover(false)}
                     onClick={(e) => {if (e.target !== nob.current) seek(e)}}
                 >
-                    <div className="relative rounded bg-gray-200 h-1  w-full" ref={bar}>
+                    <div tabIndex="0" className="relative rounded bg-gray-200 h-1  w-full focus:h-2" ref={bar} onKeyDown={handleKeyDown}>
                         <div 
                             className="rounded bg-pink-500 absolute top-0 bottom-0 left-0"
                             style={{width: `${barPercent}%`}}
@@ -135,16 +147,16 @@ function Footer(){
                         />
                     </div>
                 </div>   
-                <span className="text-xs select-none">{jukebox.track && jukebox.readableDuration()}</span>
+                <span className="w-6 text-xs select-none">{track && jukebox.readableDuration()}</span>
             </div>                                                                                                                           
-            <div className="flex flex-row items-center">
-                <img src={getThumbnail(jukebox.track && jukebox.track.thumbnail)} 
+            <div className="flex flex-row items-center sm:w-72 sm:px-4">
+                <img src={getThumbnail(track && track.thumbnail)} 
                     alt=""
                     className="w-12 h-12 mx-3 sm:w-8 sm:h-8 sm:mx-2 rounded"
                     />
-                <div className="flex flex-col">
-                    <span className="text-gray-200 sm:text-xs">{jukebox.track && jukebox.track.owner.display_name}</span>
-                    <span className="text-white sm:text-xs">{jukebox.track && jukebox.track.title}</span>
+                <div className="flex flex-col w-40">
+                    <span className="text-gray-200 sm:text-xs">{track && track.owner.display_name}</span>
+                    <span className="text-white sm:text-xs truncate">{track && track.title}</span>
                 </div>
                 <button  type="button" className={`${buttonClass} ${liked ? "text-pink-500" : "text-white"}`} onClick={toggleLiked}>
                     <FontAwesomeIcon icon={faHeart} />

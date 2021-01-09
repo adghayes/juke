@@ -1,6 +1,7 @@
 import '../styles/globals.css'
 import Head from 'next/head'
 import Header from '../components/Header'
+import AccountAlert from '../components/AccountAlert'
 import Footer from '../components/Footer'
 import "tailwindcss/tailwind.css";
 import React, {useEffect, useState} from 'react';
@@ -8,7 +9,7 @@ import Jukebox from '../lib/jukebox'
 import debounce from 'lodash.debounce'
 
 export const JukeboxContext = React.createContext({})
-export const WindowContext = React.createContext(null)
+export const SetAlertContext = React.createContext(null)
 
 function App({ Component, pageProps }) {
 
@@ -30,20 +31,24 @@ function App({ Component, pageProps }) {
       window.onresize = null
     }
   }, [])
+
+  const [accountAlert, setAccountAlert] = useState(null)
   
   return (
     <JukeboxContext.Provider value={jukebox}>
-      <WindowContext.Provider value={innerWidth}>
+        <SetAlertContext.Provider value={setAccountAlert}>
         <div id="app" className="bg-gray-200 min-h-screen w-full relative">
           <Head>
             <title>Juke</title>
             <link rel="icon" href="/favicon.ico" /> 
           </Head>
+          
           <Header />
-          <Component {...pageProps}/>
+          <AccountAlert message={accountAlert} close={() => setAccountAlert(null)}/>
+          <Component {...pageProps} width={innerWidth}/>
           <Footer/>
         </div>
-      </WindowContext.Provider>
+        </SetAlertContext.Provider>
     </JukeboxContext.Provider>
   )
 }

@@ -30,27 +30,33 @@ export async function getTrack(trackId) {
   }).then((response) => response.json());
 }
 
-async function persistLike(trackId, method) {
-    return fetch(API.url(["tracks", trackId, "like"]), {
+async function persistLike(track, method) {
+    return fetch(API.url(["tracks", track.id, "like"]), {
         method,
         headers: API.authHeader(),
       })
 }
 
-export async function like(user, trackId) {
-  if (user.likes.includes(trackId)) return;
+export async function like(track) {
+  mutate("user", user => {
+    const mutatedLikedTrackIds = user.liked_track_ids.slice();
+    mutatedLikedTrackIds.push(track.id);
+    return { ...user, liked_track_ids: mutatedLikedTrackIds }
+  }, false);
 
-  const mutatedLikes = user.likes.slice();
-  mutatedLikes.push(trackId);
-  mutate("user", { ...user, likes: mutatedLikes }, false);
-  return persistLike(trackId, 'POST')
+  return persistLike(track, 'POST')
 }
 
-export async function unlike(user, trackId) {
-  if (!user.likes.includes(trackId)) return;
+export async function unlike(track) {
+  mutate("user", user => {
+    const mutatedLikedTrackIds = user.liked_track_ids.filter(id => id !== track.id);
+    return { ...user, liked_track_ids: mutatedLikedTrackIds }
+  }, false);
 
-  const mutatedLikes = user.likes.filter((id) => id !== trackId);
-  mutate("user", { ...user, likes: mutatedLikes }, false);
-  return persistLike(trackId, 'DELETE')
+  return persistLike(track, 'DELETE')
+}
+
+export async function listen(track){
+
 }
 

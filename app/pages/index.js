@@ -6,8 +6,8 @@ import TimeAgo from 'timeago-react'
 
 export default function Home() {
   return (
-    <div className="mt-11 bg-gradient-to-bl from-indigo-200 to-blue-300">
-      <main className="max-w-screen-lg mx-auto bg-white pb-12 sm:pb-12">
+    <div className="mt-11 bg-gradient-to-bl from-indigo-200 to-blue-300 min-h-screen">
+      <main className="max-w-screen-lg mx-auto bg-white min-h-screen">
         <section className="relative">
           <img
             src="/guitar-man.jpg"
@@ -36,7 +36,7 @@ function Spotlight() {
     }
   );
   const isLoading = !track && !error;
-  if (isLoading) return null;
+  if (isLoading || error) return null;
 
   return (
     <section className="p-6 flex flex-col justify-center items-center">
@@ -47,7 +47,7 @@ function Spotlight() {
         </p>
       </div>
       <Player track={track} />
-      <p className='px-4 md:text-xl py-8 font-bold'>the next track here could be yours...</p>
+      <p className='px-4 md:text-xl pt-8 font-bold'>the next track here could be yours...</p>
     </section>
   );
 }

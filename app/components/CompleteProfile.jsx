@@ -1,18 +1,19 @@
 import { inputReducer, SubmitButton, TextArea } from './FormHelpers'
 import Thumbnailer from './Thumbnailer'
 
-import Router from 'next/router'
 import useUser from '../data/useUser'
 import { useEffect, useReducer } from 'react'
 
 import Uploader from '../lib/uploader'
 import { patchUser } from '../lib/api-user'
 import { getAvatar } from '../lib/thumbnails'
+import { redirectUnlessUser } from '../hooks/useRedirect'
 
 const thumbnailInfo = 'Your thumbnail is what people see on your profile page, when you post ' +
     "tracks without their own thumbnail, or when you comment on other artist's tracks"
 
 function CompleteProfile({ callback }){
+    redirectUnlessUser()
     const { user, loggedOut, loading } = useUser()
 
     const [input, inputDispatch] = useReducer(inputReducer, {
@@ -23,10 +24,9 @@ function CompleteProfile({ callback }){
     useEffect(() => {
         if (user && user.bio){
             inputDispatch({bio: user.bio})
-        } else if(loggedOut){
-            Router.replace('/')
-        } 
-    }, [loggedOut, user])
+        }
+    }, [user])
+
     if(loggedOut) return 'redirecting...'
     if(loading) return (
         <p className="font-bold text-2xl animate-pulse">loading...</p>

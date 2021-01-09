@@ -8,8 +8,10 @@ import { postTrack, notifyUploadSuccess, getTrack } from '../lib/api-track'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { redirectUnlessUser } from '../hooks/useRedirect'
 
 export default function UploadPage(props) {
+  redirectUnlessUser()
 
   const [track, setTrack] = useState(null)
   const [uploadProgress, setUploadProgress] = useState(0)

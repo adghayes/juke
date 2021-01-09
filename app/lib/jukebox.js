@@ -2,14 +2,19 @@ import {Howl, Howler} from 'howler'
 import API from './api'
 
 export default class Jukebox {
-    constructor({sound, track, mutateJukebox, playing}){
+    constructor({sound, track, mutateJukebox, playing, queue}){
         this.sound = sound
         this.track = track
         this.mutateJukebox = mutateJukebox
         this.playing = playing
+        this.queue = queue
     }
 
-    play(track){
+    dispatch(){
+        this.mutateJukebox(new Jukebox({...this}))
+    }
+
+    play(track, queue){
         if(!track && !this.track) throw new Error('play what track?')
 
         if(track && (!this.track || track.id !== this.track.id)){
@@ -17,9 +22,13 @@ export default class Jukebox {
 
             this.sound = new Howl({
                 src: track.src.map(path => API.url(path)),
-                html5: true
+                html5: true,
+                onend: () => {
+                    this.stepForward.bind(this)()
+                }
             })
             this.track = track
+            if(queue) this.queue = queue
         } 
 
         this.sound.play()
@@ -33,6 +42,35 @@ export default class Jukebox {
             this.playing = false
             this.dispatch()
         } 
+    }
+
+    currentIndex(){
+        return this.queue.tracks.findIndex(track => track.id === this.track.id)
+    }
+
+    stepBack(){
+        if(!this.track || !this.queue) return
+
+        const previousTrack = this.queue.tracks[this.currentIndex() - 1]
+        if(this.seek() > 10){
+            this.seek(0)
+        } else if(previousTrack){
+            this.play(previousTrack)
+        } else {
+            this.seek(0)
+            this.pause()
+        }
+    }
+
+    stepForward(){
+        if(!this.track || !this.queue) return
+
+        const nextTrack = this.queue.tracks[this.currentIndex() + 1]
+        if(nextTrack){
+            this.play(nextTrack)
+        } else {
+            this.pause()
+        }
     }
 
     seek(val){
@@ -50,15 +88,6 @@ export default class Jukebox {
 
     volume(level){
         Howler.volume(level)
-    }
-
-    dispatch(){
-        this.mutateJukebox(new Jukebox({
-            sound: this.sound,
-            track: this.track,
-            playing: this.playing,
-            mutateJukebox: this.mutateJukebox
-        }))
     }
 
     composeDuration(seconds){
