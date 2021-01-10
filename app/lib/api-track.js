@@ -17,11 +17,16 @@ export async function patchTrack(payload, trackId) {
   }).then((response) => response.json());
 }
 
+// TODO FIX
 export async function notifyUploadSuccess(trackId) {
-    return patchTrack({
+  return fetch(API.url(["tracks", trackId]), {
+    method: "PATCH",
+    body: JSON.stringify({
       event: "uploaded",
       track: { uploaded: true },
-    }, trackId)
+    }),
+    headers: API.allHeaders(),
+  }).then((response) => response.json());
 }  
 
 export async function getTrack(trackId) {

@@ -158,7 +158,7 @@ export default function Waves({ track, active, barCount,
     }
 
     return (
-        <div className="relative hidden sm:block">
+        <div className="relative">
             <span className={`z-10 text-xs bg-gray-800 text-white text-bold px-0.5 absolute left-0 top-7`}>
                 {active && jukebox.composeDuration(playTime)}
             </span>

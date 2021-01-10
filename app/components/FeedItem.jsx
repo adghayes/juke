@@ -4,7 +4,7 @@ import TimeAgo from "timeago-react";
 
 export default function FeedItem({ track, queue, width }) {
   const ItemSource = track ? (
-    <div className="flex inline-flex items-center py-2 flex-start self-start">
+    <div className=" flex inline-flex items-center py-2 flex-start self-start text-sm">
       <img
         src={getAvatar(track.owner.avatar)}
         alt="Your user avatar"
@@ -12,7 +12,7 @@ export default function FeedItem({ track, queue, width }) {
         height="24"
         className="rounded-full"
       />
-      <span className="text-sm sm:text-base px-3">
+      <span className="px-3">
         {track.owner.display_name + " posted a track "}
         <TimeAgo datetime={track.created} />
         {"..."}
@@ -23,9 +23,11 @@ export default function FeedItem({ track, queue, width }) {
   );
 
   return (
-    <section className="flex flex-col items-center sm:items-start pt-2 pb-6">
+    <section className="flex flex-col items-center w-full py-4">
       {ItemSource}
-      <Player track={track} queue={queue} width={width} />
+      <div className="w-full self-center flex justify-center items-center">
+        <Player track={track} queue={queue} maxWidth={width} />
+      </div>
     </section>
   );
 }

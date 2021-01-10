@@ -6,7 +6,7 @@ import { faPlay, faPause, faStepForward, faStepBackward, faHeart } from '@fortaw
 import useUser from '../hooks/useUser'
 import useLiked from '../hooks/useLiked'
 
-const buttonClass = "w-5 mx-3"
+const buttonClass = "w-7 sm:w-5 mx-3"
 const frameInterval = 12
 
 function normalize(num){
@@ -149,12 +149,12 @@ function Footer(){
                 </div>   
                 <span className="w-6 text-xs select-none">{track && jukebox.readableDuration()}</span>
             </div>                                                                                                                           
-            <div className="flex flex-row items-center sm:w-72 sm:px-4">
+            <div className="flex flex-row items-center sm:w-48 md:w-72 sm:px-4">
                 <img src={getThumbnail(track && track.thumbnail)} 
                     alt=""
                     className="w-12 h-12 mx-3 sm:w-8 sm:h-8 sm:mx-2 rounded"
                     />
-                <div className="flex flex-col w-40">
+                <div className="flex flex-col w-28 md:w-40">
                     <span className="text-gray-200 sm:text-xs">{track && track.owner.display_name}</span>
                     <span className="text-white sm:text-xs truncate">{track && track.title}</span>
                 </div>

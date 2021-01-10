@@ -6,7 +6,7 @@ import TimeAgo from 'timeago-react'
 
 export default function Home() {
   return (
-    <div className="mt-11 bg-gradient-to-bl from-indigo-200 to-blue-300 min-h-screen">
+    <div className="bg-gradient-to-bl from-indigo-200 to-blue-300 min-h-screen">
       <main className="max-w-screen-lg mx-auto bg-white min-h-screen">
         <section className="relative">
           <img

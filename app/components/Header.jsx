@@ -163,7 +163,7 @@ function Dropdown(props) {
         <ul
           className={`bg-gray-700 flex flex-col absolute right-0 top-8 text-lg divide-y border-l border-b border-gray-900 divide-gray-900`}
         >
-          <NavLink label="Stream" href="/" addClass="px-6" />
+          <NavLink label="Stream" href="/stream" addClass="px-6" />
           <NavLink label="Library" href="/" />
           <UploadLink />
           <ProfileLinks />
