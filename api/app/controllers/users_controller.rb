@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :require_logged_in, only: [:update, :likes, :history]
+  before_action :require_logged_in, only: [:update, :history]
   before_action :require_logged_out, only: :create
 
   def create
@@ -46,14 +46,54 @@ class UsersController < ApplicationController
     end
   end
 
+  def tracks
+    @user = User.friendly.find(params[:id])
+    has_many_queue :tracks, tracks_user_path(@user)
+  end
+
   def likes
-    @likes = current_user.liked_tracks.includes(:thumbnail_attachment, :streams_attachments)
-    render :likes
+    @user = User.friendly.find(params[:id])
+    has_many_through_queue :likes, likes_user_path(@user)
   end
 
   def history
-    @history = current_user.history_tracks(n)
-    render :history
+    @user = User.friendly.find(params[:id])
+    if @user != current_user
+      head :forbidden
+      return
+    end
+    
+    has_many_through_queue :recents, history_user_path(@user)
+  end
+
+  def has_many_queue(association, next_path)
+    _queue association, :id, next_path
+  end
+
+  def has_many_through_queue(association, next_path)
+    _queue association, :track_id, next_path
+  end
+
+  def _queue(association, key, next_path)
+    sleep 1
+    latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now.iso8601
+    limit = params[:limit] ? params[:limit].to_i : 5
+
+    track_ids_with_timestamp = @user.send(association)
+      .where('created_at < ?', latest )
+      .order(created_at: :desc)
+      .limit(limit)
+      .pluck(key, :created_at)
+    track_ids, timestamps = track_ids_with_timestamp.transpose
+    @tracks = Track
+      .with_details
+      .find(track_ids)
+    
+    @oldest = timestamps.min
+    @path = next_path
+    @limit = limit
+
+    render 'tracks/queue'
   end
 
   private

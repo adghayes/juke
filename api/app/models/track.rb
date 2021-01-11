@@ -93,8 +93,7 @@ class Track < ApplicationRecord
       .with_attached_thumbnail
       .with_attached_streams
       .with_attached_original
-      .includes(:stats, :owner)
-      .eager_load(owner: [:avatar_attachment])
+      .eager_load(:stats, :owner, owner: [avatar_attachment: :blob])
   end
 
   private

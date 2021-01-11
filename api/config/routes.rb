@@ -13,12 +13,15 @@ Rails.application.routes.draw do
     collection do 
       get 'exists'
     end
+
+    member do 
+      get 'likes', to: 'users#likes'
+      get 'history', to: 'users#history'
+      get 'tracks', to: 'users#tracks'
+    end
   end
   
-  resource 'user', only: [:show, :update] do
-    get 'likes', to: 'users#likes'
-    get 'history', to: 'users#history'
-  end
+  resource 'user', only: [:show, :update]
 
   resource 'session', only: [:create, :destroy]
   post '/rails/active_storage/direct_uploads' => 'direct_uploads#create'
