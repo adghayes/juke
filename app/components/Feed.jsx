@@ -1,13 +1,14 @@
-import useFeed from "../hooks/useFeed";
+import useQueue from "../hooks/useQueue";
 import useUser from "../hooks/useUser";
 import FeedItem from "../components/FeedItem";
 import useRect from "../hooks/useRect";
 import { useEffect, useRef, useState } from "react";
 
-export default function Feed({}) {
+export default function Feed() {
   const rect = useRect("feed", 500);
   const { user, loading: userLoading } = useUser();
-  const queue = useFeed(userLoading ? false : user ? user.id : true);
+  const queueKey = userLoading ? null : ['feed', user ? user.id : null]
+  const queue = useQueue(queueKey, 'feed');
 
   const [spinner, setSpinner] = useState(true)
   const loading = useRef(true);

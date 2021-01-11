@@ -21,6 +21,12 @@ const API = {
     }
     return url.replace(/(?<!:)\/\//, "/");
   },
+
+  fetch: (path) => {
+    return fetch(API.url(path), {
+      headers: API.authHeader()
+    })
+  }
 };
 
 export default API;
