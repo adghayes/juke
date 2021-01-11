@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_08_235713) do
+ActiveRecord::Schema.define(version: 2021_01_10_083926) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -44,16 +44,6 @@ ActiveRecord::Schema.define(version: 2021_01_08_235713) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "histories", force: :cascade do |t|
-    t.bigint "track_id", null: false
-    t.bigint "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["created_at"], name: "index_histories_on_created_at"
-    t.index ["track_id"], name: "index_histories_on_track_id"
-    t.index ["user_id"], name: "index_histories_on_user_id"
-  end
-
   create_table "likes", force: :cascade do |t|
     t.bigint "track_id", null: false
     t.bigint "user_id", null: false
@@ -61,6 +51,21 @@ ActiveRecord::Schema.define(version: 2021_01_08_235713) do
     t.index ["created_at"], name: "index_likes_on_created_at"
     t.index ["track_id"], name: "index_likes_on_track_id"
     t.index ["user_id", "track_id"], name: "index_likes_on_user_id_and_track_id", unique: true
+  end
+
+  create_table "plays", force: :cascade do |t|
+    t.bigint "track_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["track_id"], name: "index_plays_on_track_id"
+  end
+
+  create_table "recents", force: :cascade do |t|
+    t.bigint "track_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["track_id"], name: "index_recents_on_track_id"
+    t.index ["user_id", "track_id"], name: "index_recents_on_user_id_and_track_id", unique: true
+    t.index ["user_id"], name: "index_recents_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -108,20 +113,21 @@ ActiveRecord::Schema.define(version: 2021_01_08_235713) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "histories", "tracks"
-  add_foreign_key "histories", "users"
   add_foreign_key "likes", "tracks"
   add_foreign_key "likes", "users"
+  add_foreign_key "plays", "tracks"
+  add_foreign_key "recents", "tracks"
+  add_foreign_key "recents", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "tracks", "users", column: "owner_id"
 
   create_view "track_stats", sql_definition: <<-SQL
       SELECT tracks.id,
       count(DISTINCT likes.id) AS likes_count,
-      count(DISTINCT histories.id) AS listens_count
+      count(DISTINCT plays.id) AS play_count
      FROM ((tracks
        LEFT JOIN likes ON ((tracks.id = likes.track_id)))
-       LEFT JOIN histories ON ((tracks.id = histories.track_id)))
+       LEFT JOIN plays ON ((tracks.id = plays.track_id)))
     GROUP BY tracks.id;
   SQL
 end

@@ -15,4 +15,4 @@ json.track_ids user.track_ids
 
 json.liked_track_ids user.liked_track_ids
 
-json.history user.history_track_ids(10)
+json.recents user.recent_track_ids

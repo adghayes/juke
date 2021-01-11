@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   
   resource 'user', only: [:show, :update] do
     get 'likes', to: 'users#likes'
+    get 'history', to: 'users#history'
   end
 
   resource 'session', only: [:create, :destroy]

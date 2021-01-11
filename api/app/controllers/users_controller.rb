@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :require_logged_in, only: [:update, :likes]
+  before_action :require_logged_in, only: [:update, :likes, :history]
   before_action :require_logged_out, only: :create
 
   def create

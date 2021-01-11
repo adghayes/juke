@@ -48,7 +48,7 @@ class Track < ApplicationRecord
   has_many :likes,
     dependent: :destroy
 
-  has_many :histories,
+  has_many :plays,
     dependent: :destroy
 
   has_one :stats,
@@ -86,6 +86,15 @@ class Track < ApplicationRecord
 
   def self.live 
     where(submitted: true, processing: "done")
+  end
+
+  def self.with_details
+    self
+      .with_attached_thumbnail
+      .with_attached_streams
+      .with_attached_original
+      .includes(:stats, :owner)
+      .eager_load(owner: [:avatar_attachment])
   end
 
   private

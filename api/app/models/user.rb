@@ -42,15 +42,15 @@ class User < ApplicationRecord
   has_many :likes,
     dependent: :destroy
 
-  has_many :histories,
+  has_many :recents,
     dependent: :destroy
 
   has_many :liked_tracks,
     through: :likes,
     source: :track
 
-  has_many :listened_tracks,
-    through: :histories,
+  has_many :recent_tracks,
+    through: :recents,
     source: :track
     
   has_one_attached :avatar
@@ -60,6 +60,12 @@ class User < ApplicationRecord
     return nil unless email_match
 
     email_match.is_password?(password) ? email_match : nil
+  end
+
+  def self.with_details
+    self
+      .includes(:tracks, :likes, :recents)
+      .with_attached_avatar
   end
 
   def password=(password)
@@ -75,11 +81,7 @@ class User < ApplicationRecord
     histories.order(created_at: :desc).limit(1).pluck(:track_id)[0] == track_id
   end
 
-  def history_track_ids(n)
-    histories.order(created_at: :desc).pluck(:track_id).uniq.slice(0, n)
-  end
-
-  def history_tracks(n)
-    Track.where(id: histories.order(created_at: :desc).pluck(:track_id).uniq.slice(0, 10)).includes(:thumbnail_attachment, :streams_attachments)
+  def recent_track_ids
+    recents.order(created_at: :desc).pluck(:track_id)
   end
 end

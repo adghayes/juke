@@ -30,8 +30,12 @@ if current_user == track.owner
   json.submitted track.submitted
 end
 
+if track.downloadable
+  json.download rails_blob_url(track.original)
+end
+
 json.num_likes track.stats.likes_count
-json.num_listens track.stats.listens_count
+json.num_plays track.stats.play_count
 
 json.created track.created_at
 

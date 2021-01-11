@@ -27,21 +27,18 @@
 #  fk_rails_...  (owner_id => users.id)
 #
 
-music_dir = File.join(Rails.root, 'spec', 'attachments', 'music')
-
 FactoryBot.define do
   factory :track do
     transient do 
-      filename { true }
-      path { File.join(music_dir, filename) }
-      metadata { AudioInfo.open(path) { |info| info.to_h } }
-      num_likes { 3 }
-      num_listens { 10 }
+      file { true }
+      basename {  File.basename(file) }
+      thumbnail { true }
+      metadata { AudioInfo.open(file) { |info| info.to_h } }
     end
 
-    title { metadata.title.presence || File.basename(filename, ".*").split('-').map(&:capitalize).join(' ') } 
+    title { basename } 
     duration { metadata["length"] } 
-    downloadable { Random.rand > 0.5 }
+    downloadable { Random.rand > 0.8 }
     description { Random.rand > 0.5 ? Faker::Lorem.sentence  : '' }
     peaks { Random.base64(432) }
     uploaded { true }
@@ -51,10 +48,12 @@ FactoryBot.define do
     created_at { Faker::Time.backward(days: 14) }
 
     after(:build) do |track, evaluator|
-      track.original.attach(io: File.open(evaluator.path), filename: evaluator.filename, 
-        content_type: MIME::Types.type_for(evaluator.filename)[0].to_s)
-      track.streams.attach(io: File.open(evaluator.path), filename: evaluator.filename, 
-        content_type: MIME::Types.type_for(evaluator.filename)[0].to_s)
+      track.original.attach(io: File.open(evaluator.file), filename: evaluator.basename, 
+        content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
+      track.streams.attach(io: File.open(evaluator.file), filename: evaluator.basename, 
+        content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
+      track.thumbnail.attach(io: File.open(evaluator.thumbnail), filename: File.basename(evaluator.thumbnail), 
+        content_type: MIME::Types.type_for(evaluator.thumbnail)[0].to_s)
     end
   end
 end
