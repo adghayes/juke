@@ -6,7 +6,7 @@ export default function LoginPage(props) {
   redirectIfUser()
 
   return (
-    <main className="relative min-h-screen w-full bg-gradient-to-tr from-blue-200 to-pink-300">
+    <main className="relative min-h-screen w-full bg-gradient-to-br from-indigo-300 to-pink-300">
       <Card visible={true}>
         <Login/>
       </Card>

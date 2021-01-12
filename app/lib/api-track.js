@@ -42,30 +42,38 @@ async function persistLike(track, method) {
       })
 }
 
-export async function like(user, track) {
-  mutate("user", () => {
+export async function like(track) {
+  mutate("user", user => {
+    if (!user) return user
+
+    mutate(`users/${user.slug}/likes`, likesQueue => {
+      if (!likesQueue) return likesQueue
+
+      const mutatedLikedTracks = [track, ...likesQueue.tracks]
+      return { ...likesQueue, tracks: mutatedLikedTracks }
+    }, false)
+
     const mutatedLikedTrackIds = [track.id, ...user.liked_track_ids];
     return { ...user, liked_track_ids: mutatedLikedTrackIds }
   }, false);
 
-  mutate([user.slug, "likes"], likesQueue => {
-    const mutatedLikedTracks = [track, ...likesQueue.tracks]
-    return { ...likesQueue, tracks: mutatedLikedTracks }
-  }, false)
-
   return persistLike(track, 'POST')
 }
 
-export async function unlike(user, track) {
-  mutate("user", () => {
+export async function unlike(track) {
+  mutate("user", user => {
+    if (!user) return user
+
+    mutate(`users/${user.slug}/likes`, likesQueue => {
+      if(!likesQueue) return likesQueue
+
+      const mutatedLikedTracks = likesQueue.tracks.filter(liked_track => liked_track.id !== track.id)
+      return { ...likesQueue, tracks: mutatedLikedTracks}
+    }, false)
+
     const mutatedLikedTrackIds = user.liked_track_ids.filter(id => id !== track.id);
     return { ...user, liked_track_ids: mutatedLikedTrackIds }
   }, false);
-
-  mutate([user.slug, "likes"], likesQueue => {
-    const mutatedLikedTracks = likesQueue.tracks.filter(liked_track => liked_track.id !== track.id)
-    return { ...likesQueue, tracks: mutatedLikedTracks}
-  }, false)
 
   return persistLike(track, 'DELETE')
 }
@@ -73,10 +81,14 @@ export async function unlike(user, track) {
 const RECENTS_LENGTH = 10
 
 export async function listen(track){
-  mutate("user", user => {
-    if(!user || user.recent_track_ids.includes(track.id)) return user
+  mutate("user", (user) => {
+    if(!user || user.recent_track_ids.includes(track.id)) {
+      return user
+    }
 
-    mutate([user.slug, "history"], historyQueue => {
+    mutate(`users/${user.slug}/history`, historyQueue => {
+      if(!historyQueue) return historyQueue
+      
       const mutatedHistoryTracks = [track, ...historyQueue.tracks]
       return { ...historyQueue, tracks: mutatedHistoryTracks}
     }, false)

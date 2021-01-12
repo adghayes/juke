@@ -8,7 +8,7 @@ export default class Jukebox {
   }
 
   dispatch() {
-    this.setJuke(juke => ({ jukebox: this, id: juke.id + 1}));
+    this.setJuke(juke => ({ ...juke, id: juke.id + 1}));
   }
 
   set(track) {
@@ -55,10 +55,6 @@ export default class Jukebox {
     this.dispatch();
   }
 
-  cancelSound(){
-
-  }
-
   _pausePlayback(){
     if (this.sound) this.sound.pause();
     if (this.timer) this.timer.stop()
@@ -88,7 +84,7 @@ export default class Jukebox {
   }
 
   stepBack() {
-    if (!this.track || !this.queue) return;
+    if (!this.queue) return;
 
     const previousTrack = this.queue.tracks[this.currentIndex() - 1];
     if (this.seek() > 10) {

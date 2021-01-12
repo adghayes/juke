@@ -7,14 +7,16 @@ import "tailwindcss/tailwind.css";
 import React, { useCallback, useEffect, useRef, useState} from 'react';
 import Jukebox from '../lib/jukebox'
 import { listen } from '../lib/api-track'
+import { mutate } from 'swr'
 
-export const JukeboxContext = React.createContext({})
-export const SetAlertContext = React.createContext(null)
+export const JukeContext = React.createContext({})
 
 function App({ Component, pageProps }) {
 
   const jukebox = useRef(new Jukebox({}))
-  const [juke, setJuke] = useState({ jukebox: jukebox.current, id: 0 })
+  const [myAlert, setAlert] = useState(null)
+
+  const [juke, setJuke] = useState({ setAlert, jukebox: jukebox.current, id: 0 })
   
 
   useEffect(() => {
@@ -22,27 +24,23 @@ function App({ Component, pageProps }) {
     window.jukebox = jukebox.current
     window.listen = listen
   }, [])
-
-  const [accountAlert, setAccountAlert] = useState(null)
   
   return (
-    <JukeboxContext.Provider value={juke}>
-        <SetAlertContext.Provider value={setAccountAlert}>
-        <div id="app" className="bg-gray-200 min-h-screen w-full relative">
-          <Head>
-            <title>Juke</title>
-            <link rel="icon" href="/favicon.ico" /> 
-          </Head>
-          
-          <Header />
-          <AccountAlert message={accountAlert} close={() => setAccountAlert(null)}/>
-          <div id="view" className={`fixed top-11 left-0 right-0 ${jukebox.track ? ' bottom-16 sm:bottom-12' : 'bottom-0' } overflow-y-scroll overflow-x-hidden`}>
-            <Component {...pageProps}/>
-          </div>
-          <Footer/>
+    <JukeContext.Provider value={juke}>
+      <div id="app" className="bg-gray-200 min-h-screen w-full relative">
+        <Head>
+          <title>Juke</title>
+          <link rel="icon" href="/favicon.ico" /> 
+        </Head>
+        
+        <Header />
+        <AccountAlert message={myAlert} close={() => setAlert(null)}/>
+        <div id="view" className={`fixed top-11 left-0 right-0 ${jukebox.track ? ' bottom-16 sm:bottom-12' : 'bottom-0' } overflow-y-scroll overflow-x-hidden`}>
+          <Component {...pageProps}/>
         </div>
-        </SetAlertContext.Provider>
-    </JukeboxContext.Provider>
+        <Footer/>
+      </div>
+    </JukeContext.Provider>
   )
 }
 

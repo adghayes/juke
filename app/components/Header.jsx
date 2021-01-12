@@ -6,7 +6,7 @@ import useUser from "../hooks/useUser";
 import { logout } from "../lib/auth";
 import { getAvatar } from "../lib/thumbnails";
 import Logo from "./Logo";
-import { SetAlertContext } from "../pages/_app";
+import { JukeContext } from "../pages/_app";
 
 function Header() {
   return (
@@ -15,7 +15,7 @@ function Header() {
         <HeaderLogo />
         <ul className="hidden md:flex h-full divide-x divide-gray-900 border-r border-gray-900 text-sm">
           <NavLink label="Stream" href="/stream" addClass="px-6" />
-          <NavLink label="Library" href="/library" addClass="px-6" />
+          <LibraryLink />
         </ul>
         <SearchBar />
         <ul className="hidden md:flex h-full items-center divide-x divide-gray-900 border-l border-r border-gray-900 text-sm">
@@ -33,8 +33,8 @@ function Header() {
 function HeaderLogo() {
   return (
     <Link href="/">
-      <a className="block h-full bg-gradient-to-t from-purple-500 to-pink-500 text-white  p-1.5 pt-0">
-        <Logo className="fill-current text-white h-11 w-14" />
+      <a className="block h-full bg-gradient-to-t from-purple-500 to-pink-500 pl-1.5 pr-0.5">
+        <Logo className="w-16 h-11"/>
       </a>
     </Link>
   );
@@ -84,9 +84,28 @@ function SearchBar() {
   );
 }
 
+function LibraryLink() {
+  const { user } = useUser()
+  const { setAlert } = useContext(JukeContext)
+
+  return (
+    <NavLink 
+      label="Library" 
+      href="/you" 
+      addClass="px-6" 
+      onClick={(e) => {
+        if(!user){
+          e.preventDefault()
+          setAlert("Your library is empty because you don't have an account yet...")
+        }
+      }}
+    />
+  )
+}
+
 function UploadLink() {
   const { user } = useUser()
-  const setAlert = useContext(SetAlertContext)
+  const { setAlert } = useContext(JukeContext)
 
   return (
     <NavLink
@@ -96,7 +115,7 @@ function UploadLink() {
       onClick={(e) => {
           if(!user){
             e.preventDefault()
-            setAlert('Uploading is something you need an account for... but getting an account is easy!')
+            setAlert('Uploading is something you need an account for...')
           }
         }}
     />
@@ -164,7 +183,7 @@ function Dropdown(props) {
           className={`bg-gray-700 flex flex-col absolute right-0 top-8 text-lg divide-y border-l border-b border-gray-900 divide-gray-900`}
         >
           <NavLink label="Stream" href="/stream" addClass="px-6" />
-          <NavLink label="Library" href="/library" />
+          <LibraryLink />
           <UploadLink />
           <ProfileLinks />
         </ul>

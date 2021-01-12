@@ -6,7 +6,7 @@ export function redirectUnlessUser(){
     const { loggedOut } = useUser();
     useEffect(() => {
       if (loggedOut) {
-        Router.replace("/");
+        Router.replace("/login");
       }
     }, [loggedOut]);  
 }

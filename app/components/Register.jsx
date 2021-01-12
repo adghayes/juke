@@ -2,7 +2,7 @@ import { register } from '../lib/auth'
 import { useReducer } from 'react'
 import { TextField, SubmitButton, inputReducer, errorReducer } from './FormHelpers'
 import Link from 'next/link'
-import useUser from '../data/useUser'
+import useUser from '../hooks/useUser'
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 

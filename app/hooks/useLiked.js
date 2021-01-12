@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react"
 import { like, unlike } from "../lib/api-track"
-import { SetAlertContext } from "../pages/_app"
+import { JukeContext } from "../pages/_app"
 
 export default function useLiked(user, track){
-    const setAlert = useContext(SetAlertContext)
+    const { setAlert } = useContext(JukeContext)
     const [numLikes, setNumLikes] = useState(null)
     useEffect(() => {
         if(track){
@@ -17,17 +17,16 @@ export default function useLiked(user, track){
           setAlert('Get an account so we can keep track of the songs you like!')
       }, numLikes]
     }
-    
     const liked  = user.liked_track_ids.includes(track.id)
 
     if (liked){
         return [true, () => {
-            unlike(user, track)
+            unlike(track)
             setNumLikes(numLikes - 1)
         }, numLikes]
     } else {
         return [false, () => {
-            like(user, track)
+            like(track)
             setNumLikes(numLikes + 1)
         }, numLikes]
     }

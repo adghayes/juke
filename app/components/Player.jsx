@@ -1,9 +1,9 @@
-import { useContext, useEffect, useMemo, useState } from "react";
+import { useContext, useMemo } from "react";
 
-import { JukeboxContext } from "../pages/_app";
+import { JukeContext } from "../pages/_app";
 import useUser from "../hooks/useUser";
 import { getThumbnail } from "../lib/thumbnails";
-
+import Link from 'next/link'
 import Waves from "./Waves";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlay, faPause, faHeart, faDownload } from "@fortawesome/free-solid-svg-icons";
@@ -12,7 +12,7 @@ import useLiked from "../hooks/useLiked";
 const bottomButtonClasses = "py-0.5 px-1.5  rounded flex flex-row items-center justify-center divide-x-8 divide-white m-1"
 
 function Player({ track, queue, maxWidth }) {
-  const jukebox = useContext(JukeboxContext).jukebox;
+  const jukebox = useContext(JukeContext).jukebox;
   const { user } = useUser();
   const [liked, toggleLiked, numLikes] = useLiked(user, track);
 
@@ -74,15 +74,16 @@ function Player({ track, queue, maxWidth }) {
                 {track.title}
               </span>
             </span>
-            <span className={`${titleWidth} ${horizontal ? 'px-0' : 'px-1' } truncate text-gray-700`}>
-              {track.owner.display_name}
-            </span>
+            <Link href={`/${track.owner.slug}`}>
+              <a className={`${titleWidth} ${horizontal ? 'px-0' : 'px-1' } block truncate text-gray-700 hover:underline focus:underline`}>
+                {track.owner.display_name}
+              </a>
+            </Link>
           </div>
         </div>
         {barCount ? (
           <Waves
             track={track}
-            scaleY={1}
             active={active}
             upperBarMinHeight={2}
             lowerBarMinHeight={1}

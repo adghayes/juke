@@ -1,7 +1,7 @@
 import { inputReducer, SubmitButton, TextArea } from './FormHelpers'
 import Thumbnailer from './Thumbnailer'
 
-import useUser from '../data/useUser'
+import useUser from '../hooks/useUser'
 import { useEffect, useReducer } from 'react'
 
 import Uploader from '../lib/uploader'

@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import useUser from "../hooks/useUser";
@@ -9,42 +8,26 @@ import Error from "next/error";
 import Queue from "../components/Queue";
 
 const tabs = [
-  { id: "tracks", label: "Tracks", condition: () => true },
-  { id: "likes", label: "Likes", condition: () => true },
-  {
-    id: "history",
-    label: "Listening History",
-    condition: (user, artist) => {
-      user && artist && user.id === artist.id;
-    },
-  },
+  { id: "tracks", label: "Tracks", private: false},
+  { id: "likes", label: "Likes", private: false },
+  { id: "history", label: "Listening History", private: true },
 ];
 
-export default function ArtistPage({ ownPage }) {
-  const { user, loggedOut, loading: userLoading } = useUser();
-
+export default function ArtistPage({ forceUser }) {
   const router = useRouter();
-  const { slug } = router.query;
-  const artistKey = !slug || ownPage ? null : `users/${slug}`;
-  const { data, error, loading: artistLoading } = useSWR(
-    artistKey,
-    (key) => {
-      return API.fetch(key).then((response) => {
-        if (!response.ok) {
-          const error = new Error(response.statusText);
-          error.status = response.status;
-          throw error;
-        }
-        return response.json();
-      });
-    },
+  const { artistSlug } = router.query;
+
+  const { user } = useUser();
+  const isUser = forceUser || (user && user.slug === artistSlug)
+
+  const artistKey = !artistSlug || isUser ? null : `users/${artistSlug}`;
+  const { data, error } = useSWR(artistKey, API.fetch,
     {
       dedupingInterval: 1000 * 60 * 60,
     }
   );
 
   const [openTab, setOpenTab] = useState("tracks");
-
   useEffect(() => {
     if (location.hash) {
       setOpenTab(location.hash.replace("#", ""));
@@ -52,19 +35,17 @@ export default function ArtistPage({ ownPage }) {
   }, []);
 
   if (error) return <Error statusCode={error.status} />;
-
-  const artist = ownPage ? user : data;
-  const loading = ownPage ? userLoading : artistLoading;
+  const artist = isUser ? user : data;
 
   return (
-    <div className="static bg-gradient-to-tl from-green-200 to-purple-300 min-h-screen w-screen">
-      <div className="lg:min-w-min max-w-screen-lg xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-col sm:flex-row p-4">
+    <div className="bg-gradient-to-tl from-green-200 to-purple-300 min-h-screen w-screen">
+      <div className="lg:min-w-min max-w-screen-lg xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-col md:flex-row p-4">
         <aside className="pr-4 border-r flex flex-col items-stretch divide-y flex-none">
           <div className="py-4 flex flex-col items-center">
             <img
               src={artist && getAvatar(artist.avatar)}
               alt={artist && `${artist.display_name}'s avatar`}
-              className="w-64 h-64 rounded-full shadow"
+              className="w-64 h-64 rounded-full"
             />
             <p className="text-xl font-bold text-center py-2">
               {artist && artist.display_name}
@@ -73,7 +54,7 @@ export default function ArtistPage({ ownPage }) {
           </div>
           <ul className="text-3xl divide-y border-b text-left">
             {tabs.map((tab) =>
-              tab.condition(user, artist) ? (
+              !tab.private || isUser ? (
                 <li key={tab.id}>
                   <a
                     href={`#${tab.id}`}
@@ -91,10 +72,7 @@ export default function ArtistPage({ ownPage }) {
         </aside>
         <main className="flex-grow pl-4">
           {artist ? (
-            <Queue
-              initialPath={`users/${artist.slug}/${openTab}`}
-              queueKey={[artist.slug, openTab]}
-            />
+            <Queue queueKey={`users/${artist.slug}/${openTab}`} />
           ) : null}
         </main>
       </div>

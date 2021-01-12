@@ -4,12 +4,12 @@ import { useContext, useEffect, useState } from "react";
 import useQueue from "../hooks/useQueue";
 import useUser from "../hooks/useUser";
 import { getThumbnail } from "../lib/thumbnails";
-import { JukeboxContext } from "../pages/_app";
+import { JukeContext } from "../pages/_app";
 
-export default function QueuePreview({ title, queueKey, initialPath, length, emptyMessage }) {
+export default function QueuePreview({ title, queueKey, length, emptyMessage }) {
   const { loggedOut } = useUser()
-  const jukebox = useContext(JukeboxContext).jukebox;
-  const queue = useQueue(queueKey, initialPath);
+  const jukebox = useContext(JukeContext).jukebox;
+  const queue = useQueue(queueKey);
   const [overlay, setOverlay] = useState(false)
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function QueuePreview({ title, queueKey, initialPath, length, emp
 
   return (
     <section className="lg:w-64 xl:w-72 my-8 mx-4 border-gray-300 border rounded flex flex-col items-stretch overflow-hidden">
-      <h2 className="text-lg font-bold px-4 py-2 bg-gradient-to-b from-red-200 to-pink-300">
+      <h2 className="text-lg font-bold px-4 py-2 bg-pink-100 border-b border-gray-300">
         {title}
       </h2>
       <div className="relative">

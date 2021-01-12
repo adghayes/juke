@@ -1,5 +1,5 @@
 import { useContext, useState, useRef, useEffect } from 'react'
-import { JukeboxContext } from '../pages/_app'
+import { JukeContext } from '../pages/_app'
 import { getThumbnail } from '../lib/thumbnails'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlay, faPause, faStepForward, faStepBackward, faHeart } from '@fortawesome/free-solid-svg-icons'
@@ -14,7 +14,7 @@ function normalize(num){
 }
 
 function Footer(){
-    const jukebox = useContext(JukeboxContext).jukebox
+    const jukebox = useContext(JukeContext).jukebox
     const track = jukebox.track
     const { user } = useUser()
     const [liked, toggleLiked] = useLiked(user, track)

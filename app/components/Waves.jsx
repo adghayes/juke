@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState, useRef, useMemo } from "react";
-import { JukeboxContext } from "../pages/_app";
+import { JukeContext } from "../pages/_app";
 
 const base64 =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -42,7 +42,7 @@ export default function Waves({
   barSpacing,
   lowerBarAlpha,
 }) {
-  const jukebox = useContext(JukeboxContext).jukebox;
+  const jukebox = useContext(JukeContext).jukebox;
 
   const canvasElement = useRef(null);
   const [ctx, setCtx] = useState(null);
@@ -195,7 +195,7 @@ export default function Waves({
   }
 
   return (
-    <div className="relative">
+    <div className="relative w-min">
       <span
         className={`z-10 text-xs bg-gray-800 text-white text-bold px-0.5 absolute left-0 top-7`}
       >

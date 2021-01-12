@@ -22,10 +22,18 @@ const API = {
     return url.replace(/(?<!:)\/\//, "/");
   },
 
-  fetch: (path) => {
-    return fetch(API.url(path), {
+  fetch: async (path) => {
+    const response = await fetch(API.url(path), {
       headers: API.authHeader()
     })
+
+    if (!response.ok) {
+      const error = new Error(response.statusText);
+      error.status = response.status;
+      throw error;
+    }
+    
+    return response.json();
   }
 };
 

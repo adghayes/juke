@@ -2,7 +2,6 @@ import { login } from '../lib/auth'
 import { useState, useReducer, useEffect } from 'react'
 import Router from 'next/router'
 import Link from 'next/link'
-import Logo from './Logo'
 import { TextField, SubmitButton, inputReducer } from './FormHelpers'
 
 const initialInput = {
@@ -30,7 +29,7 @@ function Login(props) {
         <form onSubmit={handleSubmit} className={`flex flex-col items-center px-8 py-4 bg-white rounded-xl`} >
             <div className="flex px-2 pb-2 rounded-full w-full items-center justify-center">
                 <h1 className="font-bold text-2xl px-2">JUKE</h1>
-                <Logo className="fill-current text-blue-700 w-24 h-16" /> 
+                <img src="/jukeColor.svg" alt="Juke Logo" className="w-32"/> 
             </div>
             {error ? 
                 <strong className='text-center text-red-700 font-medium text-xs whitespace-wrap w-56 pb-2'> 
