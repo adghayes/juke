@@ -15,4 +15,6 @@ json.track_ids user.track_ids
 
 json.liked_track_ids user.liked_track_ids
 
-json.recents user.recent_track_ids
+if user == current_user
+  json.recent_track_ids user.recent_track_ids
+end

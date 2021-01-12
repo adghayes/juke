@@ -1,7 +1,7 @@
 class TracksController < ApplicationController
   before_action :require_logged_in, only: [:create, :update, :like, :unlike]
   before_action :require_valid_jwt, only: :streams
-  before_action :set_track, only: [:show, :update, :streams]
+  before_action :set_track, only: [:show, :update, :streams, :listen]
   
   def create
     @track = Track.new(owner: current_user, **track_params)
@@ -50,21 +50,16 @@ class TracksController < ApplicationController
   end
 
   def listen
-    if current_user.listened_recently?(params[:id])
-      head :ok
-      return
-    end
+    @track.listen
 
-    @history = History.new({ user: current_user, track_id: params[:id] })
-    History.transaction do 
-      @history.save
-      current_user.histories.order(:created_at).limit(1).destroy
-    end
-
-    if @history.persisted
-      render :history
+    if current_user
+      if current_user.listen(@track)
+        head :ok
+      else
+        head :unprocessable_entity
+      end 
     else
-      render json: @history.errors.messages, status: :unprocessable_entity
+      head :ok
     end
   end
 

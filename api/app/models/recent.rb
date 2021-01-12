@@ -25,18 +25,4 @@ class Recent < ApplicationRecord
   belongs_to :track
 
   LENGTH = 10
-
-  def self.log(user, track)
-    existing = self.find_by(user: user, track: track)
-    return if existing
-
-    num_recents = user.recents.count
-    self.transaction do
-      user.recents.create(track: track)
-      if num_recents >= LENGTH
-        user.recents.order(:created_at).limit(1).destroy_all
-      end
-    end
-
-  end
 end

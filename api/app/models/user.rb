@@ -77,11 +77,18 @@ class User < ApplicationRecord
     BCrypt::Password.new(password_digest).is_password?(password)
   end
 
-  def last_listened?(track_id)
-    histories.order(created_at: :desc).limit(1).pluck(:track_id)[0] == track_id
-  end
+  def listen(track)
+    Recent.transaction do
+      existing = Recent.find_by(user: self, track: track)
+      return true if existing
 
-  def recent_track_ids
-    recents.order(created_at: :desc).pluck(:track_id)
+      num_recents = recents.count
+      entry = recents.create(track: track)
+      return false unless entry.persisted?
+
+      return true if num_recents < Recent::LENGTH
+
+      return recents.order(:created_at).limit(1).first.delete > 0
+    end
   end
 end

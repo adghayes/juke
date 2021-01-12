@@ -96,6 +96,10 @@ class Track < ApplicationRecord
       .eager_load(:stats, :owner, owner: [avatar_attachment: :blob])
   end
 
+  def listen
+    Play.create(track: self)
+  end
+
   private
 
   def require_original

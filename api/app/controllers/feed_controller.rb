@@ -10,14 +10,10 @@ class FeedController < ApplicationController
       .order('created_at': :desc)
       .limit(limit)
       .pluck(:id, :created_at)
+    track_ids, timestamps = track_ids_with_timestamp.transpose
+    @tracks = track_ids ? Track.with_details.find(track_ids) : []
 
-    track_ids, track_timestamp = track_ids_with_timestamp.transpose
-
-    @tracks = Track
-      .with_details
-      .find(track_ids)
-
-    @oldest = track_timestamp.min.iso8601
+    @oldest = timestamps.try(:min).try(:iso8601)
     @limit = limit
     @path = feed_path
       

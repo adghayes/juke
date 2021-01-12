@@ -14,7 +14,7 @@ class UsersController < ApplicationController
 
   def show
     if params[:id]
-      @user = User.find(params[:id])
+      @user = User.friendly.find(params[:id])
       render :show
     else
       require_logged_in
@@ -76,7 +76,7 @@ class UsersController < ApplicationController
 
   def _queue(association, key, next_path)
     sleep 1
-    latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now.iso8601
+    latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now
     limit = params[:limit] ? params[:limit].to_i : 5
 
     track_ids_with_timestamp = @user.send(association)
@@ -85,11 +85,9 @@ class UsersController < ApplicationController
       .limit(limit)
       .pluck(key, :created_at)
     track_ids, timestamps = track_ids_with_timestamp.transpose
-    @tracks = Track
-      .with_details
-      .find(track_ids)
+    @tracks = track_ids ? Track.with_details.find(track_ids) : []
     
-    @oldest = timestamps.min
+    @oldest = timestamps.try(:min).try(:iso8601)
     @path = next_path
     @limit = limit
 
