@@ -88,7 +88,7 @@ class User < ApplicationRecord
 
       return true if num_recents < Recent::LENGTH
 
-      return recents.order(:created_at).limit(1).first.delete > 0
+      return !recents.order(:created_at).limit(1).first.delete.persisted?
     end
   end
 end

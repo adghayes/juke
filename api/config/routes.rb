@@ -9,6 +9,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get '/tracks/:artist/:track', to: 'tracks#show'
+
   resources 'users', only: [:create, :show] do
     collection do 
       get 'exists'

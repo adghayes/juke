@@ -89,7 +89,12 @@ class TracksController < ApplicationController
   private
 
   def set_track
-    @track = Track.find(params[:id])
+    if params[:id]
+      @track = Track.find(params[:id])
+    else
+      @artist = User.friendly.find(params[:artist])
+      @track = @artist.tracks.friendly.find(params[:track])
+    end
   end
 
   def encode_peaks(peaks)
