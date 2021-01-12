@@ -1,79 +1,40 @@
 import useQueue from "../hooks/useQueue";
-import useUser from "../hooks/useUser";
 import Player from "../components/Player";
 import useRect from "../hooks/useRect";
-import { useEffect, useRef, useState } from "react";
+import useLoadingZone from "../hooks/useLoadingZone";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faList, faThLarge } from "@fortawesome/free-solid-svg-icons";
+import { useState } from "react";
 
-export default function Queue({queueKey, intialPath, emptyMessage}) {
+export default function Queue({queueKey, initialPath, emptyMessage}) {
   const [rect, rectRef] = useRect(500);
-  const { user, loading: userLoading } = useUser();
-  const queueKey = userLoading ? null : ['feed', user ? user.id : null]
-  const queue = useQueue(queueKey, 'feed');
-
-  const [spinner, setSpinner] = useState(true)
-  const loading = useRef(true);
-
-  useEffect(() => {
-    if(!!queue){
-      loading.current = false
-      setSpinner(false)
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach(async (entry) => {
-            if (entry.isIntersecting && !loading.current && queue.next) {
-              loading.current = true
-              setSpinner(true)
-              await queue.pushNext();
-              loading.current = false
-              setSpinner(false)
-            }
-          });
-        },
-        {
-          root: document.querySelector("#view"),
-          rootMargin: "0px",
-          threshold: 1.0,
-        }
-      );
-
-      const loadingElement = document.querySelector('#feed-loading')
-
-      observer.observe(loadingElement);
-
-      return () => {
-        observer.unobserve(loadingElement);
-      };
-    }
-  }, [!!queue, queue && queue.next])
+  const queue = useQueue(queueKey, initialPath);
+  const LoadingZone = useLoadingZone(queue)
+  const [tileView, setTileView] = useState(false)
 
   return (
-    <div ref={rectRef} className="p-1 flex flex-col w-full">
-     <ul className="flex flex-col">
+    <div ref={rectRef} className="p-1 flex flex-col items-center w-full">
+      <div className="flex flex-row justify-end self-stretch px-20 text-gray-800">
+        <button className={`p-1 mx-1 ${tileView ? '' : 'bg-gray-300'}`} onClick={() => setTileView(false)}>
+          <FontAwesomeIcon icon={faList} className="w-6"/>
+        </button>
+        <button className={`p-1 mx-1 ${tileView ? 'bg-gray-300' : ''}`} onClick={() => setTileView(true)}>
+          <FontAwesomeIcon icon={faThLarge} className="w-6"/>
+        </button>
+      </div>
+      <ul className={`flex ${tileView ? 'flex-row flex-wrap' : 'flex-col'}`}>
         {!!queue
           ? queue.tracks.map((track) => (
-              <li key={track.id}>
-                <Player track={track} queue={queue} maxWidth={rect && rect.width} />
+              <li key={track.id} className={`py-4 ${tileView ? 'px-4' : ''}`}>
+                <Player track={track} queue={queue} maxWidth={tileView ? 0 : rect && rect.width} />
               </li>
             ))
           : null}
       </ul>
-      <div className={`py-8 flex justify-center items-center`}
-          id="feed-loading"
-        >
-          { spinner ? <Spinner /> : null}
-        </div>
-    </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <div className="spinner rounded-full w-16 h-16 border-8 animate-spin">
-      <style jsx>{`
-        .spinner {
-          border-top-color: rgba(236, 72, 153);
-        }
-      `}</style>
+      {queue && queue.tracks.length === 0 ? 
+      <p className="text-2xl text-gray-800">{emptyMessage}</p>
+      : 
+      LoadingZone}
     </div>
   );
 }
