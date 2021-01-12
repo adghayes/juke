@@ -1,12 +1,13 @@
 import debounce from 'lodash.debounce'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-export default function useRect(id, wait){
+export default function useRect(wait){
+  const rectRef = useRef(null)
   const [rect, setRect] = useState(null)
   const debouncedSetRect = debounce(setRect, wait)
 
   useEffect(() => {
-    const element = document.getElementById(id)
+    const element = rectRef.current
     setRect(element.getBoundingClientRect())
 
     const observer = new ResizeObserver(entries => {
@@ -22,5 +23,5 @@ export default function useRect(id, wait){
     }
   },[])
 
-  return rect
+  return [rect, rectRef]
 }

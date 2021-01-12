@@ -12,20 +12,22 @@ export default function useLiked(user, track){
       }, [track])
     
     if (!track) return [undefined, () => {}]
-    if (!user) return [undefined, () => {
-        setAlert('Get an account so we can keep track of the songs you like!')
-    }, numLikes]
-
+    if (!user) {
+        return [undefined, () => {
+          setAlert('Get an account so we can keep track of the songs you like!')
+      }, numLikes]
+    }
+    
     const liked  = user.liked_track_ids.includes(track.id)
 
     if (liked){
         return [true, () => {
-            unlike(track)
+            unlike(user, track)
             setNumLikes(numLikes - 1)
         }, numLikes]
     } else {
         return [false, () => {
-            like(track)
+            like(user, track)
             setNumLikes(numLikes + 1)
         }, numLikes]
     }

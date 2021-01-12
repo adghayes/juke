@@ -4,23 +4,29 @@ import Header from '../components/Header'
 import AccountAlert from '../components/AccountAlert'
 import Footer from '../components/Footer'
 import "tailwindcss/tailwind.css";
-import React, { useState} from 'react';
+import React, { useCallback, useEffect, useRef, useState} from 'react';
 import Jukebox from '../lib/jukebox'
+import { listen } from '../lib/api-track'
 
 export const JukeboxContext = React.createContext({})
 export const SetAlertContext = React.createContext(null)
 
 function App({ Component, pageProps }) {
 
-  function mutateJukebox(newJukebox){
-    setJukebox(newJukebox)
-  }
+  const jukebox = useRef(new Jukebox({}))
+  const [juke, setJuke] = useState({ jukebox: jukebox.current, id: 0 })
+  
 
-  const [jukebox, setJukebox] = useState(new Jukebox({mutateJukebox}))
+  useEffect(() => {
+    jukebox.current.setJuke = setJuke
+    window.jukebox = jukebox.current
+    window.listen = listen
+  }, [])
+
   const [accountAlert, setAccountAlert] = useState(null)
   
   return (
-    <JukeboxContext.Provider value={jukebox}>
+    <JukeboxContext.Provider value={juke}>
         <SetAlertContext.Provider value={setAccountAlert}>
         <div id="app" className="bg-gray-200 min-h-screen w-full relative">
           <Head>
@@ -30,7 +36,7 @@ function App({ Component, pageProps }) {
           
           <Header />
           <AccountAlert message={accountAlert} close={() => setAccountAlert(null)}/>
-          <div id="view" className={`fixed top-11 left-0 right-0 ${jukebox.track ? ' bottom-16 sm:bottom-12' : 'bottom-0' } overflow-scroll`}>
+          <div id="view" className={`fixed top-11 left-0 right-0 ${jukebox.track ? ' bottom-16 sm:bottom-12' : 'bottom-0' } overflow-y-scroll overflow-x-hidden`}>
             <Component {...pageProps}/>
           </div>
           <Footer/>

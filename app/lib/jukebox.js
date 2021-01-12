@@ -1,108 +1,195 @@
-import {Howl, Howler} from 'howler'
-import API from './api'
+import { Howl, Howler } from "howler";
+import API from "./api";
+import { listen } from "./api-track";
 
 export default class Jukebox {
-    constructor({sound, track, mutateJukebox, playing, queue}){
-        this.sound = sound
-        this.track = track
-        this.mutateJukebox = mutateJukebox
-        this.playing = playing
-        this.queue = queue
+  constructor(){
+    this.navigationHistory = []
+  }
+
+  dispatch() {
+    this.setJuke(juke => ({ jukebox: this, id: juke.id + 1}));
+  }
+
+  set(track) {
+    if (!track) throw new Error("won't set track to falsy value");
+
+    if (!this.track || track.id !== this.track.id) {
+      this._pausePlayback();
+
+      this.sound = new Howl({
+        src: track.src.map(API.url),
+        html5: true,
+        onend: () => {
+          this.stepForward.bind(this)();
+        },
+      });
+      this.track = track;
+      this.timer = new Timer(5000, () => {
+        console.log('listened to ' + track.title)
+        listen(track)
+      })
+
+      this.navigationHistory.push(track.id)
+
+      this._ensureNext()
     }
+  }
 
-    dispatch(){
-        this.mutateJukebox(new Jukebox({...this}))
+  async _ensureNext(){
+    const nextTrack = this.queue && this.queue.tracks[this.currentIndex() + 1];
+    if(!nextTrack && this.queue && this.queue.pushNext){
+      this.queue = await this.queue.pushNext()
     }
+  }
 
-    play(track, queue){
-        if(!track && !this.track) throw new Error('play what track?')
+  play(track, queue) {
+    if (!track && !this.track) throw new Error("play what track?");
 
-        if(track && (!this.track || track.id !== this.track.id)){
-            if(this.playing) this.sound.pause()
+    if (queue) this.queue = queue;
+    if (track) this.set(track);
 
-            this.sound = new Howl({
-                src: track.src.map(path => API.url(path)),
-                html5: true,
-                onend: () => {
-                    this.stepForward.bind(this)()
-                }
-            })
-            this.track = track
-            if(queue) this.queue = queue
-        } 
+    this.sound.play();
+    this.timer.start()
+    this.playing = true;
+    this.dispatch();
+  }
 
-        this.sound.play()
-        this.playing = true
-        this.dispatch()
+  cancelSound(){
+
+  }
+
+  _pausePlayback(){
+    if (this.sound) this.sound.pause();
+    if (this.timer) this.timer.stop()
+  }
+
+  pause() {
+    this._pausePlayback();
+    this.playing = false;
+    this.dispatch();
+  }
+
+  toggle(track, queue) {
+    if (!this.track || track.id !== this.track.id || !this.playing) {
+      this.play(track, queue);
+    } else {
+      this.pause();
     }
+  }
 
-    pause(){
-        if (this.playing){
-            this.sound.pause()
-            this.playing = false
-            this.dispatch()
-        } 
+  _stepTo(track) {
+    this.set(track);
+    this.playing ? this.play() : this.dispatch();
+  }
+
+  currentIndex() {
+    return this.queue.tracks.findIndex((track) => track.id === this.track.id);
+  }
+
+  stepBack() {
+    if (!this.track || !this.queue) return;
+
+    const previousTrack = this.queue.tracks[this.currentIndex() - 1];
+    if (this.seek() > 10) {
+      this.seek(0);
+    } else if (previousTrack) {
+      this._stepTo(previousTrack);
+    } else {
+      this.seek(0);
+      this.pause();
     }
+  }
 
-    currentIndex(){
-        return this.queue.tracks.findIndex(track => track.id === this.track.id)
+  stepForward() {
+    if (!this.track || !this.queue) return;
+
+    const nextTrack = this.queue.tracks[this.currentIndex() + 1];
+    if (nextTrack) {
+      this._stepTo(nextTrack);
+    } else {
+      this.pause();
     }
+  }
 
-    stepBack(){
-        if(!this.track || !this.queue) return
+  seek(val) {
+    if (this.sound) {
+      if (val !== undefined) {
+        let newPosition = this.sound.seek(val * this.track.duration);
+        if (!this.playing) this.dispatch();
+        return newPosition;
+      } else {
+        return this.sound.seek();
+      }
+    }
+    return 0;
+  }
 
-        const previousTrack = this.queue.tracks[this.currentIndex() - 1]
-        if(this.seek() > 10){
-            this.seek(0)
-        } else if(previousTrack){
-            this.play(previousTrack)
-        } else {
-            this.seek(0)
-            this.pause()
+  queueAlert(queue){
+    if(this.queue && (JSON.stringify(this.queue.key) === JSON.stringify(queue.key))){
+      this.queue = queue
+    }
+  }
+
+  volume(level) {
+    Howler.volume(level);
+  }
+
+  composeDuration(seconds) {
+    let hours, minutes;
+    if (seconds > 3600) {
+      hours = Math.floor(seconds / 3600);
+      seconds = seconds % 3600;
+    }
+    minutes = Math.floor(seconds / 60);
+    seconds = Math.floor(seconds % 60);
+
+    return (
+      (hours ? hours.toString() + ":" : "") +
+      minutes.toString() +
+      ":" +
+      seconds.toString().padStart(2, "0")
+    );
+  }
+
+  readableDuration() {
+    return this.composeDuration(this.track.duration);
+  }
+}
+
+class Timer {
+  constructor(time, cb){
+    this.time = time
+    this.elapsed = 0
+    this.listened = false
+    this.cb = cb
+  }
+
+  start(){
+    if (this.started) return
+
+    if(!this.listened){
+      this.started = Date.now()
+      this.poll = setInterval(() => {
+        if (this.current() > this.time){
+          this.listened = true
+          this.started = null
+          clearInterval(this.poll)
+          this.cb()
         }
+      }, 2000)
     }
+  }
 
-    stepForward(){
-        if(!this.track || !this.queue) return
+  stop(){
+    if(!this.started) return
 
-        const nextTrack = this.queue.tracks[this.currentIndex() + 1]
-        if(nextTrack){
-            this.play(nextTrack)
-        } else {
-            this.pause()
-        }
-    }
+    this.elapsed += Date.now() - this.started
+    this.started = null
+    if(this.poll) clearInterval(this.poll)
+  }
 
-    seek(val){
-        if(this.sound){
-            if(val !== undefined){ 
-                let newPosition = this.sound.seek(val * this.track.duration)
-                if (!this.playing) this.dispatch()
-                return newPosition
-            } else {
-                return this.sound.seek()
-            }
-        } 
-        return 0
-    }
-
-    volume(level){
-        Howler.volume(level)
-    }
-
-    composeDuration(seconds){
-        let hours, minutes
-        if (seconds > 3600){
-            hours = Math.floor(seconds / 3600)
-            seconds = seconds % 3600
-        }
-        minutes = Math.floor(seconds / 60)
-        seconds = Math.floor(seconds % 60)
-
-        return (hours ? hours.toString() + ':' : '') + minutes.toString() + ':' + seconds.toString().padStart(2, '0')
-    }
-
-    readableDuration(){
-        return this.composeDuration(this.track.duration)
-    }
+  current(){
+    return this.elapsed + (this.started ? (Date.now() - this.started) : 0)
+  }
 }

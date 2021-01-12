@@ -15,7 +15,7 @@ function Header() {
         <HeaderLogo />
         <ul className="hidden md:flex h-full divide-x divide-gray-900 border-r border-gray-900 text-sm">
           <NavLink label="Stream" href="/stream" addClass="px-6" />
-          <NavLink label="Library" href="/" addClass="px-6" />
+          <NavLink label="Library" href="/library" addClass="px-6" />
         </ul>
         <SearchBar />
         <ul className="hidden md:flex h-full items-center divide-x divide-gray-900 border-l border-r border-gray-900 text-sm">
@@ -164,7 +164,7 @@ function Dropdown(props) {
           className={`bg-gray-700 flex flex-col absolute right-0 top-8 text-lg divide-y border-l border-b border-gray-900 divide-gray-900`}
         >
           <NavLink label="Stream" href="/stream" addClass="px-6" />
-          <NavLink label="Library" href="/" />
+          <NavLink label="Library" href="/library" />
           <UploadLink />
           <ProfileLinks />
         </ul>

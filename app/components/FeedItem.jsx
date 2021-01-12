@@ -2,7 +2,7 @@ import { getAvatar } from "../lib/thumbnails";
 import Player from "./Player";
 import TimeAgo from "timeago-react";
 
-export default function FeedItem({ track, queue, width }) {
+export default function FeedItem({ track, queue, maxWidth }) {
   const ItemSource = track ? (
     <div className=" flex inline-flex items-center py-2 flex-start self-start text-sm">
       <img
@@ -23,10 +23,10 @@ export default function FeedItem({ track, queue, width }) {
   );
 
   return (
-    <section className="flex flex-col items-center w-full py-4">
+    <section className="flex flex-col items-center py-4">
       {ItemSource}
-      <div className="w-full self-center flex justify-center items-center">
-        <Player track={track} queue={queue} maxWidth={width} />
+      <div className="flex flex-col items-start ">
+        <Player track={track} queue={queue} maxWidth={maxWidth} />
       </div>
     </section>
   );

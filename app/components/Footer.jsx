@@ -6,7 +6,7 @@ import { faPlay, faPause, faStepForward, faStepBackward, faHeart } from '@fortaw
 import useUser from '../hooks/useUser'
 import useLiked from '../hooks/useLiked'
 
-const buttonClass = "w-7 sm:w-5 mx-3"
+const buttonClass = "w-5 mx-2 sm:mx-3"
 const frameInterval = 12
 
 function normalize(num){
@@ -14,7 +14,7 @@ function normalize(num){
 }
 
 function Footer(){
-    const jukebox = useContext(JukeboxContext)
+    const jukebox = useContext(JukeboxContext).jukebox
     const track = jukebox.track
     const { user } = useUser()
     const [liked, toggleLiked] = useLiked(user, track)
@@ -29,7 +29,7 @@ function Footer(){
     const nob = useRef(null)
     const bar = useRef(null)
 
-    const barPercent = track && current / track.duration * 100
+    const barPercent = track && normalize(current / track.duration) * 100
     const readableCurrent = jukebox.composeDuration(current)
 
     useEffect(() => {
@@ -53,9 +53,7 @@ function Footer(){
     }, [jukebox, jukebox.playing])
 
     function togglePlay(){
-        if (track){
-           jukebox.playing ? jukebox.pause() : jukebox.play() 
-        }
+      track && jukebox.playing ? jukebox.pause() : jukebox.play() 
     }
 
     function getRatio(e){
@@ -134,7 +132,7 @@ function Footer(){
                     onMouseLeave={() => setHover(false)}
                     onClick={(e) => {if (e.target !== nob.current) seek(e)}}
                 >
-                    <div tabIndex="0" className="relative rounded bg-gray-200 h-1  w-full focus:h-2" ref={bar} onKeyDown={handleKeyDown}>
+                    <div className="relative rounded bg-gray-200 h-1  w-full focus:h-2" ref={bar} onKeyDown={handleKeyDown}>
                         <div 
                             className="rounded bg-pink-500 absolute top-0 bottom-0 left-0"
                             style={{width: `${barPercent}%`}}
@@ -154,9 +152,9 @@ function Footer(){
                     alt=""
                     className="w-12 h-12 mx-3 sm:w-8 sm:h-8 sm:mx-2 rounded"
                     />
-                <div className="flex flex-col w-28 md:w-40">
-                    <span className="text-gray-200 sm:text-xs">{track && track.owner.display_name}</span>
-                    <span className="text-white sm:text-xs truncate">{track && track.title}</span>
+                <div className="flex flex-col w-24 text-sm sm:text-xs md:w-40">
+                    <span className="text-gray-200 truncate">{track && track.owner.display_name}</span>
+                    <span className="text-white truncate">{track && track.title}</span>
                 </div>
                 <button  type="button" className={`${buttonClass} ${liked ? "text-pink-500" : "text-white"}`} onClick={toggleLiked}>
                     <FontAwesomeIcon icon={faHeart} />

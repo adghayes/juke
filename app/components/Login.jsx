@@ -19,7 +19,7 @@ function Login(props) {
         e.preventDefault()
         login(email, password)
             .then(() => {
-                Router.replace('/')
+                Router.replace('/stream')
             })
             .catch(() => {
                 setError(true)

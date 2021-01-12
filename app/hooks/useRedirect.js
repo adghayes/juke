@@ -15,7 +15,7 @@ export function redirectIfUser(){
     const { user } = useUser();
     useEffect(() => {
       if (user) {
-        Router.replace("/");
+        Router.replace("/stream");
       }
     }, [user]);  
 }

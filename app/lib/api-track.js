@@ -42,26 +42,58 @@ async function persistLike(track, method) {
       })
 }
 
-export async function like(track) {
-  mutate("user", user => {
-    const mutatedLikedTrackIds = user.liked_track_ids.slice();
-    mutatedLikedTrackIds.push(track.id);
+export async function like(user, track) {
+  mutate("user", () => {
+    const mutatedLikedTrackIds = [track.id, ...user.liked_track_ids];
     return { ...user, liked_track_ids: mutatedLikedTrackIds }
   }, false);
+
+  mutate([user.slug, "likes"], likesQueue => {
+    const mutatedLikedTracks = [track, ...likesQueue.tracks]
+    return { ...likesQueue, tracks: mutatedLikedTracks }
+  }, false)
 
   return persistLike(track, 'POST')
 }
 
-export async function unlike(track) {
-  mutate("user", user => {
+export async function unlike(user, track) {
+  mutate("user", () => {
     const mutatedLikedTrackIds = user.liked_track_ids.filter(id => id !== track.id);
     return { ...user, liked_track_ids: mutatedLikedTrackIds }
   }, false);
 
+  mutate([user.slug, "likes"], likesQueue => {
+    const mutatedLikedTracks = likesQueue.tracks.filter(liked_track => liked_track.id !== track.id)
+    return { ...likesQueue, tracks: mutatedLikedTracks}
+  }, false)
+
   return persistLike(track, 'DELETE')
 }
 
-export async function listen(track){
+const RECENTS_LENGTH = 10
 
+export async function listen(track){
+  mutate("user", user => {
+    if(!user || user.recent_track_ids.includes(track.id)) return user
+
+    mutate([user.slug, "history"], historyQueue => {
+      const mutatedHistoryTracks = [track, ...historyQueue.tracks]
+      return { ...historyQueue, tracks: mutatedHistoryTracks}
+    }, false)
+      
+    const mutatedRecentTrackIds = [track.id, ...user.recent_track_ids]
+    if (mutatedRecentTrackIds.length > RECENTS_LENGTH){
+      mutatedRecentTrackIds.pop()
+    }
+
+    return { ...user, recent_track_ids: mutatedRecentTrackIds}
+  }, false)
+  
+  return fetch(API.url(["tracks", track.id, "listen"]), {
+    method: "POST",
+    headers: API.authHeader(),
+  })
 }
+
+
 
