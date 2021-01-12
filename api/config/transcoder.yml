@@ -1,0 +1,34 @@
+default: &default
+  peaks:
+    count: 2304
+    quality: 0.5
+  specs: 
+    - format: webm
+      audio: 
+        bitrate: 96
+      video: false
+      options: 
+        - "-dash 1"
+      extension: webm
+    - format: mp3
+      audio:
+        bitrate: 128
+      video: false
+      extension: mp3
+  metadata:
+    platform: noisepuff
+  client:
+    endpoint: http://localhost:3002
+    max_attempts: 1
+  function: ffmpeg-dev-transcode
+  host: http://docker.for.mac.localhost:3000
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
+  client: null
