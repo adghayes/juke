@@ -67,7 +67,7 @@ function Register({ callback }) {
 
     return (
         <form id='register' className='flex flex-col items-center px-8 py-4 bg-white rounded-xl' onSubmit={handleSubmit}>
-            <h1 className='text-3xl py-4 font-medium'>Join Noisepuff</h1>
+            <h1 className='text-3xl py-4 font-medium'>Join Juke</h1>
             <TextField type='text' name='displayName' label='Display Name'
                 value={displayName} inputDispatch={inputDispatch} 
                 errors={errors.displayName} syncErrors={syncErrors('displayName')}

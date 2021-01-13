@@ -16,7 +16,7 @@ default: &default
       video: false
       extension: mp3
   metadata:
-    platform: noisepuff
+    platform: juke
   client:
     endpoint: http://localhost:3002
     max_attempts: 1

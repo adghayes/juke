@@ -138,9 +138,9 @@ class TracksController < ApplicationController
     config = Rails.application.config.transcoder
 
     jwt = encode_jwt({
-      iss: 'noisepuff-api',
+      iss: 'juke',
       exp: (Time.now.to_i + 3600),
-      sub: 'noisepuff-transcoder'
+      sub: 'juke-transcoder'
     })
 
     outputs = config.specs.map do |spec|
