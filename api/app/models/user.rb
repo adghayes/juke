@@ -20,13 +20,12 @@ class User < ApplicationRecord
   extend FriendlyId
   friendly_id :display_name, :use => :slugged
 
-  validates :email, presence: { message: "Can't be empty"}, uniqueness: { message: "That's already taken"},
+  validates :email, uniqueness: { message: "That's already taken", case_sensitive: false },
     format: { with: URI::MailTo::EMAIL_REGEXP, message: "Invalid email address" }
-  validates :display_name, presence: { message: "Can't be blank"}, uniqueness: { message: "That's already taken"},
-    length: { minimum: 3, message: "Minimum length: 3" }
-  validates :password_digest, presence: { message: "Can't be blank" }
-  validates :password, length: { minimum: 8, allow_nil: true , message: "Minimum length: 8"}
-  validates :slug, presence: true
+  validates :display_name, uniqueness: { message: "That's already taken"},
+    length: { minimum: 3, maximum: 24 }
+  validates :password_digest, presence: true
+  validates :password, length: { minimum: 8, allow_nil: true }
   validates :bio, length: { maximum: 160 }
 
   attr_reader :password
@@ -79,16 +78,10 @@ class User < ApplicationRecord
 
   def listen(track)
     Recent.transaction do
-      existing = Recent.find_by(user: self, track: track)
-      return true if existing
-
-      num_recents = recents.count
-      entry = recents.create(track: track)
-      return false unless entry.persisted?
-
-      return true if num_recents < Recent::LENGTH
-
-      return !recents.order(:created_at).limit(1).first.delete.persisted?
+      recent = Recent.find_or_create_by(user: self, track: track)
+      if recent.persisted? && recents.count > Recent::LENGTH
+        recents.order(:created_at).first.delete
+      end
     end
   end
 end

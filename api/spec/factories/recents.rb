@@ -20,6 +20,8 @@
 #
 FactoryBot.define do
   factory :recent do
-    
+    user { association :user }
+    track { association :track }
+    created_at { Faker::Time.backward(days: 14) }
   end
 end

@@ -19,17 +19,29 @@
 FactoryBot.define do
   factory :user do
     transient do 
-      avatar { true }
+      avatar { false }
     end
 
     email { Faker::Internet.unique.safe_email }
     display_name { Faker::Games::SuperSmashBros.unique.fighter }
     password { 'password' }
-    bio { Random.rand > 0.5 ? Faker::Lorem.sentence : ''}
+    bio { Faker::Lorem.sentence}
+
+    factory :user_with_recents do
+      transient do
+        recents_count { Recent::LENGTH }
+      end
+
+      after(:create) do |user, evaluator|
+        FactoryBot.create_list(:recent, evaluator.recents_count, user: user)
+      end
+    end
 
     after(:build) do |user, evaluator|
-      user.avatar.attach(io: File.open(evaluator.avatar), filename: File.basename(evaluator.avatar), 
-        content_type: MIME::Types.type_for(evaluator.avatar)[0].to_s)
+      if evaluator.avatar
+        user.avatar.attach(io: File.open(evaluator.avatar), filename: File.basename(evaluator.avatar), 
+          content_type: MIME::Types.type_for(evaluator.avatar)[0].to_s)
+      end
     end
   end
 end

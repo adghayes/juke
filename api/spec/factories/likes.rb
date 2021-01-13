@@ -20,6 +20,7 @@
 #
 FactoryBot.define do
   factory :like do
-    
+    track { association :track }
+    user { association :user }
   end
 end

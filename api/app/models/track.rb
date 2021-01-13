@@ -32,13 +32,16 @@ class Track < ApplicationRecord
 
   after_initialize :default_processing
 
-  validate :require_original
-  validates :title, presence: { if: :submitted, message: 'Tracks need a title!' }, 
+  validates :description, length: { maximum: 160 }
+  
+  validates :title, presence: { if: :submitted }, 
     uniqueness: { scope: :owner_id, allow_nil: true, message: 'You already have a track with that title' }
-  validates :slug, presence: { if: :submitted }
+  validates :slug, presence: { if: :submitted }, uniqueness: { scope: :owner_id, allow_nil: true }
+  
+  validate :require_streams, if: :processed?
   validates :duration, presence: { if: :processed? }
   validates :peaks, presence: { if: :processed? }
-  validates :description, length: { maximum: 160 }
+
 
   belongs_to :owner,
     class_name: :User,
@@ -104,6 +107,10 @@ class Track < ApplicationRecord
 
   def require_original
     errors.add(:original, 'Must have an associated audio file') unless original.attached?
+  end
+
+  def require_streams
+    errors.add(:streams, 'Must have an associated file for streaming') unless streams.attached?
   end
 
   def default_processing

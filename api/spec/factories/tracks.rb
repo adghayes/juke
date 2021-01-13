@@ -29,31 +29,36 @@
 
 FactoryBot.define do
   factory :track do
-    transient do 
-      file { true }
-      basename {  File.basename(file) }
-      thumbnail { true }
-      metadata { AudioInfo.open(file) { |info| info.to_h } }
-    end
-
-    title { basename } 
-    duration { metadata["length"] } 
-    downloadable { Random.rand > 0.8 }
-    description { Random.rand > 0.5 ? Faker::Lorem.sentence  : '' }
-    peaks { Random.base64(432) }
-    uploaded { true }
+    owner { association :user }
+    title { Faker::Lorem.unique.word }
     submitted { true }
-    processing { 'done' }
-    owner { User.all[Random.rand(User.count)] }
-    created_at { Faker::Time.backward(days: 14) }
+    
+    factory :track_live do
+      transient do
+        original { File.join(Rails.root, 'spec', 'attachments', 'cantina.mp3') }
+        streams { original }
+        basename { original ? File.basename(original) : nil }
+        metadata { original ? AudioInfo.open(original) { |info| info.to_h } : nil }
+      end
 
-    after(:build) do |track, evaluator|
-      track.original.attach(io: File.open(evaluator.file), filename: evaluator.basename, 
-        content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
-      track.streams.attach(io: File.open(evaluator.file), filename: evaluator.basename, 
-        content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
-      track.thumbnail.attach(io: File.open(evaluator.thumbnail), filename: File.basename(evaluator.thumbnail), 
-        content_type: MIME::Types.type_for(evaluator.thumbnail)[0].to_s)
+      duration { metadata && metadata["length"] || 150  } 
+      peaks { Random.base64(432) }
+      uploaded { true }
+      processing { 'done' }
+
+      after(:build) do |track, evaluator|
+        if evaluator.original
+          track.original.attach(io: File.open(evaluator.original), filename: evaluator.basename, 
+            content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
+          track.streams.attach(io: File.open(evaluator.original), filename: evaluator.basename, 
+            content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
+        end
+
+        if evaluator.thumbnail
+          track.thumbnail.attach(io: File.open(evaluator.thumbnail), filename: File.basename(evaluator.thumbnail), 
+            content_type: MIME::Types.type_for(evaluator.thumbnail)[0].to_s)
+        end
+      end
     end
   end
 end

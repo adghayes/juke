@@ -19,7 +19,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Recent < ApplicationRecord
-  validates_uniqueness_of :track_id, scope: :user_id
+  validates :user, uniqueness: { scope: :track_id }
 
   belongs_to :user
   belongs_to :track

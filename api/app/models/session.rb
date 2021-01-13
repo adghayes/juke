@@ -22,7 +22,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Session < ApplicationRecord
-  validates :token, presence: true
+  validates :token, presence: true, uniqueness: true
 
   belongs_to :user
 

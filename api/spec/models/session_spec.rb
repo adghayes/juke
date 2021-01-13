@@ -24,5 +24,45 @@
 require 'rails_helper'
 
 RSpec.describe Session, type: :model do
-  pending "add some examples to (or delete) #{__FILE__}"
+  let(:user) { FactoryBot.create(:user) }
+  subject(:session) { FactoryBot.create( :session) }
+
+  describe "validations" do
+    it { should validate_uniqueness_of(:token) }
+  end
+
+  describe "associations" do
+    it { should belong_to(:user) }
+  end
+
+  describe "::generate_token" do
+    it 'generates a base64 token of length 24' do
+      expect(Session.generate_token).to match(/[a-zA-Z0-9+\/]{24}/)
+    end
+  end
+
+  describe "#deactivate!" do
+    it 'sets active to false' do
+      expect(session.active).to be true
+      session.deactivate!
+      expect(session.active).to be false
+    end
+  end
+
+  describe "::for" do
+    it 'creates a session for a user' do
+      expect(user.sessions).to match_array([])
+      user_session = Session.for(user)
+      expect(user_session.persisted?).to be true
+      expect(user.reload.sessions.to_a).to include(user_session)
+    end
+
+    it 'adds details about the session if provided' do
+      device = 'MacBook Pro'
+      browser = 'Chrome'
+      details_session = Session.for(user, device: device, browser: browser)
+      expect(details_session.device).to eq device
+      expect(details_session.browser).to eq browser
+    end
+  end
 end

@@ -16,6 +16,6 @@
 #
 FactoryBot.define do
   factory :play do
-    
+    track { association :track }
   end
 end
