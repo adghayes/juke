@@ -2,6 +2,7 @@ class ApplicationController < ActionController::API
   include Auth
   helper_method :current_user
   before_action :identify_bearer
+  before_action :set_default_response_format
 
   def log_in_user(user)
     client = DeviceDetector.new(request.user_agent)
@@ -9,5 +10,9 @@ class ApplicationController < ActionController::API
     browser = client.name
 
     Session.for(user, device: device, browser: browser).token
+  end
+
+  def set_default_response_format
+    request.format = :json
   end
 end

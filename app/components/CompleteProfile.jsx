@@ -46,7 +46,7 @@ function CompleteProfile({ callback }){
             const avatarUpload = new Uploader(input.thumbnail)
             payload.avatar = await avatarUpload.start()
         }
-        patchUser(payload)
+        patchUser(user.id, payload)
         if(callback) callback()
     }
 

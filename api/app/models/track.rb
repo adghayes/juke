@@ -35,8 +35,7 @@ class Track < ApplicationRecord
   validates :description, length: { maximum: 160 }
   
   validates :title, presence: { if: :submitted }, 
-    uniqueness: { scope: :owner_id, allow_nil: true, message: 'You already have a track with that title' }
-  validates :slug, presence: { if: :submitted }, uniqueness: { scope: :owner_id, allow_nil: true }
+    uniqueness: { scope: :owner_id, if: :submitted, message: 'You already have a track with that title' }
   
   validate :require_streams, if: :processed?
   validates :duration, presence: { if: :processed? }
@@ -80,7 +79,7 @@ class Track < ApplicationRecord
   end
 
   def live?
-    uploaded && submitted && processed?
+    submitted && processed?
   end
 
   def processed?

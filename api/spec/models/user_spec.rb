@@ -96,7 +96,7 @@ RSpec.describe User, type: :model do
   describe '#listen' do
     let(:user_with_recents) { FactoryBot.create(:user_with_recents) }
     let(:initial_recents) { user_with_recents.recents }
-    let(:track) { FactoryBot.create(:track_submitted) }
+    let(:track) { FactoryBot.create(:track) }
 
     it 'does nothing if recent already exists' do
       recent_track = user_with_recents.recents.first.track

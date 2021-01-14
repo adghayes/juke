@@ -6,7 +6,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       @token = log_in_user(@user)
-      render 'sessions/show'
+      render 'sessions/show', status: :created
     else
       render json: @user.errors.messages, status: :unprocessable_entity
     end
@@ -26,11 +26,15 @@ class UsersController < ApplicationController
   end
 
   def update
-    if current_user.update(user_params)
-      @user = current_user
-      render :show
+    @user = User.friendly.find(params[:id])
+    if @user == current_user
+      if @user.update(user_params)
+        render :show
+      else
+        render json: @user.errors.messages, status: :unprocessable_entity
+      end
     else
-      render json: current_user.errors.messages, status: :unprocessable_entity
+      head :forbidden
     end
   end
     
@@ -66,16 +70,17 @@ class UsersController < ApplicationController
     has_many_through_queue :recents, history_user_path(@user)
   end
 
+  private
+
   def has_many_queue(association, next_path)
-    _queue association, :id, next_path
+    queue association, :id, next_path
   end
 
   def has_many_through_queue(association, next_path)
-    _queue association, :track_id, next_path
+    queue association, :track_id, next_path
   end
 
-  def _queue(association, key, next_path)
-    sleep 1
+  def queue(association, key, next_path)
     latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now
     limit = params[:limit] ? params[:limit].to_i : 5
 
@@ -93,8 +98,6 @@ class UsersController < ApplicationController
 
     render 'tracks/queue'
   end
-
-  private
 
   def user_params
     params.require(:user).permit(:email, :password, :display_name, :bio, :avatar)

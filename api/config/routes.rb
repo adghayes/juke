@@ -11,7 +11,7 @@ Rails.application.routes.draw do
 
   get '/tracks/:artist/:track', to: 'tracks#show'
 
-  resources 'users', only: [:create, :show] do
+  resources 'users', only: [:create, :show, :update] do
     collection do 
       get 'exists'
     end
@@ -23,7 +23,7 @@ Rails.application.routes.draw do
     end
   end
   
-  resource 'user', only: [:show, :update]
+  resource 'user', only: [:show]
 
   resource 'session', only: [:create, :destroy]
   post '/rails/active_storage/direct_uploads' => 'direct_uploads#create'

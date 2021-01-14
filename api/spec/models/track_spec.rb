@@ -28,28 +28,20 @@
 #
 
 RSpec.describe Track, type: :model do
+  subject(:track)  { FactoryBot.create(:track) }
+
   describe 'validations' do
-    it do
-      should validate_uniqueness_of(:slug)
-        .scoped_to(:owner_id)
-        .allow_nil
-    end 
-
-    it do 
-      should validate_uniqueness_of(:title)
-        .allow_nil
-        .scoped_to(:owner_id)
-        .with_message('You already have a track with that title') 
-    end
-
     context 'when submitted' do
-      subject { FactoryBot.build(:track, submitted: true)}
       it { should validate_presence_of(:title) }
-      it { should validate_presence_of(:slug) }
+      it do 
+        should validate_uniqueness_of(:title)
+          .scoped_to(:owner_id)
+          .with_message('You already have a track with that title') 
+      end
     end
 
     context 'when processed' do
-      subject { FactoryBot.build(:track, processing: "done") }
+      subject { FactoryBot.create(:track_live) }
       it { should validate_presence_of(:peaks) }
       it { should validate_presence_of(:duration) }
     end
@@ -67,11 +59,46 @@ RSpec.describe Track, type: :model do
     it { should have_many_attached(:streams) }
   end
 
-  describe '#should generate_new_friendly_id?' do
+  describe '#should_generate_new_friendly_id?' do
     context 'title is not changed' do
       it 'should be false' do
-        
+        expect(track.should_generate_new_friendly_id?).to be false
       end
+    end
+
+    context 'title has changed' do
+      it 'should be true' do
+        track.title = track.title + " changed"
+        expect(track.should_generate_new_friendly_id?).to be true
+      end
+    end
+  end
+
+  describe '#live?' do
+    context 'submitted and unprocessed track' do
+      it 'should be false' do
+        expect(track.live?).to be(false)
+      end
+    end
+
+    context 'processed and unsubmitted track' do
+      it 'should be true' do
+        expect(FactoryBot.create(:track_live, submitted: false).live?).to be(false)
+      end
+    end
+
+    context 'processed and submitted track' do
+      it 'should be true' do
+        expect(FactoryBot.create(:track_live).live?).to be(true)
+      end
+    end
+  end
+
+  describe '#listen' do
+    it 'creates a new play record' do
+      initial_count = track.plays.count
+      track.listen
+      expect(track.plays.count).to be (initial_count + 1)
     end
   end
 end

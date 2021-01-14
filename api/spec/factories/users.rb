@@ -23,7 +23,7 @@ FactoryBot.define do
     end
 
     email { Faker::Internet.unique.safe_email }
-    display_name { Faker::Games::SuperSmashBros.unique.fighter }
+    display_name { Faker::Internet::unique.username(specifier: 3..24) }
     password { 'password' }
     bio { Faker::Lorem.sentence}
 

@@ -36,9 +36,9 @@ FactoryBot.define do
     factory :track_live do
       transient do
         original { File.join(Rails.root, 'spec', 'attachments', 'cantina.mp3') }
-        streams { original }
-        basename { original ? File.basename(original) : nil }
+        streams { [original] }
         metadata { original ? AudioInfo.open(original) { |info| info.to_h } : nil }
+        thumbnail { false } 
       end
 
       duration { metadata && metadata["length"] || 150  } 
@@ -48,10 +48,15 @@ FactoryBot.define do
 
       after(:build) do |track, evaluator|
         if evaluator.original
-          track.original.attach(io: File.open(evaluator.original), filename: evaluator.basename, 
-            content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
-          track.streams.attach(io: File.open(evaluator.original), filename: evaluator.basename, 
-            content_type: MIME::Types.type_for(evaluator.basename)[0].to_s)
+          track.original.attach(io: File.open(evaluator.original), filename: File.basename(evaluator.original), 
+            content_type: MIME::Types.type_for(evaluator.original)[0].to_s)
+        end
+
+        if evaluator.streams.length > 0
+          evaluator.streams.each do |stream|
+            track.streams.attach(io: File.open(stream), filename: File.basename(stream), 
+            content_type: MIME::Types.type_for(stream)[0].to_s)
+          end
         end
 
         if evaluator.thumbnail

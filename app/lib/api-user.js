@@ -20,8 +20,8 @@ export async function userFetcher(key){
     }
 }
 
-export async function patchUser(payload){
-    return fetch(API.url('user'), {
+export async function patchUser(id, payload){
+    return fetch(API.url(['users', id]), {
         method: 'PATCH',
         body: JSON.stringify({ user: payload }),
         headers: API.allHeaders()

@@ -16,112 +16,50 @@ RSpec.describe "/sessions", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Session. As you add validations to Session, be sure to
   # adjust the attributes here as well.
-  let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
-  }
+  let(:user) { FactoryBot.create(:user, password: "password") }
 
-  let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
-  }
+  let(:valid_attributes) { { password: "password", email: user.email } }
 
-  # This should return the minimal set of values that should be in the headers
-  # in order to pass any filters (e.g. authentication) defined in
-  # SessionsController, or in your router and rack
-  # middleware. Be sure to keep this updated too.
-  let(:valid_headers) {
-    {}
-  }
-
-  describe "GET /index" do
-    it "renders a successful response" do
-      Session.create! valid_attributes
-      get sessions_url, headers: valid_headers, as: :json
-      expect(response).to be_successful
-    end
-  end
-
-  describe "GET /show" do
-    it "renders a successful response" do
-      session = Session.create! valid_attributes
-      get session_url(session), as: :json
-      expect(response).to be_successful
-    end
-  end
+  let(:invalid_attributes) { { password: "wrong_password", email: user.email } }
 
   describe "POST /create" do
     context "with valid parameters" do
       it "creates a new Session" do
         expect {
-          post sessions_url,
-               params: { session: valid_attributes }, headers: valid_headers, as: :json
+          post session_url,
+               params: { user: valid_attributes }, as: :json
         }.to change(Session, :count).by(1)
       end
 
       it "renders a JSON response with the new session" do
-        post sessions_url,
-             params: { session: valid_attributes }, headers: valid_headers, as: :json
+        post session_url,
+             params: { user: valid_attributes }, as: :json
         expect(response).to have_http_status(:created)
-        expect(response.content_type).to match(a_string_including("application/json"))
       end
     end
 
     context "with invalid parameters" do
       it "does not create a new Session" do
         expect {
-          post sessions_url,
-               params: { session: invalid_attributes }, as: :json
+          post session_url,
+               params: { user: invalid_attributes }, as: :json
         }.to change(Session, :count).by(0)
       end
 
       it "renders a JSON response with errors for the new session" do
-        post sessions_url,
-             params: { session: invalid_attributes }, headers: valid_headers, as: :json
+        post session_url,
+             params: { user: invalid_attributes }, as: :json
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq("application/json")
-      end
-    end
-  end
-
-  describe "PATCH /update" do
-    context "with valid parameters" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
-
-      it "updates the requested session" do
-        session = Session.create! valid_attributes
-        patch session_url(session),
-              params: { session: invalid_attributes }, headers: valid_headers, as: :json
-        session.reload
-        skip("Add assertions for updated state")
-      end
-
-      it "renders a JSON response with the session" do
-        session = Session.create! valid_attributes
-        patch session_url(session),
-              params: { session: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq("application/json")
-      end
-    end
-
-    context "with invalid parameters" do
-      it "renders a JSON response with errors for the session" do
-        session = Session.create! valid_attributes
-        patch session_url(session),
-              params: { session: invalid_attributes }, headers: valid_headers, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq("application/json")
       end
     end
   end
 
   describe "DELETE /destroy" do
     it "destroys the requested session" do
-      session = Session.create! valid_attributes
-      expect {
-        delete session_url(session), headers: valid_headers, as: :json
-      }.to change(Session, :count).by(-1)
+      user = FactoryBot.create(:user)
+      session = Session.for(user)
+      delete session_url, headers: { 'Authorization' => "bearer #{session.token}"}
+      expect(session.reload.active).to be false
     end
   end
 end
