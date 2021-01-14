@@ -6,7 +6,7 @@ class TracksController < ApplicationController
   def create
     @track = Track.new(owner: current_user, **track_params)
     if @track.save
-      render :show
+      render :show, status: :created
     else
       render json: @track.errors.messages, status: :unprocessable_entity
     end
@@ -19,7 +19,7 @@ class TracksController < ApplicationController
   def update
     if @track.owner == current_user
       if @track.update(track_params)
-        start_processing if params[:event] == 'uploaded'
+        start_processing if @track.previous_changes["uploaded"] == [false, true]
         render :show
       else
         render json: @track.errors.messages, status: :unprocessable_entity
@@ -66,7 +66,7 @@ class TracksController < ApplicationController
   def streams
     if params[:status] != 200
       @track.update(processing: 'error')
-      head :ok
+      return head :ok
     end
 
     signed_blob_ids = []
@@ -117,15 +117,6 @@ class TracksController < ApplicationController
 
   def sample_peaks(slice)
     slice.map(&:abs).sum / slice.length
-  end
-
-  def parse_duration(duration)
-    sum = 0
-    parts = duration.split(':')
-    parts.length.times do | i |
-      sum += parts[parts.length - 1 - i].to_f * 60 ** i
-    end
-    sum
   end
 
   def track_params
