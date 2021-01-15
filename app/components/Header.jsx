@@ -34,7 +34,7 @@ function HeaderLogo() {
   return (
     <Link href="/">
       <a className="block h-full bg-gradient-to-t from-purple-500 to-pink-500 pl-1.5 pr-0.5">
-        <Logo className="w-16 h-11"/>
+        <Logo className="w-16 h-11" />
       </a>
     </Link>
   );
@@ -68,7 +68,11 @@ function SearchBar() {
 
   return (
     <div className="flex flex-grow justify-center items-center relative">
-      <a className="contents" href="https://github.com/adghayes/juke" target="_blank">
+      <a
+        className="contents"
+        href="https://github.com/adghayes/juke"
+        target="_blank"
+      >
         <input
           disabled
           type="text"
@@ -88,27 +92,29 @@ function SearchBar() {
 }
 
 function LibraryLink() {
-  const { user } = useUser()
-  const { setAlert } = useContext(JukeContext)
+  const { user } = useUser();
+  const { setAlert } = useContext(JukeContext);
 
   return (
-    <NavLink 
-      label="Library" 
-      href="/you" 
-      addClass="px-6" 
+    <NavLink
+      label="Library"
+      href="/you"
+      addClass="px-6"
       onClick={(e) => {
-        if(!user){
-          e.preventDefault()
-          setAlert("Your library is empty because you don't have an account yet...")
+        if (!user) {
+          e.preventDefault();
+          setAlert(
+            "Your library is empty because you don't have an account yet..."
+          );
         }
       }}
     />
-  )
+  );
 }
 
 function UploadLink() {
-  const { user } = useUser()
-  const { setAlert } = useContext(JukeContext)
+  const { user } = useUser();
+  const { setAlert } = useContext(JukeContext);
 
   return (
     <NavLink
@@ -116,11 +122,11 @@ function UploadLink() {
       href="/upload"
       addClass="px-4"
       onClick={(e) => {
-          if(!user){
-            e.preventDefault()
-            setAlert('Uploading is something you need an account for...')
-          }
-        }}
+        if (!user) {
+          e.preventDefault();
+          setAlert("Uploading is something you need an account for...");
+        }
+      }}
     />
   );
 }

@@ -20,13 +20,21 @@ export default function Stream({}) {
               title="Your Likes"
               length={3}
               queueKey={user && `users/${user.slug}/likes`}
-              emptyMessage={ !user ? "gotta be logged in to save your likes... ": "start liking tracks to add them to your library..."}
+              emptyMessage={
+                !user
+                  ? "gotta be logged in to save your likes... "
+                  : "start liking tracks to add them to your library..."
+              }
             />
             <QueuePreview
               title="Recently Played"
               length={3}
               queueKey={user && `users/${user.slug}/history`}
-              emptyMessage={ !user ? "gotta be logged in for this too..." : "nothing here yet..."}
+              emptyMessage={
+                !user
+                  ? "gotta be logged in for this too..."
+                  : "nothing here yet..."
+              }
             />
           </div>
         </aside>

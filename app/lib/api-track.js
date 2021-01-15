@@ -100,8 +100,8 @@ export async function listen(track) {
           if (!historyQueue) return historyQueue;
 
           const mutatedHistoryTracks = [track, ...historyQueue.tracks];
-          if(mutatedHistoryTracks.length > RECENTS_LENGTH){
-            mutatedHistoryTracks.pop()
+          if (mutatedHistoryTracks.length > RECENTS_LENGTH) {
+            mutatedHistoryTracks.pop();
           }
           return { ...historyQueue, tracks: mutatedHistoryTracks };
         },

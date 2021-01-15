@@ -7,7 +7,7 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins /(|http:\/\/)(localhost|192\.168\.1\.\d+|127\.0\.0\.1|lvh\.me):\d+/
+    origins /http:\/\/lvh\.me(:\d+)?/, /https:\/\/.*\.vercel\.app/
 
     resource '*',
       headers: :any,

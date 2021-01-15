@@ -1,8 +1,8 @@
-import { redirectUnlessUser } from '../hooks/useRedirect'
-import ArtistPage from './[artistSlug]'
+import { redirectUnlessUser } from "../hooks/useRedirect";
+import ArtistPage from "./[artistSlug]";
 
-export default function You(){
-  redirectUnlessUser()
+export default function You() {
+  redirectUnlessUser();
 
-  return <ArtistPage forceUser={true} />
+  return <ArtistPage forceUser={true} />;
 }

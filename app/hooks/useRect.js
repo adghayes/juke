@@ -1,27 +1,27 @@
-import debounce from 'lodash.debounce'
-import { useEffect, useRef, useState } from 'react'
+import debounce from "lodash.debounce";
+import { useEffect, useRef, useState } from "react";
 
-export default function useRect(wait){
-  const rectRef = useRef(null)
-  const [rect, setRect] = useState(null)
-  const debouncedSetRect = debounce(setRect, wait)
+export default function useRect(wait) {
+  const rectRef = useRef(null);
+  const [rect, setRect] = useState(null);
+  const debouncedSetRect = debounce(setRect, wait);
 
   useEffect(() => {
-    const element = rectRef.current
-    setRect(element.getBoundingClientRect())
+    const element = rectRef.current;
+    setRect(element.getBoundingClientRect());
 
-    const observer = new ResizeObserver(entries => {
+    const observer = new ResizeObserver((entries) => {
       for (let entry of entries) {
-        debouncedSetRect(entry.contentRect)
+        debouncedSetRect(entry.contentRect);
       }
-    })
-    observer.observe(element)
+    });
+    observer.observe(element);
 
     return () => {
-      debouncedSetRect.cancel()
-      observer.unobserve(element)
-    }
-  },[])
+      debouncedSetRect.cancel();
+      observer.unobserve(element);
+    };
+  }, []);
 
-  return [rect, rectRef]
+  return [rect, rectRef];
 }

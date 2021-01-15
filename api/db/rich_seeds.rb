@@ -3,11 +3,12 @@ require 'tempfile'
 
 require_relative './seeds_helper.rb'
 
-@num_seed_bots = 3
-@num_seed_tracks = 10
 
-s3_client = Aws::S3::Resource.new(region: "ca-central-1").client
-seed_keys = s3_client.list_objects({ bucket: 'juke-seeds' }).contents.map { |struct| struct.key }
+@num_seed_tracks = ENV['NUM_SEED_TRACKS'].to_i
+@num_seed_bots = @num_seed_tracks / 3
+
+s3_client = Aws::S3::Resource.new(region: "us-east-1").client
+seed_keys = s3_client.list_objects({ bucket: 'juke-seed' }).contents.map { |struct| struct.key }
 
 track_keys = []
 image_keys = []
@@ -27,7 +28,7 @@ end
 
     avatar.binmode
     s3_client.get_object(
-      bucket: 'juke-seeds',
+      bucket: 'juke-seed',
       key: avatar_key,
       response_target: avatar.path
     )
@@ -50,7 +51,7 @@ track_keys.shuffle!
   Tempfile.create(['juke_', File.extname(track_key)]) do |track|
     track.binmode
     s3_client.get_object(
-      bucket: 'juke-seeds',
+      bucket: 'juke-seed',
       key: track_key,
       response_target: track.path
     )
@@ -60,7 +61,7 @@ track_keys.shuffle!
     Tempfile.create(['juke_', File.extname(thumbnail_key)]) do |thumbnail|
       thumbnail.binmode
       s3_client.get_object(
-        bucket: 'juke-seeds',
+        bucket: 'juke-seed',
         key: thumbnail_key,
         response_target: thumbnail.path
       )

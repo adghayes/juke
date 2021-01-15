@@ -105,6 +105,10 @@ GEM
     debug_inspector (0.0.3)
     device_detector (1.0.5)
     diff-lcs (1.4.4)
+    dotenv (2.7.6)
+    dotenv-rails (2.7.6)
+      dotenv (= 2.7.6)
+      railties (>= 3.2)
     erubi (1.10.0)
     eventmachine (1.2.7)
     factory_bot (6.1.0)
@@ -332,6 +336,7 @@ DEPENDENCIES
   bootsnap (>= 1.4.2)
   byebug
   device_detector
+  dotenv-rails
   factory_bot_rails
   faker
   friendly_id

@@ -6,7 +6,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList, faThLarge } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
-export default function Queue({ queueKey, emptyMessage, disableTileView, LabelComponent }) {
+export default function Queue({
+  queueKey,
+  emptyMessage,
+  disableTileView,
+  LabelComponent,
+}) {
   const [rect, rectRef] = useRect(200);
   const queue = useQueue(queueKey);
   const LoadingZone = useLoadingZone(queue);
@@ -32,16 +37,20 @@ export default function Queue({ queueKey, emptyMessage, disableTileView, LabelCo
       ) : null}
       <ul
         className={`flex ${
-          tileView ? "flex-row flex-wrap justify-center self-center justify-start" : "flex-col"
+          tileView
+            ? "flex-row flex-wrap justify-center self-center justify-start"
+            : "flex-col"
         }`}
       >
         {!!queue
           ? queue.tracks.map((track) => (
               <li
                 key={track.id}
-                className={`py-4 flex flex-col items-center ${tileView ? "px-4" : ""}`}
+                className={`py-4 flex flex-col items-center ${
+                  tileView ? "px-4" : ""
+                }`}
               >
-                { LabelComponent ? <LabelComponent track={track}/> : null }
+                {LabelComponent ? <LabelComponent track={track} /> : null}
                 <Player
                   track={track}
                   queue={queue}
@@ -52,7 +61,9 @@ export default function Queue({ queueKey, emptyMessage, disableTileView, LabelCo
           : null}
       </ul>
       {queue && queue.tracks.length === 0 ? (
-        <p className="text-center py-24 text-2xl font-bold text-gray-500">{emptyMessage}</p>
+        <p className="text-center py-24 text-2xl font-bold text-gray-500">
+          {emptyMessage}
+        </p>
       ) : (
         LoadingZone
       )}

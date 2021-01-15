@@ -19,12 +19,9 @@ const downloadInfo =
   `If you check this, other users will be able to download your ` +
   `track with a click!`;
 
-export default function SubmitTrack({
-  uploadProgress,
-  track,
-  callback,
-}) {
-  const uploadComplete = track && ["done", "started", "error"].includes(track.processing)
+export default function SubmitTrack({ uploadProgress, track, callback }) {
+  const uploadComplete =
+    track && ["done", "started", "error"].includes(track.processing);
   const [disabled, setDisabled] = useState(false);
   const [input, inputDispatch] = useReducer(inputReducer, {
     thumbnail: null,
@@ -53,11 +50,11 @@ export default function SubmitTrack({
       payload.thumbnail = await thumbnailUpload.start();
     }
     const resBody = await patchTrack(payload, track.id);
-    if(resBody.id){
+    if (resBody.id) {
       if (callback) callback();
     } else {
-      setTitleErrors(resBody.title)
-      setDisabled(false)
+      setTitleErrors(resBody.title);
+      setDisabled(false);
     }
   }
 
@@ -92,7 +89,7 @@ export default function SubmitTrack({
           <span className={`${processingClass}`}>
             {track && processingMessage[track.processing]}
           </span>
-          { track && track.processing ? <Info info={processingInfo}/> : null }
+          {track && track.processing ? <Info info={processingInfo} /> : null}
         </span>
       </div>
       <div className="flex flex-row h-1.5 my-0.5 w-full rounded-full overflow-hidden bg-gray-300 divide-x-2 divide-black">
@@ -135,10 +132,12 @@ export default function SubmitTrack({
           />
           <label className="inline-flex items-center justify-center pt-2">
             <input
-              checked = {input.downloadable}
+              checked={input.downloadable}
               type="checkbox"
               className="mx-2"
-              onChange={(e) => inputDispatch({ downloadable: e.target.checked })}
+              onChange={(e) =>
+                inputDispatch({ downloadable: e.target.checked })
+              }
             />
             <span className="font-medium">Easy Download</span>
             <Info info={downloadInfo} />

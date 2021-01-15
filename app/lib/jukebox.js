@@ -3,12 +3,12 @@ import API from "./api";
 import { listen } from "./api-track";
 
 export default class Jukebox {
-  constructor(){
-    this.navigationHistory = []
+  constructor() {
+    this.navigationHistory = [];
   }
 
   dispatch() {
-    this.setJuke(juke => ({ ...juke, id: juke.id + 1}));
+    this.setJuke((juke) => ({ ...juke, id: juke.id + 1 }));
   }
 
   set(track) {
@@ -25,21 +25,21 @@ export default class Jukebox {
         },
       });
       this.track = track;
-      const listenedMark = Math.min(5000, this.track.duration / 2 * 1000)
+      const listenedMark = Math.min(5000, (this.track.duration / 2) * 1000);
       this.timer = new Timer(listenedMark, () => {
-        listen(track)
-      })
+        listen(track);
+      });
 
-      this.navigationHistory.push(track.id)
+      this.navigationHistory.push(track.id);
 
-      this._ensureNext()
+      this._ensureNext();
     }
   }
 
-  async _ensureNext(){
+  async _ensureNext() {
     const nextTrack = this.queue && this.queue.tracks[this.currentIndex() + 1];
-    if(!nextTrack && this.queue && this.queue.pushNext){
-      this.queue = await this.queue.pushNext()
+    if (!nextTrack && this.queue && this.queue.pushNext) {
+      this.queue = await this.queue.pushNext();
     }
   }
 
@@ -50,14 +50,14 @@ export default class Jukebox {
     if (track) this.set(track);
 
     this.sound.play();
-    this.timer.start()
+    this.timer.start();
     this.playing = true;
     this.dispatch();
   }
 
-  _pausePlayback(){
+  _pausePlayback() {
     if (this.sound) this.sound.pause();
-    if (this.timer) this.timer.stop()
+    if (this.timer) this.timer.stop();
   }
 
   pause() {
@@ -121,9 +121,12 @@ export default class Jukebox {
     return 0;
   }
 
-  queueAlert(queue){
-    if(this.queue && (JSON.stringify(this.queue.key) === JSON.stringify(queue.key))){
-      this.queue = queue
+  queueAlert(queue) {
+    if (
+      this.queue &&
+      JSON.stringify(this.queue.key) === JSON.stringify(queue.key)
+    ) {
+      this.queue = queue;
     }
   }
 
@@ -154,38 +157,38 @@ export default class Jukebox {
 }
 
 class Timer {
-  constructor(time, cb){
-    this.time = time
-    this.elapsed = 0
-    this.listened = false
-    this.cb = cb
+  constructor(time, cb) {
+    this.time = time;
+    this.elapsed = 0;
+    this.listened = false;
+    this.cb = cb;
   }
 
-  start(){
-    if (this.started) return
+  start() {
+    if (this.started) return;
 
-    if(!this.listened){
-      this.started = Date.now()
+    if (!this.listened) {
+      this.started = Date.now();
       this.poll = setInterval(() => {
-        if (this.current() > this.time){
-          this.listened = true
-          this.started = null
-          clearInterval(this.poll)
-          this.cb()
+        if (this.current() > this.time) {
+          this.listened = true;
+          this.started = null;
+          clearInterval(this.poll);
+          this.cb();
         }
-      }, 500)
+      }, 500);
     }
   }
 
-  stop(){
-    if(!this.started) return
+  stop() {
+    if (!this.started) return;
 
-    this.elapsed += Date.now() - this.started
-    this.started = null
-    if(this.poll) clearInterval(this.poll)
+    this.elapsed += Date.now() - this.started;
+    this.started = null;
+    if (this.poll) clearInterval(this.poll);
   }
 
-  current(){
-    return this.elapsed + (this.started ? (Date.now() - this.started) : 0)
+  current() {
+    return this.elapsed + (this.started ? Date.now() - this.started : 0);
   }
 }

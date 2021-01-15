@@ -1,30 +1,29 @@
 import { useEffect, useRef, useState } from "react";
 
-
-export default function useLoadingZone(queue){
-  const zone = useRef(null)
-  const [spinner, setSpinner] = useState(true)
+export default function useLoadingZone(queue) {
+  const zone = useRef(null);
+  const [spinner, setSpinner] = useState(true);
   const loading = useRef(true);
-  const complete = queue && !queue.next
+  const complete = queue && !queue.next;
 
-  function setLoading(val){
-    loading.current = val
-    setSpinner(val)
+  function setLoading(val) {
+    loading.current = val;
+    setSpinner(val);
   }
 
   useEffect(() => {
-    setLoading(!queue)
-  }, [!queue])
-  
+    setLoading(!queue);
+  }, [!queue]);
+
   useEffect(() => {
-    if (queue && queue.next){
+    if (queue && queue.next) {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(async (entry) => {
             if (entry.isIntersecting && !loading.current) {
-              setLoading(true)
+              setLoading(true);
               await queue.pushNext();
-              setLoading(false)
+              setLoading(false);
             }
           });
         },
@@ -38,14 +37,17 @@ export default function useLoadingZone(queue){
       observer.observe(zone.current);
       return () => observer.disconnect();
     }
-  }, [queue && queue.next])
+  }, [queue && queue.next]);
 
   return (
-    <div ref={zone} className={`self-stretch flex flex-col justify-center items-center`}>
-      { spinner ? <Spinner /> : null}
-      { complete ? <div className="w-3/4 h-0.5 my-12 border-t"></div> : null }
+    <div
+      ref={zone}
+      className={`self-stretch flex flex-col justify-center items-center`}
+    >
+      {spinner ? <Spinner /> : null}
+      {complete ? <div className="w-3/4 h-0.5 my-12 border-t"></div> : null}
     </div>
-  )
+  );
 }
 
 function Spinner() {

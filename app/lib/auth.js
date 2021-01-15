@@ -46,7 +46,7 @@ export async function logout() {
   };
   clearToken();
   mutate("user", null, false);
-  return fetch(API.url("session"), fetchOptions)
+  return fetch(API.url("session"), fetchOptions);
 }
 
 export async function register(user) {

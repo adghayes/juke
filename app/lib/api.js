@@ -1,7 +1,7 @@
 import { getToken } from "./auth";
 
 const API = {
-  BACKEND: "http://localhost:3000",
+  BACKEND: process.env.NEXT_PUBLIC_BACKEND,
 
   authHeader: () => ({ Authorization: "bearer " + getToken() }),
 
@@ -24,17 +24,17 @@ const API = {
 
   fetch: async (path) => {
     const response = await fetch(API.url(path), {
-      headers: API.authHeader()
-    })
+      headers: API.authHeader(),
+    });
 
     if (!response.ok) {
       const error = new Error(response.statusText);
       error.status = response.status;
       throw error;
     }
-    
+
     return response.json();
-  }
+  },
 };
 
 export default API;

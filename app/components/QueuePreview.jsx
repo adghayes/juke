@@ -6,21 +6,26 @@ import useUser from "../hooks/useUser";
 import { getThumbnail } from "../lib/thumbnails";
 import { JukeContext } from "../pages/_app";
 
-export default function QueuePreview({ title, queueKey, length, emptyMessage }) {
-  const { loggedOut } = useUser()
+export default function QueuePreview({
+  title,
+  queueKey,
+  length,
+  emptyMessage,
+}) {
+  const { loggedOut } = useUser();
   const jukebox = useContext(JukeContext).jukebox;
   const queue = useQueue(queueKey);
-  const [overlay, setOverlay] = useState(false)
+  const [overlay, setOverlay] = useState(false);
 
   useEffect(() => {
-    setOverlay(loggedOut || queue && queue.tracks.length === 0)
-  }, [loggedOut, queue])
+    setOverlay(loggedOut || (queue && queue.tracks.length === 0));
+  }, [loggedOut, queue]);
 
   useEffect(() => {
-    if(queue && queue.tracks.length <= length && queue.pushNext){
-      queue.pushNext()
+    if (queue && queue.tracks.length <= length && queue.pushNext) {
+      queue.pushNext();
     }
-  }, [queue])
+  }, [queue]);
 
   return (
     <section className="lg:w-64 xl:w-72 my-8 mx-4 border-gray-300 border rounded flex flex-col items-stretch overflow-hidden">
@@ -43,7 +48,13 @@ export default function QueuePreview({ title, queueKey, length, emptyMessage }) 
             );
           })}
         </ul>
-        <p className={`absolute inset-0 p-2 z-40 bg-gray-200 opacity-80 flex items-center justify-center text-center ${overlay ? '' : 'hidden'}`}>{emptyMessage}</p>
+        <p
+          className={`absolute inset-0 p-2 z-40 bg-gray-200 opacity-80 flex items-center justify-center text-center ${
+            overlay ? "" : "hidden"
+          }`}
+        >
+          {emptyMessage}
+        </p>
       </div>
     </section>
   );

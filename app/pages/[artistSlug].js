@@ -8,30 +8,36 @@ import Error from "next/error";
 import Queue from "../components/Queue";
 
 const tabs = {
-  tracks: {label: "Tracks", private: false, empty: "No tracks posted" },
-  likes: {label: "Likes", private: false, empty: "Hmmm... don't like anything?" },
-  history: {label: "Listening History", private: true, empty: "Not much of a listener!" }
-}
+  tracks: { label: "Tracks", private: false, empty: "No tracks posted" },
+  likes: {
+    label: "Likes",
+    private: false,
+    empty: "Hmmm... don't like anything?",
+  },
+  history: {
+    label: "Listening History",
+    private: true,
+    empty: "Not much of a listener!",
+  },
+};
 
 export default function ArtistPage({ forceUser }) {
   const router = useRouter();
   const { artistSlug } = router.query;
 
   const { user } = useUser();
-  const isUser = forceUser || (user && user.slug === artistSlug)
+  const isUser = forceUser || (user && user.slug === artistSlug);
 
   const artistKey = !artistSlug || isUser ? null : `users/${artistSlug}`;
-  const { data, error } = useSWR(artistKey, API.fetch,
-    {
-      dedupingInterval: 1000 * 60 * 60,
-    }
-  );
+  const { data, error } = useSWR(artistKey, API.fetch, {
+    dedupingInterval: 1000 * 60 * 60,
+  });
 
   const [openTab, setOpenTab] = useState("tracks");
   useEffect(() => {
     if (location.hash) {
-      const hashTab = location.hash.replace("#", "")
-      if(Object.keys(tabs).includes(hashTab)){
+      const hashTab = location.hash.replace("#", "");
+      if (Object.keys(tabs).includes(hashTab)) {
         setOpenTab(hashTab);
       }
     }
@@ -75,8 +81,8 @@ export default function ArtistPage({ forceUser }) {
         </aside>
         <main className="md:pl-4 flex flex-col items-center w-full max-w-full md:w-auto md:flex-grow ">
           {artist ? (
-            <Queue 
-              queueKey={`users/${artist.slug}/${openTab}`} 
+            <Queue
+              queueKey={`users/${artist.slug}/${openTab}`}
               emptyMessage={tabs[openTab].empty}
             />
           ) : null}

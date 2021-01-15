@@ -3,7 +3,7 @@ import useRect from "../hooks/useRect.js";
 import useQueue from "../hooks/useQueue.js";
 import useUser from "../hooks/useUser.js";
 import Link from "next/link";
-import Image from 'next/image';
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -33,37 +33,45 @@ export default function Home() {
     </div>
   );
 }
- useQueue
+useQueue;
 
 function Spotlight() {
-  const queue = useQueue('feed')
-  const { loggedOut } = useUser()
-  const [rect, rectRef] = useRect(500)
-  const track = queue && queue.tracks[0]
+  const queue = useQueue("feed");
+  const { loggedOut } = useUser();
+  const [rect, rectRef] = useRect(500);
+  const track = queue && queue.tracks[0];
 
   return (
-    <section ref={rectRef} className="p-6 md:p-8 pb-12 flex flex-col justify-center items-center">
-      { queue ? 
+    <section
+      ref={rectRef}
+      className="p-6 md:p-8 pb-12 flex flex-col justify-center items-center"
+    >
+      {queue ? (
         <>
-          <p className="px-4 md:text-xl pb-6"><i><strong>{track.owner.display_name}</strong></i> posted our most recent track...</p>
-            <Player track={track} maxWidth={rect && rect.width}/>
-          <p className='px-4 md:text-xl py-8 text-center'>
-            and yours could be next...{' '}
-            { loggedOut ?
-            <span className="px-2 font-normal whitespace-nowrap">
-              <Link href="/register">
-                <a className="font-bold hover:underline">sign up</a>
-              </Link>
-              <span> or </span>
-              <Link href="/login">
-                <a className="font-bold hover:underline">log in</a>
-              </Link>
-              <span> to upload</span>
-            </span>
-              : null
-            }
+          <p className="px-4 md:text-xl pb-6">
+            <i>
+              <strong>{track.owner.display_name}</strong>
+            </i>{" "}
+            posted our most recent track...
           </p>
-        </> : null }
+          <Player track={track} maxWidth={rect && rect.width} />
+          <p className="px-4 md:text-xl py-8 text-center">
+            and yours could be next...{" "}
+            {loggedOut ? (
+              <span className="px-2 font-normal whitespace-nowrap">
+                <Link href="/register">
+                  <a className="font-bold hover:underline">sign up</a>
+                </Link>
+                <span> or </span>
+                <Link href="/login">
+                  <a className="font-bold hover:underline">log in</a>
+                </Link>
+                <span> to upload</span>
+              </span>
+            ) : null}
+          </p>
+        </>
+      ) : null}
     </section>
   );
 }

@@ -12,16 +12,24 @@ amazon_dev:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
-  region: ca-central-1
-  bucket: juke-development
+  region: us-east-1
+  bucket: juke-develop
+  public: true
+
+amazon_stage:
+  service: S3
+  access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
+  secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
+  region: us-east-1
+  bucket: juke-stage
   public: true
 
 amazon:
   service: S3
   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
-  region: ca-central-1
-  bucket: juke-public
+  region: us-east-1
+  bucket: juke-prod
   public: true
 
 # Remember not to checkin your GCS keyfile to a repository

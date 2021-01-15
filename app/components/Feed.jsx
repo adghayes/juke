@@ -1,13 +1,19 @@
-import Queue from './Queue'
+import Queue from "./Queue";
 import { getAvatar } from "../lib/thumbnails";
 import TimeAgo from "timeago-react";
-import Link from 'next/link'
+import Link from "next/link";
 
 export default function Feed({}) {
-  return <Queue queueKey="feed" disableTileView={true} LabelComponent={Attribution}/>
+  return (
+    <Queue
+      queueKey="feed"
+      disableTileView={true}
+      LabelComponent={Attribution}
+    />
+  );
 }
 
-function Attribution({ track }){
+function Attribution({ track }) {
   return (
     <div className=" flex inline-flex items-center py-2 flex-start self-start text-sm">
       <img
@@ -19,15 +25,13 @@ function Attribution({ track }){
       />
       <span className="px-3">
         <Link href={`/${track.owner.slug}`}>
-          <a className="hover:underline">
-            {track.owner.display_name}
-          </a>
+          <a className="hover:underline">{track.owner.display_name}</a>
         </Link>
-        
+
         <span>{" posted a track "}</span>
         <TimeAgo datetime={track.created} />
         {"..."}
       </span>
     </div>
-  )
-}    
+  );
+}

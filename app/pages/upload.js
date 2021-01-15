@@ -4,11 +4,7 @@ import Card from "../components/Card";
 import Upload from "../components/Upload";
 import SubmitTrack from "../components/SubmitTrack";
 import Uploader from "../lib/uploader";
-import {
-  postTrack,
-  patchTrack,
-  getTrack,
-} from "../lib/api-track";
+import { postTrack, patchTrack, getTrack } from "../lib/api-track";
 import Link from "next/link";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -25,7 +21,6 @@ export default function UploadPage(props) {
   const [visible, setVisible] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
 
-
   const transitionTo = (phaseIndex) => {
     setVisible(false);
     setTimeout(() => {
@@ -37,10 +32,10 @@ export default function UploadPage(props) {
   };
 
   useEffect(() => {
-    if(!!user){
-      setVisible(true)
+    if (!!user) {
+      setVisible(true);
     }
-  }, [!!user])
+  }, [!!user]);
 
   useEffect(async () => {
     if (track) {
@@ -50,11 +45,9 @@ export default function UploadPage(props) {
         }, 5000);
 
         return () => clearTimeout(pollId);
-
-      } else if (track.processing === "done" && user){
-        console.log('sup bish')
-        mutate(`users/${user.slug}/tracks`)
-        mutate('feed')
+      } else if (track.processing === "done" && user) {
+        mutate(`users/${user.slug}/tracks`);
+        mutate("feed");
       }
     }
   }, [track]);
@@ -92,7 +85,7 @@ export default function UploadPage(props) {
 }
 
 function TrackStatus({ track }) {
-  const status = track && track.processing
+  const status = track && track.processing;
 
   return (
     <div className="flex flex-col items-center bg-white rounded-xl shadow-xl p-8">

@@ -15,11 +15,27 @@ a {
   box-sizing: border-box;
 }
 
-ul, ol, li, div, p, a, span, i, 
-  strong, section, article, header,
-  footer, h1, h2, h3, h4, h5, h6 {
-    padding: 0;
-    margin: 0;
+ul,
+ol,
+li,
+div,
+p,
+a,
+span,
+i,
+strong,
+section,
+article,
+header,
+footer,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
 }
 
 ul {
@@ -31,24 +47,21 @@ input:focus {
 }
 
 .cashmere {
-  background: #CBC5C1;
+  background: #cbc5c1;
 }
 
 .french {
-  background: #A2AAB0;
+  background: #a2aab0;
 }
 
 .white {
-  background: #EBECED;
-
+  background: #ebeced;
 }
 
 .denim {
-  background: #4C586F;
-
+  background: #4c586f;
 }
 
 .gunmetal {
-  background: #3E3E3B;
-
+  background: #3e3e3b;
 }
