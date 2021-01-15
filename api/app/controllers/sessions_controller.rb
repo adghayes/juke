@@ -7,7 +7,6 @@ class SessionsController < ApplicationController
 
     if @user
       @token = log_in_user(@user)
-      @current_user = @user
       render :show, status: :created
     else
       render json: {error: "invalid credentials"}, status: :unprocessable_entity

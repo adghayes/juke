@@ -90,9 +90,8 @@ export async function listen(track) {
   mutate(
     "user",
     (user) => {
-      if (!user || user.recent_track_ids.includes(track.id)) {
-        return user;
-      }
+      if (!user) return user;
+      if (user.recent_track_ids.includes(track.id)) return user;
 
       mutate(
         `users/${user.slug}/history`,

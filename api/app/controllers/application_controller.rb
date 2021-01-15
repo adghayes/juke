@@ -9,7 +9,8 @@ class ApplicationController < ActionController::API
     device = client.device_name || client.os_name
     browser = client.name
 
-    Session.for(user, device: device, browser: browser).token
+    @current_user = user
+    @current_session = Session.for(user, device: device, browser: browser).token
   end
 
   def set_default_response_format
