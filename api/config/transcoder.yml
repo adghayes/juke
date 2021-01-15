@@ -31,4 +31,6 @@ test:
 
 production:
   <<: *default
-  client: null
+  client: {}
+  function: ffmpeg-prod-transcode
+  host: https://boiling-shore-32918.herokuapp.com/
