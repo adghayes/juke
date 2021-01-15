@@ -51,7 +51,7 @@ export function Info({ info }){
                 onMouseEnter={ () => setOpen(true)}
                 onMouseLeave={ () => setOpen(false)}
                 className={`bg-gray-300 text-xs rounded-full text-white text-center 
-                    w-min px-1.5 mx-2 hover:bg-gray-400 font-serif font-bold`}>
+                    w-min px-1.5 mx-1 hover:bg-gray-400 font-serif font-bold`}>
                 {'i'}
             </i>
             <p className={`absolute text-xs z-30 left-16 -top-2 bg-white shadow-lg 

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef, useMemo } from "react";
+import { useContext, useEffect, useState, useRef, useMemo, useLayoutEffect } from "react";
 import { JukeContext } from "../pages/_app";
 
 const base64 =
@@ -32,7 +32,6 @@ function rgbaMidpoint(color1, color2, ratio) {
 
 export default function Waves({
   track,
-  active,
   barCount,
   upperBarMaxHeight,
   upperBarMinHeight,
@@ -42,7 +41,8 @@ export default function Waves({
   barSpacing,
   lowerBarAlpha,
 }) {
-  const jukebox = useContext(JukeContext).jukebox;
+  const { jukebox } = useContext(JukeContext);
+  let active = jukebox.track && jukebox.track.id === track.id;
 
   const canvasElement = useRef(null);
   const [ctx, setCtx] = useState(null);
@@ -56,7 +56,7 @@ export default function Waves({
   const [playTime, setPlayTime] = useState(0);
   const hoverPosition = useRef(null);
   const playPosition = useRef(0);
-  const animationId = useRef(null);
+  const animationId = useRef(0);
   const frameIndex = useRef(0);
 
   const height = lowerBarMaxHeight + upperBarMaxHeight + 1;
@@ -81,18 +81,18 @@ export default function Waves({
     setCtx(canvasElement.current.getContext("2d"));
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ctx && bars) {
       if (active && (hover || jukebox.playing)) {
         animationId.current = window.requestAnimationFrame(animationStep);
+
+        return () => {
+          window.cancelAnimationFrame(animationId.current);
+        };
       } else {
         refresh();
       }
     }
-
-    return () => {
-      window.cancelAnimationFrame(animationId.current);
-    };
   }, [ctx, bars, hover, active, jukebox, jukebox.playing, active]);
 
   function refresh() {

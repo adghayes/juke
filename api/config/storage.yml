@@ -13,7 +13,7 @@ amazon_dev:
   access_key_id: <%= Rails.application.credentials.dig(:aws, :access_key_id) %>
   secret_access_key: <%= Rails.application.credentials.dig(:aws, :secret_access_key) %>
   region: ca-central-1
-  bucket: juke-dev
+  bucket: juke-development
   public: true
 
 amazon:

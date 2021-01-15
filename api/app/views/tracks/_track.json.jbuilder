@@ -7,12 +7,12 @@ json.owner do
   json.id track.owner.id
   json.slug track.owner.slug
   if track.owner.avatar.attached?
-    json.avatar url_for(track.owner.avatar)
+    json.avatar url_for(track.owner.resized_avatar)
   end
 end
 
 if track.thumbnail.attached?
-  json.thumbnail url_for(track.thumbnail)
+  json.thumbnail url_for(track.resized_thumbnail)
 end
 
 if track.streams.attached?

@@ -35,7 +35,7 @@ function App({ Component, pageProps }) {
         
         <Header />
         <AccountAlert message={myAlert} close={() => setAlert(null)}/>
-        <div id="view" className={`fixed top-11 left-0 right-0 ${jukebox.track ? ' bottom-16 sm:bottom-12' : 'bottom-0' } overflow-y-scroll overflow-x-hidden`}>
+        <div id="view" className={`fixed top-11 left-0 right-0 ${jukebox.current.track ? ' bottom-16 sm:bottom-12' : 'bottom-0' } overflow-y-scroll overflow-x-hidden`}>
           <Component {...pageProps}/>
         </div>
         <Footer/>

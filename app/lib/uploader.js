@@ -15,6 +15,7 @@ class Uploader {
   async start() {
     return new Promise((resolve, reject) => {
       this.upload.create((error, blob) => {
+        console.log('start calllback')
         if (error) {
           reject(error);
         } else {

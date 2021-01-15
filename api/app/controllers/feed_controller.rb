@@ -1,7 +1,7 @@
 class FeedController < ApplicationController
   def show
     sleep 1
-    latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now.iso8601
+    latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now
     limit = params[:limit] ? params[:limit].to_i : 5
 
     track_ids_with_timestamp = Track

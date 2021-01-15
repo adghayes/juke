@@ -33,11 +33,11 @@ function Thumbnailer({label, thumbnail, inputDispatch, info, placeholder}){
 
     function confirm(){
         const name = fileInput.current.files[0].name
-        editor.current.getImageScaledToCanvas().toBlob(blob => {
+        editor.current.getImage().toBlob(blob => {
             blob.name = name
             inputDispatch({ thumbnail: blob})
             setEditing(false)
-        }) 
+        }, 'image/jpeg') 
     }
 
     return (

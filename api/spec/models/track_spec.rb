@@ -19,7 +19,8 @@
 # Indexes
 #
 #  index_tracks_on_created_at          (created_at)
-#  index_tracks_on_owner_id_and_title  (owner_id,title) UNIQUE
+#  index_tracks_on_owner_id_and_slug   (owner_id,slug) UNIQUE WHERE submitted
+#  index_tracks_on_owner_id_and_title  (owner_id,title) UNIQUE WHERE submitted
 #  index_tracks_on_title               (title)
 #
 # Foreign Keys

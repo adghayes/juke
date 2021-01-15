@@ -19,7 +19,7 @@ class TracksController < ApplicationController
   def update
     if @track.owner == current_user
       if @track.update(track_params)
-        start_processing if @track.previous_changes["uploaded"] == [false, true]
+        start_processing if @track.uploaded == true && @track.processing == "none"
         render :show
       else
         render json: @track.errors.messages, status: :unprocessable_entity
@@ -140,7 +140,7 @@ class TracksController < ApplicationController
     end
 
     callback = {
-      url: config.host + streams_track_path(@track),
+      url: config.host + "/tracks/#{@track.id}/streams",
       headers: { Authorization: "bearer #{jwt}" },
       method: "POST"
     }
@@ -149,7 +149,7 @@ class TracksController < ApplicationController
       peaks: config.peaks,
       input: {
         download: {
-          url: config.host + rails_blob_path(@track.original, disposition: "attachment")
+          url: config.host + rails_blob_path(@track.original)
         }
       }, 
       outputs: outputs,

@@ -7,11 +7,11 @@ import { getAvatar } from "../lib/thumbnails";
 import Error from "next/error";
 import Queue from "../components/Queue";
 
-const tabs = [
-  { id: "tracks", label: "Tracks", private: false},
-  { id: "likes", label: "Likes", private: false },
-  { id: "history", label: "Listening History", private: true },
-];
+const tabs = {
+  tracks: {label: "Tracks", private: false, empty: "No tracks posted" },
+  likes: {label: "Likes", private: false, empty: "Hmmm... don't like anything?" },
+  history: {label: "Listening History", private: true, empty: "Not much of a listener!" }
+}
 
 export default function ArtistPage({ forceUser }) {
   const router = useRouter();
@@ -30,7 +30,10 @@ export default function ArtistPage({ forceUser }) {
   const [openTab, setOpenTab] = useState("tracks");
   useEffect(() => {
     if (location.hash) {
-      setOpenTab(location.hash.replace("#", ""));
+      const hashTab = location.hash.replace("#", "")
+      if(Object.keys(tabs).includes(hashTab)){
+        setOpenTab(hashTab);
+      }
     }
   }, []);
 
@@ -39,8 +42,8 @@ export default function ArtistPage({ forceUser }) {
 
   return (
     <div className="bg-gradient-to-tl from-green-200 to-purple-300 min-h-screen w-screen">
-      <div className="lg:min-w-min max-w-screen-lg xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-col md:flex-row p-4">
-        <aside className="pr-4 border-r flex flex-col items-stretch divide-y flex-none">
+      <div className="max-w-screen-lg lg:min-w-min xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-col md:flex-row md:justify-betewen p-4">
+        <aside className="pr-4 md:border-r flex flex-col items-stretch divide-y flex-none">
           <div className="py-4 flex flex-col items-center">
             <img
               src={artist && getAvatar(artist.avatar)}
@@ -53,26 +56,29 @@ export default function ArtistPage({ forceUser }) {
             <p className="text-center">{artist && artist.bio}</p>
           </div>
           <ul className="text-3xl divide-y border-b text-left">
-            {tabs.map((tab) =>
-              !tab.private || isUser ? (
-                <li key={tab.id}>
+            {Object.entries(tabs).map(([tabId, tabProps]) =>
+              !tabProps.private || isUser ? (
+                <li key={tabId}>
                   <a
-                    href={`#${tab.id}`}
+                    href={`#${tabId}`}
                     className={`block py-2 ${
-                      tab.id === openTab ? "text-pink-600 font-bold" : ""
+                      tabId === openTab ? "text-pink-600 font-bold" : ""
                     }`}
-                    onClick={() => setOpenTab(tab.id)}
+                    onClick={() => setOpenTab(tabId)}
                   >
-                    {tab.label}
+                    {tabProps.label}
                   </a>
                 </li>
               ) : null
             )}
           </ul>
         </aside>
-        <main className="flex-grow pl-4">
+        <main className="md:pl-4 flex flex-col items-center w-full max-w-full md:w-auto md:flex-grow ">
           {artist ? (
-            <Queue queueKey={`users/${artist.slug}/${openTab}`} />
+            <Queue 
+              queueKey={`users/${artist.slug}/${openTab}`} 
+              emptyMessage={tabs[openTab].empty}
+            />
           ) : null}
         </main>
       </div>

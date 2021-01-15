@@ -1,5 +1,5 @@
 import { redirectUnlessUser } from '../hooks/useRedirect'
-import ArtistPage from './[slug]'
+import ArtistPage from './[artistSlug]'
 
 export default function You(){
   redirectUnlessUser()

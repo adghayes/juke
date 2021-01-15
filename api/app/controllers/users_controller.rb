@@ -52,12 +52,12 @@ class UsersController < ApplicationController
 
   def tracks
     @user = User.friendly.find(params[:id])
-    has_many_queue :tracks, tracks_user_path(@user)
+    has_many_queue @user.tracks.live, tracks_user_path(@user)
   end
 
   def likes
     @user = User.friendly.find(params[:id])
-    has_many_through_queue :likes, likes_user_path(@user)
+    has_many_through_queue @user.likes, likes_user_path(@user)
   end
 
   def history
@@ -67,7 +67,7 @@ class UsersController < ApplicationController
       return
     end
     
-    has_many_through_queue :recents, history_user_path(@user)
+    has_many_through_queue @user.recents, history_user_path(@user)
   end
 
   private
@@ -84,13 +84,13 @@ class UsersController < ApplicationController
     latest = params[:latest] ? DateTime.iso8601(params[:latest]) : DateTime.now
     limit = params[:limit] ? params[:limit].to_i : 5
 
-    track_ids_with_timestamp = @user.send(association)
-      .where('created_at < ?', latest )
+    track_ids_with_timestamp = association
+      .where('created_at < ?', latest)
       .order(created_at: :desc)
       .limit(limit)
       .pluck(key, :created_at)
     track_ids, timestamps = track_ids_with_timestamp.transpose
-    @tracks = track_ids ? Track.with_details.find(track_ids) : []
+    @tracks = track_ids ? Track.live.with_details.find(track_ids) : []
     
     @oldest = timestamps.try(:min).try(:iso8601)
     @path = next_path

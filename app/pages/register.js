@@ -27,7 +27,7 @@ export default function RegisterPage(props) {
   ]
 
   return (
-    <main className="relative min-h-screen min-w-full bg-gradient-to-br from-pink-300 to-blue-300">
+    <main className="min-h-full min-w-full bg-gradient-to-br from-pink-300 to-blue-300 flex justify-center items-center">
         <Card visible={visible}>
           { phases[phaseIndex] }
         </Card>
@@ -40,10 +40,10 @@ function GetStarted(){
     <div className="flex flex-col justify-center items-center">
       
       <Link href="/stream">
-        <a className={`z-50 relative text-5xl px-8 py-4 text-black font-bold flex flex-row items-center ` +
-          `bg-white px-4 py-2 rounded-xl transition transform hover:scale-110`}>
-          <img src="/jukeColor.svg" alt="Juke Logo" className="w-32"/> 
-          <p>Get Listening</p>
+        <a className={`z-50 relative px-4 sm:px-8 py-4 text-black font-bold flex flex-row items-center ` +
+          `bg-white py-2 rounded-xl transition transform hover:scale-110 w-max`}>
+          <img src="/jukeColor.svg" alt="Juke Logo" className="w-24 sm:w-32"/> 
+          <p className="text-2xl sm:text-5xl">Get Listening</p>
         </a>
       </Link>
     </div>

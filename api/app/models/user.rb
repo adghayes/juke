@@ -86,4 +86,8 @@ class User < ApplicationRecord
       end
     end
   end
+
+  def resized_avatar
+    avatar.variant(resize_to_limit:[500, 500])
+  end
 end

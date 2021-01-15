@@ -24,7 +24,13 @@ function Register({ callback }) {
     const [errors, errorDispatch] = useReducer(errorReducer, {})
     const validations = {
         displayName: value => {
-            return value.length < 3 ? ['Minimum Length: 3'] : []
+          if(value.length < 3 ){
+            return ['Minimum Length: 3']
+          } else if (value.length > 24) {
+            return ['Maximum Length: 24']
+          } else {
+            return []
+          }
         },
 
         email: value => {

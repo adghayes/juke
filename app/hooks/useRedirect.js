@@ -3,12 +3,14 @@ import { useEffect } from "react";
 import useUser from "./useUser";
 
 export function redirectUnlessUser(){
-    const { loggedOut } = useUser();
+    const { loggedOut, user } = useUser();
     useEffect(() => {
       if (loggedOut) {
         Router.replace("/login");
       }
-    }, [loggedOut]);  
+    }, [loggedOut]);
+
+    return user
 }
 
 export function redirectIfUser(){
@@ -17,5 +19,5 @@ export function redirectIfUser(){
       if (user) {
         Router.replace("/stream");
       }
-    }, [user]);  
+    }, [user]);
 }

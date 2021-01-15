@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_13_192841) do
+ActiveRecord::Schema.define(version: 2021_01_15_060003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "citext"
@@ -95,7 +95,8 @@ ActiveRecord::Schema.define(version: 2021_01_13_192841) do
     t.string "processing"
     t.text "peaks"
     t.index ["created_at"], name: "index_tracks_on_created_at"
-    t.index ["owner_id", "title"], name: "index_tracks_on_owner_id_and_title", unique: true
+    t.index ["owner_id", "slug"], name: "index_tracks_on_owner_id_and_slug", unique: true, where: "submitted"
+    t.index ["owner_id", "title"], name: "index_tracks_on_owner_id_and_title", unique: true, where: "submitted"
     t.index ["title"], name: "index_tracks_on_title"
   end
 

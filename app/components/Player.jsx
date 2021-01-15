@@ -31,7 +31,7 @@ function Player({ track, queue, maxWidth }) {
     } else if (maxWidth > 650) {
       return [true, 144, 'w-88'];
     } else if (maxWidth > 560) {
-      return [true, 96, 'w-54'] ;
+      return [true, 96, 'w-56'] ;
     } else if (maxWidth > 430) {
       return [true, 72, 'w-36'] ;
     } else {
@@ -40,13 +40,13 @@ function Player({ track, queue, maxWidth }) {
   }
 
   return (
-    <div className={`rounded-xl flex-none flex ${horizontal ? 'flex-row h-48 min-w-max' : 'flex-col w-48'} items-center border overflow-hidden relative`}>
+    <div className={` bg-white rounded-xl flex-none flex ${horizontal ? 'flex-row h-48' : 'flex-col w-48'} items-center border overflow-hidden relative`}>
       <img
         src={getThumbnail(track.thumbnail)}
         alt={`thumbnail for ${track.title} by ${track.owner.display_name}`}
         className="w-48 h-48"
       />
-      <div className={`flex-none flex flex-col justify-evenly items-start h-full py-2 ${horizontal ? 'px-4 min-w-max' : ''}`}>
+      <div className={`flex flex-col justify-evenly items-start h-full py-2 ${horizontal ? 'px-4 min-w-max' : ''}`}>
         <div className={`flex flex-row items-center divide-white my-1 `}>
           <button
             className={`text-white bg-gray-700 rounded-full w-14 h-14 flex-none flex items-center justify-center ${horizontal ? 'static' : 'absolute top-16 right-16' }`}
@@ -84,7 +84,6 @@ function Player({ track, queue, maxWidth }) {
         {barCount ? (
           <Waves
             track={track}
-            active={active}
             upperBarMinHeight={2}
             lowerBarMinHeight={1}
             upperBarMaxHeight={44}

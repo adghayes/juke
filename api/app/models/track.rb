@@ -19,7 +19,8 @@
 # Indexes
 #
 #  index_tracks_on_created_at          (created_at)
-#  index_tracks_on_owner_id_and_title  (owner_id,title) UNIQUE
+#  index_tracks_on_owner_id_and_slug   (owner_id,slug) UNIQUE WHERE submitted
+#  index_tracks_on_owner_id_and_title  (owner_id,title) UNIQUE WHERE submitted
 #  index_tracks_on_title               (title)
 #
 # Foreign Keys
@@ -35,7 +36,10 @@ class Track < ApplicationRecord
   validates :description, length: { maximum: 160 }
   
   validates :title, presence: { if: :submitted }, 
-    uniqueness: { scope: :owner_id, if: :submitted, message: 'You already have a track with that title' }
+    uniqueness: { scope: :owner_id, 
+      message: 'You already have a track with that title',
+      conditions: -> { where(submitted: true) }
+    }
   
   validate :require_original, if: :downloadable
   validate :require_streams, if: :processed?
@@ -101,6 +105,10 @@ class Track < ApplicationRecord
 
   def listen
     Play.create(track: self)
+  end
+
+  def resized_thumbnail
+    thumbnail.variant(resize_to_limit:[500, 500])
   end
 
   private

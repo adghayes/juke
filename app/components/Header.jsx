@@ -68,17 +68,20 @@ function SearchBar() {
 
   return (
     <div className="flex flex-grow justify-center items-center relative">
-      <input
-        type="text"
-        placeholder="Search"
-        value={query}
-        onChange={handleChange}
-        className="text-sm flex-grow mx-6 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white"
-      />
+      <a className="contents" href="https://github.com/adghayes/juke" target="_blank">
+        <input
+          disabled
+          type="text"
+          placeholder="Click for Github"
+          value={query}
+          onChange={handleChange}
+          className="flex-grow text-sm mx-4 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white"
+        />
+      </a>
       <FontAwesomeIcon
         icon={faSearch}
         fixedWidth
-        className="text-gray-500 absolute h-4 right-10"
+        className="text-gray-500 absolute h-4  right-5 sm:right-10"
       />
     </div>
   );
@@ -137,7 +140,7 @@ function ProfileLinks({ padding }) {
       <>
         <NavLink
           label={<ProfileLabel user={user} />}
-          href="/"
+          href="/you"
           addClass={padding}
         />
         <NavLink
@@ -170,7 +173,7 @@ function Dropdown(props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative flex items-center h-full">
+    <div className="relative flex items-center h-7">
       <button className="mr-4" onClick={() => setOpen((state) => !state)}>
         <FontAwesomeIcon
           icon={faBars}
@@ -180,7 +183,8 @@ function Dropdown(props) {
       </button>
       {open ? (
         <ul
-          className={`bg-gray-700 flex flex-col absolute right-0 top-8 text-lg divide-y border-l border-b border-gray-900 divide-gray-900`}
+          className={`bg-gray-700 flex flex-col absolute right-0 top-9 text-lg divide-y border-t border-l border-b border-gray-900 divide-gray-900`}
+          onClick={() => setOpen(false)}
         >
           <NavLink label="Stream" href="/stream" addClass="px-6" />
           <LibraryLink />

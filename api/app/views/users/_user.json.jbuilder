@@ -12,5 +12,5 @@ if user == current_user
 end
 
 if user.avatar.attached?
-  json.avatar url_for(user.avatar)
+  json.avatar url_for(user.resized_avatar)
 end
