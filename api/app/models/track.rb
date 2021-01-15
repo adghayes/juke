@@ -37,6 +37,7 @@ class Track < ApplicationRecord
   validates :title, presence: { if: :submitted }, 
     uniqueness: { scope: :owner_id, if: :submitted, message: 'You already have a track with that title' }
   
+  validate :require_original, if: :downloadable
   validate :require_streams, if: :processed?
   validates :duration, presence: { if: :processed? }
   validates :peaks, presence: { if: :processed? }
@@ -105,7 +106,7 @@ class Track < ApplicationRecord
   private
 
   def require_original
-    errors.add(:original, 'Must have an associated audio file') unless original.attached?
+    errors.add(:original, 'Must have an associated original audio file') unless original.attached?
   end
 
   def require_streams

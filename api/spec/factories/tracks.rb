@@ -27,6 +27,8 @@
 #  fk_rails_...  (owner_id => users.id)
 #
 
+audio_path = File.join(Rails.root, "spec", "attachments", "cantina.mp3")
+
 FactoryBot.define do
   factory :track do
     owner { association :user }
@@ -35,10 +37,15 @@ FactoryBot.define do
     
     factory :track_live do
       transient do
-        original { File.join(Rails.root, 'spec', 'attachments', 'cantina.mp3') }
-        streams { [original] }
-        metadata { original ? AudioInfo.open(original) { |info| info.to_h } : nil }
-        thumbnail { false } 
+        original { nil}
+        original_name { nil }
+        streams { [File.open(audio_path)] }
+        thumbnail { nil } 
+        metadata do 
+          src = original || streams[0]
+
+          src ? AudioInfo.open(src.path) { |info| info.to_h } : nil
+        end
       end
 
       duration { metadata && metadata["length"] || 150  } 
@@ -48,20 +55,25 @@ FactoryBot.define do
 
       after(:build) do |track, evaluator|
         if evaluator.original
-          track.original.attach(io: File.open(evaluator.original), filename: File.basename(evaluator.original), 
-            content_type: MIME::Types.type_for(evaluator.original)[0].to_s)
+          original = evaluator.original
+          original_name = evaluator.original_name || File.basename(original.path)
+          track.original.attach(io: original, filename: original_name, 
+            content_type: MIME::Types.type_for(original_name)[0].to_s)
         end
 
         if evaluator.streams.length > 0
-          evaluator.streams.each do |stream|
-            track.streams.attach(io: File.open(stream), filename: File.basename(stream), 
-            content_type: MIME::Types.type_for(stream)[0].to_s)
+          evaluator.streams.each_with_index do |stream, i|
+            stream_name = File.basename(stream.path)
+            track.streams.attach(io: stream, filename: stream_name, 
+            content_type: MIME::Types.type_for(stream_name)[0].to_s)
           end
         end
 
         if evaluator.thumbnail
-          track.thumbnail.attach(io: File.open(evaluator.thumbnail), filename: File.basename(evaluator.thumbnail), 
-            content_type: MIME::Types.type_for(evaluator.thumbnail)[0].to_s)
+          thumbnail = evaluator.thumbnail
+          thumbnail_name = File.basename(thumbnail.path)
+          track.thumbnail.attach(io: thumbnail, filename: thumbnail_name, 
+            content_type: MIME::Types.type_for(thumbnail.path)[0].to_s)
         end
       end
     end

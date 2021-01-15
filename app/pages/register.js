@@ -42,8 +42,8 @@ function GetStarted(){
       <Link href="/stream">
         <a className={`z-50 relative text-5xl px-8 py-4 text-black font-bold flex flex-row items-center ` +
           `bg-white px-4 py-2 rounded-xl transition transform hover:scale-110`}>
-            <Logo className="fill-current text-pink-500 w-24 h-16 pr-8"/>
-          Get Listening
+          <img src="/jukeColor.svg" alt="Juke Logo" className="w-32"/> 
+          <p>Get Listening</p>
         </a>
       </Link>
     </div>

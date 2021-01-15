@@ -25,7 +25,8 @@ export default class Jukebox {
         },
       });
       this.track = track;
-      this.timer = new Timer(5000, () => {
+      const listenedMark = Math.min(5000, this.track.duration / 2 * 1000)
+      this.timer = new Timer(listenedMark, () => {
         console.log('listened to ' + track.title)
         listen(track)
       })
@@ -167,13 +168,14 @@ class Timer {
     if(!this.listened){
       this.started = Date.now()
       this.poll = setInterval(() => {
+        console.log(this.time)
         if (this.current() > this.time){
           this.listened = true
           this.started = null
           clearInterval(this.poll)
           this.cb()
         }
-      }, 2000)
+      }, 500)
     }
   }
 

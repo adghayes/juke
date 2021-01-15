@@ -19,7 +19,7 @@
 FactoryBot.define do
   factory :user do
     transient do 
-      avatar { false }
+      avatar { nil }
     end
 
     email { Faker::Internet.unique.safe_email }
@@ -39,8 +39,10 @@ FactoryBot.define do
 
     after(:build) do |user, evaluator|
       if evaluator.avatar
-        user.avatar.attach(io: File.open(evaluator.avatar), filename: File.basename(evaluator.avatar), 
-          content_type: MIME::Types.type_for(evaluator.avatar)[0].to_s)
+        avatar = evaluator.avatar
+        avatar_name = File.basename(avatar.path)
+        user.avatar.attach(io: avatar, filename: avatar_name, 
+          content_type: MIME::Types.type_for(avatar_name)[0].to_s)
       end
     end
   end

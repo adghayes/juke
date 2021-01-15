@@ -24,7 +24,7 @@ export default function QueuePreview({ title, queueKey, length, emptyMessage }) 
 
   return (
     <section className="lg:w-64 xl:w-72 my-8 mx-4 border-gray-300 border rounded flex flex-col items-stretch overflow-hidden">
-      <h2 className="text-lg font-bold px-4 py-2 bg-pink-100 border-b border-gray-300">
+      <h2 className="text-lg font-bold px-4 py-2 bg-gradient-to-t from-purple-500 via-purple-700 to-purple-500 text-white border-b border-gray-300">
         {title}
       </h2>
       <div className="relative">

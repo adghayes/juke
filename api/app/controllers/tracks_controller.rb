@@ -51,16 +51,9 @@ class TracksController < ApplicationController
 
   def listen
     @track.listen
-
-    if current_user
-      if current_user.listen(@track)
-        head :ok
-      else
-        head :unprocessable_entity
-      end 
-    else
-      head :ok
-    end
+    result = current_user.listen(@track) if current_user
+    puts result
+    head :ok
   end
 
   def streams
