@@ -132,7 +132,7 @@ RSpec.describe "Users", type: :request do
   describe '#tracks' do
     it 'returns a users track' do
       @user = FactoryBot.create(:user)
-      @track = FactoryBot.create(:track, owner: @user)
+      @track = FactoryBot.create(:track_live, owner: @user)
       get "/users/#{@user.id}/tracks"
       expect_track_in_queue(response, @track)
     end
@@ -141,7 +141,7 @@ RSpec.describe "Users", type: :request do
   describe '#likes' do
     it 'returns a users like' do
       @user = FactoryBot.create(:user)
-      @track = FactoryBot.create(:track, owner: @user)
+      @track = FactoryBot.create(:track_live, owner: @user)
       FactoryBot.create(:like, track: @track, user: @user )
       get "/users/#{@user.id}/likes"
       expect_track_in_queue(response, @track)
@@ -151,7 +151,7 @@ RSpec.describe "Users", type: :request do
   describe '#recents' do
     it 'returns a users own recent' do
       @user = FactoryBot.create(:user)
-      @track = FactoryBot.create(:track, owner: @user)
+      @track = FactoryBot.create(:track_live, owner: @user)
       FactoryBot.create(:recent, track: @track, user: @user )
       get "/users/#{@user.id}/history", headers: auth_header
       expect_track_in_queue(response, @track)
@@ -159,7 +159,7 @@ RSpec.describe "Users", type: :request do
 
     it 'does not allow accessing others history' do
       user = FactoryBot.create(:user)
-      track = FactoryBot.create(:track, owner: user)
+      track = FactoryBot.create(:track_live, owner: user)
       FactoryBot.create(:recent, track: track, user: user )
       get "/users/#{user.id}/history", headers: auth_header
       expect(response).to have_http_status(:forbidden)
