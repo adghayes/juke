@@ -34,13 +34,13 @@ audio_path = File.join(Rails.root, 'spec', 'attachments', 'cantina.mp3')
 
 FactoryBot.define do
   factory :track do
-    owner { association :user }
+    association :owner, factory: :user
     title { Faker::Lorem.unique.word }
     submitted { true }
 
     factory :track_live do
       transient do
-        original { nil }
+        original { File.open(audio_path) }
         original_name { nil }
         streams { [File.open(audio_path)] }
         thumbnail { nil }

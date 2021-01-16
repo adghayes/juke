@@ -25,6 +25,10 @@ default: &default
 
 development:
   <<: *default
+
+
+test:
+  <<: *default
   peaks:
     count: 576
     quality: 0.5
@@ -36,10 +40,6 @@ development:
       options: 
         - "-dash 1"
       extension: webm
-  host: http://localhost:3000
-
-test:
-  <<: *default
   host: http://localhost:3000
 
 production:

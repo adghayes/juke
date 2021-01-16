@@ -163,11 +163,11 @@ function statusMessage(status) {
         <p>
           Check it out on{" "}
           <Link href="/stream">
-            <a className="hover:underline">the stream</a>
+            <a className="font-medium hover:underline">the stream</a>
           </Link>{" "}
           or in{" "}
           <Link href="/you">
-            <a className="hover:underline">your library</a>
+            <a className="font-medium hover:underline">your library</a>
           </Link>
         </p>
       );
@@ -175,7 +175,7 @@ function statusMessage(status) {
       return (
         <p>
           If you don't think anything was wrong with your file, try{" "}
-          <a href="/upload" className="hover:underline">
+          <a href="/upload" className="font-medium hover:underline">
             uploading again
           </a>
         </p>
@@ -185,7 +185,7 @@ function statusMessage(status) {
         <p>
           It should appear in{" "}
           <Link href="/you">
-            <a className="hover:underline">your library</a>
+            <a className="hover:underline font-medium">your library</a>
           </Link>{" "}
           later
         </p>

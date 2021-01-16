@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class TracksController < ApplicationController
+  include AudioHelper
+
   before_action :require_logged_in, only: %i[create update like unlike]
   before_action :require_valid_jwt, only: :streams
   before_action :set_track, only: %i[show update streams listen]
@@ -21,7 +23,7 @@ class TracksController < ApplicationController
   def update
     if @track.owner == current_user
       if @track.update(track_params)
-        start_processing if @track.uploaded == true && @track.processing == 'none'
+        process_audio @track if @track.uploaded && @track.processing == 'none'
         render :show
       else
         render json: @track.errors.messages, status: :unprocessable_entity
@@ -92,80 +94,8 @@ class TracksController < ApplicationController
     end
   end
 
-  def encode_peaks(peaks)
-    base64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
-    encoded = ''
-
-    samples = []
-    (peaks.length / 8).times do |i|
-      samples.push(sample_peaks(peaks.slice(i * 8, 8)))
-    end
-    max = samples.max
-    min = samples.min
-
-    samples.each do |sample|
-      normalized = (sample.to_f - min) / (max - min)
-      encoded += base64[(normalized * 63).floor]
-    end
-    encoded
-  end
-
-  def sample_peaks(slice)
-    slice.map(&:abs).sum / slice.length
-  end
-
   def track_params
     params.require(:track).permit(:title, :description, :downloadable,
                                   :owner_id, :thumbnail, :original, :uploaded, :submitted, :processing)
-  end
-
-  def start_processing
-    require 'aws-sdk-lambda'
-    config = Rails.application.config.transcoder
-
-    jwt = encode_jwt({
-                       iss: 'juke',
-                       exp: (Time.now.to_i + 3600),
-                       sub: 'juke-transcoder'
-                     })
-
-    outputs = config.specs.map do |spec|
-      spec[:metadata] = config.metadata
-      spec[:upload] = {
-        type: 'rails',
-        url: config.host + rails_direct_uploads_path,
-        headers: { Authorization: "bearer #{jwt}" },
-        name: "#{@track.id}.#{spec[:extension]}",
-        extension: spec[:extension]
-      }
-      spec
-    end
-
-    callback = {
-      url: config.host + "/tracks/#{@track.id}/streams",
-      headers: { Authorization: "bearer #{jwt}" },
-      method: 'POST'
-    }
-
-    payload = {
-      peaks: config.peaks,
-      input: {
-        download: {
-          url: config.host + rails_blob_path(@track.original)
-        }
-      },
-      outputs: outputs,
-      callback: callback
-    }
-
-    client = Aws::Lambda::Client.new(**config.client)
-
-    client.invoke({
-                    payload: ActiveSupport::JSON.encode(payload),
-                    function_name: config.function,
-                    invocation_type: 'Event'
-                  })
-
-    @track.update(processing: 'started')
   end
 end

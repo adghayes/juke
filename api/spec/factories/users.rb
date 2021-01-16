@@ -19,13 +19,21 @@
 #  index_users_on_email         (email) UNIQUE
 #
 FactoryBot.define do
+  sequence :email do |n|
+    "#{n}#{Faker::Internet.safe_email}"
+  end
+
+  sequence :display_name do |n|
+    "#{Faker::Internet.username(specifier: 3..24)}#{n}"
+  end
+
   factory :user do
     transient do
       avatar { nil }
     end
 
-    email { Faker::Internet.unique.safe_email }
-    display_name { Faker::Internet.unique.username(specifier: 3..24) }
+    email { generate :email }
+    display_name { generate :display_name }
     password { 'password' }
     bio { Faker::Lorem.sentence }
 
