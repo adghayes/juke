@@ -45,7 +45,7 @@ FactoryBot.define do
         streams { [File.open(audio_path)] }
         thumbnail { nil }
         metadata do
-          src = original || streams[0]
+          src = streams[0] || original
 
           src ? AudioInfo.open(src.path, &:to_h) : nil
         end
