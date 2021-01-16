@@ -19,7 +19,7 @@ const API = {
     } else {
       url = API.BACKEND + "/" + path;
     }
-    return url.replace(/(?<!:)\/\//, "/");
+    return url.replace(/[^:]\/\//g, x => x.replace('//','/'))
   },
 
   fetch: async (path) => {
