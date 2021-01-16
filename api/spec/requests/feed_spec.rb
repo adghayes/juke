@@ -8,9 +8,9 @@ RSpec.describe 'Feeds', type: :request do
 
     it 'returns requested number of tracks and link for next' do
       @tracks = FactoryBot.create_list(:track_live, 10)
-      get "/feed?limit=7"
+      get '/feed?limit=7'
       body = JSON.parse(response.body)
-      
+
       expect(response).to have_http_status(:ok)
       expect(body.tracks.length).to eq(7)
       expect(body.next).to be_truthy

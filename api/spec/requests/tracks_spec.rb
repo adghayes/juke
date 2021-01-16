@@ -69,63 +69,6 @@ RSpec.describe 'Tracks', type: :request do
         expect(response).to have_http_status(:forbidden)
       end
     end
-
-    context 'uploaded = true and processing = none' do
-      let(:original) { File.open(File.join(Rails.root, 'spec', 'attachments', 'cantina.mp3'))}
-      let(:track) { FactoryBot.create(:track_live, 
-        owner: user, 
-        processing: "none", 
-        uploaded: false,
-        original: original) }
-      
-      it 'hits the transcoder endpoint with proper body' do
-        stub_request(:post, "http://localhost:3002").
-        with(body: {
-          peaks: {
-            count: '576', 
-            quality: '0.5'
-          },
-          input: {
-            download: {
-              url: /http:\/\/localhost:3000\/rails\/active_storage\/blobs.*/
-            }
-          },
-          outputs: [
-            {
-              format: 'webm',
-              audio: {
-                bitrate: '96'
-              },
-              video: 'false',
-              options: ['dash -1'],
-              upload: {
-                type: 'rails',
-                url: /http:\/\/localhost:3000\/rails\/active_storage\/direct_uploads/,
-                headers: {
-                  Authorization: /bearer\s.*/
-                },
-                name: /\d+.webm/,
-                extension: 'webm'
-              }
-            }
-          ],
-          callback: {
-            method: 'POST',
-            callback: /http:\/\/localhost:3000\/tracks\/\d+\/streams/,
-            headers: {
-              Authorization: /bearer\s.+/
-            }
-          }
-        })
-        
-        expect do
-         patch track_url(track.id),
-                params: { track: { uploaded: true } },
-                headers: auth_header,
-                as: :json
-        end.to_not raise_error
-      end
-    end
   end
 
   describe 'POST /like' do

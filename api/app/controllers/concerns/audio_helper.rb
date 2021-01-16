@@ -4,13 +4,13 @@ module AudioHelper
   extend ActiveSupport::Concern
   include Rails.application.routes.url_helpers
   include Auth
-  
+
   def jwt
     encode_jwt({
-      iss: 'juke',
-      exp: (Time.now.to_i + 3600),
-      sub: 'juke-transcoder'
-    })
+                 iss: 'juke',
+                 exp: (Time.now.to_i + 3600),
+                 sub: 'juke-transcoder'
+               })
   end
 
   def config
