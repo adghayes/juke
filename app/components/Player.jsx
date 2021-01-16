@@ -149,6 +149,7 @@ function Player({ track, queue, maxWidth }) {
             <a
               href={track.download}
               className={bottomButtonClasses + " border border-gray-200"}
+              download
             >
               <FontAwesomeIcon
                 icon={faDownload}
