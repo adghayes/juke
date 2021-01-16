@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: tracks
@@ -34,34 +36,31 @@ class Track < ApplicationRecord
   after_initialize :default_processing
 
   validates :description, length: { maximum: 160 }
-  
-  validates :title, presence: { if: :submitted }, 
-    uniqueness: { scope: :owner_id, 
-      message: 'You already have a track with that title',
-      conditions: -> { where(submitted: true) }
-    }
-  
+
+  validates :title, presence: { if: :submitted },
+                    uniqueness: { scope: :owner_id,
+                                  message: 'You already have a track with that title',
+                                  conditions: -> { where(submitted: true) } }
+
   validate :require_original, if: :downloadable
   validate :require_streams, if: :processed?
   validates :duration, presence: { if: :processed? }
   validates :peaks, presence: { if: :processed? }
 
-
   belongs_to :owner,
-    class_name: :User,
-    primary_key: :id,
-    foreign_key: :owner_id
+             class_name: :User,
+             primary_key: :id
 
   has_many :likes,
-    dependent: :destroy
+           dependent: :destroy
 
   has_many :plays,
-    dependent: :destroy
+           dependent: :destroy
 
   has_one :stats,
-    class_name: :TrackStats,
-    foreign_key: :id,
-    primary_key: :id
+          class_name: :TrackStats,
+          foreign_key: :id,
+          primary_key: :id
 
   has_one_attached :thumbnail
   has_one_attached :original
@@ -91,13 +90,12 @@ class Track < ApplicationRecord
     processing == 'done'
   end
 
-  def self.live 
-    where(submitted: true, processing: "done")
+  def self.live
+    where(submitted: true, processing: 'done')
   end
 
   def self.with_details
-    self
-      .with_attached_thumbnail
+    with_attached_thumbnail
       .with_attached_streams
       .with_attached_original
       .eager_load(:stats, :owner, owner: [avatar_attachment: :blob])
@@ -108,7 +106,7 @@ class Track < ApplicationRecord
   end
 
   def resized_thumbnail
-    thumbnail.variant(resize_to_limit:[500, 500])
+    thumbnail.variant(resize_to_limit: [500, 500])
   end
 
   private

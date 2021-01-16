@@ -30,7 +30,7 @@ export default function ArtistPage({ forceUser }) {
 
   const artistKey = !artistSlug || isUser ? null : `users/${artistSlug}`;
   const { data, error } = useSWR(artistKey, API.fetch, {
-    dedupingInterval: 1000 * 60 * 60,
+    dedupingInterval: 1000 * 60,
   });
 
   const [openTab, setOpenTab] = useState("tracks");

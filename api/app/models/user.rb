@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
@@ -18,13 +20,13 @@
 #
 class User < ApplicationRecord
   extend FriendlyId
-  friendly_id :display_name, :use => :slugged
+  friendly_id :display_name, use: :slugged
 
   validates :email, uniqueness: { message: "That's already taken", case_sensitive: false },
-    format: { with: URI::MailTo::EMAIL_REGEXP, message: "Invalid email address" }
-  validates :display_name, uniqueness: { message: "That's already taken"},
-    length: { minimum: 3, maximum: 24 }, exclusion: { in: %w(upload stream login register you),
-      message: "%{value} is reserved." }
+                    format: { with: URI::MailTo::EMAIL_REGEXP, message: 'Invalid email address' }
+  validates :display_name, uniqueness: { message: "That's already taken" },
+                           length: { minimum: 3, maximum: 24 }, exclusion: { in: %w[upload stream login register you],
+                                                                             message: '%{value} is reserved.' }
   validates :password_digest, presence: true
   validates :password, length: { minimum: 8, allow_nil: true }
   validates :bio, length: { maximum: 160 }
@@ -32,40 +34,39 @@ class User < ApplicationRecord
   attr_reader :password
 
   has_many :sessions,
-    dependent: :destroy
+           dependent: :destroy
 
   has_many :tracks,
-    primary_key: :id,
-    foreign_key: :owner_id,
-    dependent: :destroy
+           primary_key: :id,
+           foreign_key: :owner_id,
+           dependent: :destroy
 
   has_many :likes,
-    dependent: :destroy
+           dependent: :destroy
 
   has_many :recents,
-    dependent: :destroy
+           dependent: :destroy
 
   has_many :liked_tracks,
-    through: :likes,
-    source: :track
+           through: :likes,
+           source: :track
 
   has_many :recent_tracks,
-    through: :recents,
-    source: :track
-    
+           through: :recents,
+           source: :track
+
   has_one_attached :avatar,
-    dependent: :destroy
+                   dependent: :destroy
 
   def self.find_by_credentials(email, password)
-    email_match = self.find_by(email: email)
+    email_match = find_by(email: email)
     return nil unless email_match
 
     email_match.is_password?(password) ? email_match : nil
   end
 
   def self.with_details
-    self
-      .includes(:tracks, :likes, :recents)
+    includes(:tracks, :likes, :recents)
       .with_attached_avatar
   end
 
@@ -81,13 +82,11 @@ class User < ApplicationRecord
   def listen(track)
     Recent.transaction do
       recent = Recent.find_or_create_by(user: self, track: track)
-      if recent.persisted? && recents.count > Recent::LENGTH
-        recents.order(:created_at).first.delete
-      end
+      recents.order(:created_at).first.delete if recent.persisted? && recents.count > Recent::LENGTH
     end
   end
 
   def resized_avatar
-    avatar.variant(resize_to_limit:[500, 500])
+    avatar.variant(resize_to_limit: [500, 500])
   end
 end

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class TracksController < ApplicationController
-  before_action :require_logged_in, only: [:create, :update, :like, :unlike]
+  before_action :require_logged_in, only: %i[create update like unlike]
   before_action :require_valid_jwt, only: :streams
-  before_action :set_track, only: [:show, :update, :streams, :listen]
-  
+  before_action :set_track, only: %i[show update streams listen]
+
   def create
     @track = Track.new(owner: current_user, **track_params)
     if @track.save
@@ -19,7 +21,7 @@ class TracksController < ApplicationController
   def update
     if @track.owner == current_user
       if @track.update(track_params)
-        start_processing if @track.uploaded == true && @track.processing == "none"
+        start_processing if @track.uploaded == true && @track.processing == 'none'
         render :show
       else
         render json: @track.errors.messages, status: :unprocessable_entity
@@ -70,7 +72,7 @@ class TracksController < ApplicationController
 
     @track.peaks = encode_peaks(params[:peaks])
     @track.duration = params[:input][:metadata][:format][:duration]
-    @track.processing = "done"
+    @track.processing = 'done'
 
     if @track.save
       head :ok
@@ -91,12 +93,12 @@ class TracksController < ApplicationController
   end
 
   def encode_peaks(peaks)
-    base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+    base64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
     encoded = ''
 
     samples = []
     (peaks.length / 8).times do |i|
-      samples.push (sample_peaks peaks.slice(i * 8, 8))
+      samples.push(sample_peaks(peaks.slice(i * 8, 8)))
     end
     max = samples.max
     min = samples.min
@@ -113,8 +115,8 @@ class TracksController < ApplicationController
   end
 
   def track_params
-    params.require(:track).permit(:title, :description, :downloadable, 
-      :owner_id, :thumbnail, :original, :uploaded, :submitted, :processing)
+    params.require(:track).permit(:title, :description, :downloadable,
+                                  :owner_id, :thumbnail, :original, :uploaded, :submitted, :processing)
   end
 
   def start_processing
@@ -122,10 +124,10 @@ class TracksController < ApplicationController
     config = Rails.application.config.transcoder
 
     jwt = encode_jwt({
-      iss: 'juke',
-      exp: (Time.now.to_i + 3600),
-      sub: 'juke-transcoder'
-    })
+                       iss: 'juke',
+                       exp: (Time.now.to_i + 3600),
+                       sub: 'juke-transcoder'
+                     })
 
     outputs = config.specs.map do |spec|
       spec[:metadata] = config.metadata
@@ -142,7 +144,7 @@ class TracksController < ApplicationController
     callback = {
       url: config.host + "/tracks/#{@track.id}/streams",
       headers: { Authorization: "bearer #{jwt}" },
-      method: "POST"
+      method: 'POST'
     }
 
     payload = {
@@ -151,7 +153,7 @@ class TracksController < ApplicationController
         download: {
           url: config.host + rails_blob_path(@track.original)
         }
-      }, 
+      },
       outputs: outputs,
       callback: callback
     }
@@ -159,10 +161,10 @@ class TracksController < ApplicationController
     client = Aws::Lambda::Client.new(**config.client)
 
     client.invoke({
-      payload: ActiveSupport::JSON.encode(payload),
-      function_name: config.function,
-      invocation_type: 'Event'
-    })
+                    payload: ActiveSupport::JSON.encode(payload),
+                    function_name: config.function,
+                    invocation_type: 'Event'
+                  })
 
     @track.update(processing: 'started')
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: sessions
@@ -25,23 +27,23 @@ require 'rails_helper'
 
 RSpec.describe Session, type: :model do
   let(:user) { FactoryBot.create(:user) }
-  subject(:session) { FactoryBot.create( :session) }
+  subject(:session) { FactoryBot.create(:session) }
 
-  describe "validations" do
+  describe 'validations' do
     it { should validate_uniqueness_of(:token) }
   end
 
-  describe "associations" do
+  describe 'associations' do
     it { should belong_to(:user) }
   end
 
-  describe "::generate_token" do
+  describe '::generate_token' do
     it 'generates a base64 token of length 24' do
-      expect(Session.generate_token).to match(/[a-zA-Z0-9+\/]{24}/)
+      expect(Session.generate_token).to match(%r{[a-zA-Z0-9+/]{24}})
     end
   end
 
-  describe "#deactivate!" do
+  describe '#deactivate!' do
     it 'sets active to false' do
       expect(session.active).to be true
       session.deactivate!
@@ -49,7 +51,7 @@ RSpec.describe Session, type: :model do
     end
   end
 
-  describe "::for" do
+  describe '::for' do
     it 'creates a session for a user' do
       expect(user.sessions).to match_array([])
       user_session = Session.for(user)

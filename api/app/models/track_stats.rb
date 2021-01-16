@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: track_stats
@@ -10,9 +12,9 @@ class TrackStats < ApplicationRecord
   self.primary_key = :id
 
   belongs_to :track,
-    class_name: :Track,
-    foreign_key: :id,
-    primary_key: :id
+             class_name: :Track,
+             foreign_key: :id,
+             primary_key: :id
 
   def readonly?
     true

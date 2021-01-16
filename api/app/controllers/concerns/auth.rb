@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Auth
   extend ActiveSupport::Concern
 
   attr_reader :current_session, :current_user
+
   def require_auth
     identify_bearer
     head :unauthorized unless @valid_jwt || current_user
@@ -40,8 +43,8 @@ module Auth
     when :jwt
       verify_jwt(@bearer_token)
     end
-    
-    @bearer_identified = true  
+
+    @bearer_identified = true
   end
 
   def get_bearer_token
@@ -62,15 +65,13 @@ module Auth
 
   def verify_jwt(jwt)
     payload = decode_jwt(jwt)
-    @valid_jwt = payload["exp"] > Time.now.to_i
+    @valid_jwt = payload['exp'] > Time.now.to_i
   end
 
   def decode_jwt(token)
-    begin
-      decoded = JWT.decode token, Rails.application.credentials.jwt[:key], true, { algorithm: 'HS256' }
-      decoded[0]
-    rescue JWT::DecodeError
-      nil
-    end
+    decoded = JWT.decode token, Rails.application.credentials.jwt[:key], true, { algorithm: 'HS256' }
+    decoded[0]
+  rescue JWT::DecodeError
+    nil
   end
 end

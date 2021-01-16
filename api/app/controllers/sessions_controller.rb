@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SessionsController < ApplicationController
   before_action :require_logged_in, only: :destroy
   before_action :require_logged_out, only: :create
@@ -9,7 +11,7 @@ class SessionsController < ApplicationController
       @token = log_in_user(@user)
       render :show, status: :created
     else
-      render json: {error: "invalid credentials"}, status: :unprocessable_entity
+      render json: { error: 'invalid credentials' }, status: :unprocessable_entity
     end
   end
 

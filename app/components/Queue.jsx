@@ -38,11 +38,11 @@ export default function Queue({
       <ul
         className={`flex ${
           tileView
-            ? "flex-row flex-wrap justify-center self-center justify-start"
+            ? "flex-row flex-wrap justify-center w-full"
             : "flex-col"
         }`}
       >
-        {!!queue
+        {!!queue & !!rect
           ? queue.tracks.map((track) => (
               <li
                 key={track.id}

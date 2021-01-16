@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: sessions
@@ -31,11 +33,9 @@ class Session < ApplicationRecord
   end
 
   def self.for(user, about = {})
-    begin
-      self.create!(user: user, token: generate_token, active: true, **about)
-    rescue ActiveRecord::RecordNotUnique
-      retry
-    end
+    create!(user: user, token: generate_token, active: true, **about)
+  rescue ActiveRecord::RecordNotUnique
+    retry
   end
 
   def deactivate!

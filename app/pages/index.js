@@ -7,8 +7,8 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <div className="bg-gradient-to-t from-pink-200 to-indigo-300 w-screen min-h-screen">
-      <main className="lg:min-w-min max-w-screen-lg xl:max-w-screen-xl mx-auto min-h-screen bg-white">
+    <div className="bg-gradient-to-t from-pink-200 to-indigo-300 w-screen min-h-full flex flex-col">
+      <main className="max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white flex-grow flex flex-col justify-between">
         <section className="relative">
           <Image
             src="/alexandre-st-louis-IlfpKwRMln0-unsplash.jpg"
@@ -29,6 +29,10 @@ export default function Home() {
           </Link>
         </section>
         <Spotlight />
+        <p className="self-stretch text-xs text-center p-2 mt-4 border-t border-b">Juke was seeded with tracks found on{' '}
+          <a className="font-medium hover:underline" href="http://dig.ccmixter.org/" target="_blank">Dig CC Mixter</a>
+          . They are processed and redistributed under non-commercial Creative Commons licenses
+        </p>
       </main>
     </div>
   );
@@ -44,18 +48,22 @@ function Spotlight() {
   return (
     <section
       ref={rectRef}
-      className="p-6 md:p-8 pb-12 flex flex-col justify-center items-center"
+      className="flex flex-col justify-center items-center"
     >
       {queue ? (
         <>
-          <p className="px-4 md:text-xl pb-6">
-            <i>
-              <strong>{track.owner.display_name}</strong>
-            </i>{" "}
-            posted our most recent track...
+          <p className="p-4 md:text-xl">
+            <Link href={`/${track.owner.slug}`}>
+              <a className="hover:underline">
+                <i>
+                  <strong>{track.owner.display_name}</strong>
+                </i>
+              </a>
+            </Link>
+            {' '}posted our most recent track...
           </p>
           <Player track={track} maxWidth={rect && rect.width} />
-          <p className="px-4 md:text-xl py-8 text-center">
+          <p className="px-4 md:text-xl py-4 text-center">
             and yours could be next...{" "}
             {loggedOut ? (
               <span className="px-2 font-normal whitespace-nowrap">

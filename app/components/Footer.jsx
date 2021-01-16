@@ -20,7 +20,7 @@ function normalize(num) {
 }
 
 function Footer() {
-  const jukebox = useContext(JukeContext).jukebox;
+  const { jukebox } = useContext(JukeContext);
   const track = jukebox.track;
   const { user } = useUser();
   const [liked, toggleLiked] = useLiked(user, track);
@@ -116,7 +116,7 @@ function Footer() {
   return (
     <footer
       className={
-        `z-30 fixed bottom-0 w-full h-16 sm:h-12 bg-gray-700 flex justify-around items-center text-white py-2` +
+        "z-30 fixed bottom-0 w-screen h-16 sm:h-12 bg-gray-700 flex justify-around items-center text-white py-2" +
         "transition transform-gpu duration-1000 " +
         (track ? "" : "translate-y-full")
       }
@@ -149,7 +149,7 @@ function Footer() {
           {track && readableCurrent}
         </span>
         <div
-          className="flex flex-row px-2 py-4  w-full cursor-pointer"
+          className="flex flex-row px-2 py-4 flex-grow cursor-pointer"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           onClick={(e) => {
@@ -157,7 +157,7 @@ function Footer() {
           }}
         >
           <div
-            className="relative rounded bg-gray-200 h-1  w-full focus:h-2"
+            className="relative rounded bg-gray-200 h-1 flex-grow"
             ref={bar}
             onKeyDown={handleKeyDown}
           >

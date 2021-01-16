@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
@@ -18,14 +20,14 @@
 #
 FactoryBot.define do
   factory :user do
-    transient do 
+    transient do
       avatar { nil }
     end
 
     email { Faker::Internet.unique.safe_email }
-    display_name { Faker::Internet::unique.username(specifier: 3..24) }
+    display_name { Faker::Internet.unique.username(specifier: 3..24) }
     password { 'password' }
-    bio { Faker::Lorem.sentence}
+    bio { Faker::Lorem.sentence }
 
     factory :user_with_recents do
       transient do
@@ -41,8 +43,8 @@ FactoryBot.define do
       if evaluator.avatar
         avatar = evaluator.avatar
         avatar_name = File.basename(avatar.path)
-        user.avatar.attach(io: avatar, filename: avatar_name, 
-          content_type: MIME::Types.type_for(avatar_name)[0].to_s)
+        user.avatar.attach(io: avatar, filename: avatar_name,
+                           content_type: MIME::Types.type_for(avatar_name)[0].to_s)
       end
     end
   end

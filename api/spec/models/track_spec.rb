@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: tracks
@@ -29,15 +31,15 @@
 #
 
 RSpec.describe Track, type: :model do
-  subject(:track)  { FactoryBot.create(:track) }
+  subject(:track) { FactoryBot.create(:track) }
 
   describe 'validations' do
     context 'when submitted' do
       it { should validate_presence_of(:title) }
-      it do 
+      it do
         should validate_uniqueness_of(:title)
           .scoped_to(:owner_id)
-          .with_message('You already have a track with that title') 
+          .with_message('You already have a track with that title')
       end
     end
 
@@ -69,7 +71,7 @@ RSpec.describe Track, type: :model do
 
     context 'title has changed' do
       it 'should be true' do
-        track.title = track.title + " changed"
+        track.title = "#{track.title} changed"
         expect(track.should_generate_new_friendly_id?).to be true
       end
     end
@@ -99,7 +101,7 @@ RSpec.describe Track, type: :model do
     it 'creates a new play record' do
       initial_count = track.plays.count
       track.listen
-      expect(track.plays.count).to be (initial_count + 1)
+      expect(track.plays.count).to be(initial_count + 1)
     end
   end
 end

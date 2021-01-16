@@ -4,10 +4,8 @@ import Header from "../components/Header";
 import AccountAlert from "../components/AccountAlert";
 import Footer from "../components/Footer";
 import "tailwindcss/tailwind.css";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Jukebox from "../lib/jukebox";
-import { listen } from "../lib/api-track";
-import { mutate } from "swr";
 
 export const JukeContext = React.createContext({});
 
@@ -24,12 +22,11 @@ function App({ Component, pageProps }) {
   useEffect(() => {
     jukebox.current.setJuke = setJuke;
     window.jukebox = jukebox.current;
-    window.listen = listen;
   }, []);
 
   return (
     <JukeContext.Provider value={juke}>
-      <div id="app" className="bg-gray-200 min-h-screen w-full relative">
+      <div id="app" className="bg-white min-h-screen w-screen relative">
         <Head>
           <title>Juke</title>
           <link rel="icon" href="/favicon.ico" />

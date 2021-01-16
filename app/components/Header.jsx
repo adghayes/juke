@@ -5,16 +5,15 @@ import { useContext, useState } from "react";
 import useUser from "../hooks/useUser";
 import { logout } from "../lib/auth";
 import { getAvatar } from "../lib/thumbnails";
-import Logo from "./Logo";
 import { JukeContext } from "../pages/_app";
 
 function Header() {
   return (
-    <header className="fixed w-full h-11 top-0 z-30 bg-gray-700">
+    <header className="fixed w-screen h-11 top-0 z-30 bg-gray-700">
       <nav className="h-full max-w-screen-lg xl:max-w-screen-xl mx-auto flex justify-center items-center">
         <HeaderLogo />
-        <ul className="hidden md:flex h-full divide-x divide-gray-900 border-r border-gray-900 text-sm">
-          <NavLink label="Stream" href="/stream" addClass="px-6" />
+        <ul className="hidden md:flex self-stretch divide-x divide-gray-900 border-r border-gray-900 text-sm">
+          <StreamLink />
           <LibraryLink />
         </ul>
         <SearchBar />
@@ -33,23 +32,21 @@ function Header() {
 function HeaderLogo() {
   return (
     <Link href="/">
-      <a className="block h-full bg-gradient-to-t from-purple-500 to-pink-500 pl-1.5 pr-0.5">
-        <Logo className="w-16 h-11" />
+      <a className="block self-stretch bg-gradient-to-t from-purple-500 to-pink-500 px-1.5 flex justify-center">
+        <img src="/juke.svg" className="w-15 h-11 z-50" />
       </a>
     </Link>
   );
 }
 
 const navLinkBaseClass =
-  "block h-full text-gray-200 hover:text-white text-center " +
-  "align-middle leading-none py-4 whitespace-nowrap border-gray-900 " +
-  "flex items-center cursor-pointer flex justify-center items-center select-none";
+  "block text-gray-200 hover:text-white text-center py-3 self-stretch flex cursor-pointer select-none";
 
 function NavLink({ label, href, onClick, addClass }) {
   const navLinkClass = `${navLinkBaseClass} ${addClass}`;
 
   return (
-    <li className="h-full">
+    <li className="self-stretch flex justify-center">
       <Link href={href}>
         <a className={navLinkClass} onClick={onClick}>
           {label}
@@ -69,7 +66,7 @@ function SearchBar() {
   return (
     <div className="flex flex-grow justify-center items-center relative">
       <a
-        className="contents"
+        className="contents cursor:pointer"
         href="https://github.com/adghayes/juke"
         target="_blank"
       >
@@ -89,6 +86,10 @@ function SearchBar() {
       />
     </div>
   );
+}
+
+function StreamLink() {
+  return <NavLink label="Stream" href="/stream" addClass="px-6" />;
 }
 
 function LibraryLink() {
@@ -175,24 +176,20 @@ function ProfileLabel({ user }) {
   );
 }
 
-function Dropdown(props) {
+function Dropdown() {
   const [open, setOpen] = useState(false);
 
   return (
     <div className="relative flex items-center h-7">
       <button className="mr-4" onClick={() => setOpen((state) => !state)}>
-        <FontAwesomeIcon
-          icon={faBars}
-          fixedWidth
-          className="text-white w-5 h-full right-10"
-        />
+        <FontAwesomeIcon icon={faBars} fixedWidth className="text-white w-5" />
       </button>
       {open ? (
         <ul
           className={`bg-gray-700 flex flex-col absolute right-0 top-9 text-lg divide-y border-t border-l border-b border-gray-900 divide-gray-900`}
           onClick={() => setOpen(false)}
         >
-          <NavLink label="Stream" href="/stream" addClass="px-6" />
+          <StreamLink />
           <LibraryLink />
           <UploadLink />
           <ProfileLinks />

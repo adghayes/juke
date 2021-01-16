@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Be sure to restart your server when you modify this file.
 
 # Avoid CORS issues when API is called from the frontend app.
@@ -7,13 +9,13 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins /http:\/\/lvh\.me(:\d+)?/, /https:\/\/.*\.vercel\.app/
+    origins(%r{http://lvh\.me(:\d+)?}, %r{https://.*\.vercel\.app})
 
     resource '*',
-      headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: true,
-      max_age: 24 * 3600
+             headers: :any,
+             methods: %i[get post put patch delete options head],
+             credentials: true,
+             max_age: 24 * 3600
   end
 end
 

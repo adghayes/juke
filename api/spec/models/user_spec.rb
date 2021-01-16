@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: users
@@ -23,23 +25,23 @@ RSpec.describe User, type: :model do
 
   describe 'validations' do
     describe 'validates email format' do
-      it { should allow_value("user@gmail.com").for(:email) }
-      it { should_not allow_value("").for(:email) }
-      it { should_not allow_value("mrman.com").for(:email) }
-      it { should_not allow_value("@email.com").for(:email)}
+      it { should allow_value('user@gmail.com').for(:email) }
+      it { should_not allow_value('').for(:email) }
+      it { should_not allow_value('mrman.com').for(:email) }
+      it { should_not allow_value('@email.com').for(:email) }
     end
-    
-    it do 
-      should validate_uniqueness_of(:email).
-        case_insensitive.
-        with_message("That's already taken") 
+
+    it do
+      should validate_uniqueness_of(:email)
+        .case_insensitive
+        .with_message("That's already taken")
     end
 
     it { should validate_length_of(:display_name).is_at_least(3).is_at_most(24) }
 
-    it do 
-      should validate_uniqueness_of(:display_name).
-        with_message("That's already taken") 
+    it do
+      should validate_uniqueness_of(:display_name)
+        .with_message("That's already taken")
     end
 
     it { should validate_presence_of(:password_digest) }
@@ -63,11 +65,11 @@ RSpec.describe User, type: :model do
     it 'should change the value of the password and password digest' do
       init_password = user.password
       init_digest = user.password_digest
-      user.password = "new_password"
+      user.password = 'new_password'
       expect(user.password).not_to eql(init_password)
       expect(user.password_digest).not_to eql(init_digest)
     end
-  end 
+  end
 
   describe '#is_password?' do
     it 'matches the correct password' do
@@ -85,11 +87,11 @@ RSpec.describe User, type: :model do
     end
 
     it 'returns nil for password mismatch' do
-      expect(User.find_by_credentials(user.email, "wrong_password")).to be nil
+      expect(User.find_by_credentials(user.email, 'wrong_password')).to be nil
     end
 
     it 'returns nil for non-existent email' do
-      expect(User.find_by_credentials(Faker::Internet.unique.safe_email, "password")).to be nil
+      expect(User.find_by_credentials(Faker::Internet.unique.safe_email, 'password')).to be nil
     end
   end
 

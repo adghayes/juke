@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 export default function useLoadingZone(queue) {
   const zone = useRef(null);
-  const [spinner, setSpinner] = useState(true);
-  const loading = useRef(true);
+  const [spinner, setSpinner] = useState(false);
+  const loading = useRef(false);
   const complete = queue && !queue.next;
 
   function setLoading(val) {

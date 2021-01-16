@@ -25,12 +25,25 @@ default: &default
 
 development:
   <<: *default
+  peaks:
+    count: 576
+    quality: 0.5
+  specs: 
+    - format: webm
+      audio: 
+        bitrate: 96
+      video: false
+      options: 
+        - "-dash 1"
+      extension: webm
+  host: http://localhost:3000
 
 test:
   <<: *default
+  host: http://localhost:3000
 
 production:
   <<: *default
   client: {}
   function: ffmpeg-dev-transcode
-  host: https://boiling-shore-32918.herokuapp.com/
+  host: <%= ENV['HOST'] %>

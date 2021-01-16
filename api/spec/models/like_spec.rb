@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # == Schema Information
 #
 # Table name: likes
@@ -23,7 +25,7 @@ require 'rails_helper'
 RSpec.describe Like, type: :model do
   subject(:like) { FactoryBot.create(:like) }
 
-  describe 'validations' do 
+  describe 'validations' do
     it { should validate_uniqueness_of(:user).scoped_to(:track_id) }
   end
 

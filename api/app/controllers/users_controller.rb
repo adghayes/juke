@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
-  before_action :require_logged_in, only: [:update, :history]
+  before_action :require_logged_in, only: %i[update history]
   before_action :require_logged_out, only: :create
 
   def create
@@ -19,7 +21,7 @@ class UsersController < ApplicationController
     else
       require_logged_in
       return unless current_user
-  
+
       @user = current_user
       render :show
     end
@@ -37,16 +39,16 @@ class UsersController < ApplicationController
       head :forbidden
     end
   end
-    
+
   def exists
     query = params.require(:user).permit(:email, :display_name)
-    if query.length > 0
-      render json: { 
+    if query.length.positive?
+      render json: {
         user: query,
         exists: User.exists?(query)
       }
     else
-      head :unprocessable_entity 
+      head :unprocessable_entity
     end
   end
 
@@ -66,7 +68,7 @@ class UsersController < ApplicationController
       head :forbidden
       return
     end
-    
+
     has_many_through_queue @user.recents, history_user_path(@user)
   end
 
@@ -85,13 +87,13 @@ class UsersController < ApplicationController
     limit = params[:limit] ? params[:limit].to_i : 5
 
     track_ids_with_timestamp = association
-      .where('created_at < ?', latest)
-      .order(created_at: :desc)
-      .limit(limit)
-      .pluck(key, :created_at)
+                               .where('created_at < ?', latest)
+                               .order(created_at: :desc)
+                               .limit(limit)
+                               .pluck(key, :created_at)
     track_ids, timestamps = track_ids_with_timestamp.transpose
     @tracks = track_ids ? Track.live.with_details.find(track_ids) : []
-    
+
     @oldest = timestamps.try(:min).try(:iso8601)
     @path = next_path
     @limit = limit
