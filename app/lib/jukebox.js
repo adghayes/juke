@@ -2,6 +2,8 @@ import { Howl, Howler } from "howler";
 import API from "./api";
 import { listen } from "./api-track";
 
+const formats = ["webm", "ogg", "m4a", "aac", "mp3", "mp4"]
+
 export default class Jukebox {
   constructor() {
     this.navigationHistory = [];
@@ -11,6 +13,19 @@ export default class Jukebox {
     this.setJuke((juke) => ({ ...juke, id: juke.id + 1 }));
   }
 
+  src(track){
+    const options = track.src.map(API.url)
+    const ordered = []
+    formats.forEach(format => {
+      options.forEach(option => {
+        if(option.endsWith(format)) {
+          ordered.push(option)
+        }
+      })
+    })
+    return ordered
+  }
+
   set(track) {
     if (!track) throw new Error("won't set track to falsy value");
 
@@ -18,7 +33,7 @@ export default class Jukebox {
       this._pausePlayback();
 
       this.sound = new Howl({
-        src: track.src.map(API.url),
+        src: this.src(track),
         html5: true,
         onend: () => {
           this.stepForward.bind(this)();
