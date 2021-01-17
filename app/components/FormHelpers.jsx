@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { ErrorMessage } from "@hookform/error-message";
 
 export function inputReducer(state, editedFields) {
   return {
@@ -7,53 +10,12 @@ export function inputReducer(state, editedFields) {
   };
 }
 
-export function errorReducer(state, { fieldError, inputError }) {
-  if (inputError) return inputError;
-  return {
-    ...state,
-    ...fieldError,
-  };
-}
-
-export function TextField({
-  type,
-  name,
-  label,
-  info,
-  value,
-  inputDispatch,
-  errors,
-  syncErrors,
-  autoComplete,
-}) {
-  const [touch, setTouch] = useState(false);
-
-  return (
-    <label className="flex flex-col font-medium">
-      <span className="inline-flex items-center">
-        <span>{label}</span>
-        {info ? <Info info={info} /> : null}
-      </span>
-      <input
-        name={name}
-        type={type}
-        value={value}
-        autoComplete={autoComplete}
-        className={`pl-1 mt-1 border-b-2 border-gray-300 relative
-                    focus:border-black hover:border-gray-500 w-56 text-sm`}
-        onChange={(e) => {
-          inputDispatch({ [name]: e.target.value });
-          if (touch && syncErrors) syncErrors(e.target.value);
-        }}
-        onBlur={(e) => {
-          if (syncErrors) syncErrors(e.target.value);
-          setTouch(true);
-        }}
-      />
-      <Errors messages={touch && errors ? errors : []} />
-    </label>
-  );
-}
+export const labelClass =
+  "flex flex-row items-center justify-start py-1 mt-2 mb-1";
+export const textInputClass =
+  "border-b hover:bg-gray-100 mb-2 text-sm focus:ring-2 focus:rounded px-1 py-0.5";
+export const formButtonClass =
+  "text-white transition duration-300 bg-blue-400 hover:bg-blue-600 focus:bg-blue-600 hover:shadow cursor-pointer outline-none";
 
 export function Info({ info }) {
   const [open, setOpen] = useState(false);
@@ -83,37 +45,41 @@ export function Info({ info }) {
   );
 }
 
-export function Errors({ message }) {
+export function Error({ errors, name }) {
   return (
-    <div className="h-8 pl-2 bg-transparent">
-      {message ? (
-        <strong className="text-red-700 font-medium text-xs whitespace-wrap">
-          {message}
-        </strong>
-      ) : null}
-    </div>
+    <ErrorMessage
+      errors={errors}
+      name={name}
+      render={({ message }) => (
+        <p className="text-xs text-red-700 whitespace-wrap">{message}</p>
+      )}
+    />
   );
 }
 
-export function SubmitButton({ disabled, value }) {
+export function SubmitButton({ disabled, label }) {
   return (
-    <input
-      className={
-        "text-sm text-white font-medium px-6 py-2 whitespace-nowrap w-min " +
-        (disabled
-          ? "bg-gray-200"
-          : "bg-blue-400 transition duration-300 hover:bg-blue-600 focus:bg-blue-600 hover:shadow cursor-pointer")
-      }
+    <button
+      className={`self-center flex justify-center items-center ${
+        disabled ? "pl-1.5 pr-3" : "px-6"
+      } py-2 my-4 ${formButtonClass}`}
       type="submit"
-      value={value}
       disabled={disabled}
-    />
+    >
+      {disabled ? (
+        <FontAwesomeIcon
+          icon={faSpinner}
+          className="text-white w-5 px-1 animate-spin"
+        />
+      ) : null}
+      <span className="text-sm text-white font-medium">{label}</span>
+    </button>
   );
 }
 
 const maxLength = 160;
 
-export function TextArea({ label, name, value, placeholder, inputDispatch }) {
+export function TextArea({ label, name, value, setValue, placeholder }) {
   return (
     <label className="flex flex-col">
       <span className="inline-flex items-center py-1 font-medium">{label}</span>
@@ -126,7 +92,7 @@ export function TextArea({ label, name, value, placeholder, inputDispatch }) {
           "resize-none border border-gray-500 px-2 py-1 hover:bg-white bg-gray-100 rounded-xl " +
           "text-xs focus:outline-none focus:border-black focus:bg-white mx-1"
         }
-        onChange={(e) => inputDispatch({ [name]: e.target.value })}
+        onChange={(e) => setValue(e.target.value)}
         maxLength={maxLength}
       />
       <span className="self-end text-xs">

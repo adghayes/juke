@@ -1,10 +1,16 @@
 import { signUp } from "../lib/auth";
-import { Info, SubmitButton } from "./FormHelpers";
+import {
+  Info,
+  SubmitButton,
+  Error,
+  labelClass,
+  textInputClass,
+} from "./FormHelpers";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import { ErrorMessage } from "@hookform/error-message";
+import { useContext, useState } from "react";
 import API from "../lib/api";
+import { JukeContext } from "../pages/_app";
 
 const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
@@ -12,11 +18,8 @@ const displayInfo =
   "Your Display Name is what other people see when you post or repost tracks, " +
   "and also what appears in your public URL";
 
-const labelClass = "flex flex-row items-center justify-start py-1 mt-2 mb-1";
-const textInputClass = "border-b mb-2 text-sm";
-const errorClass = "text-xs text-red-700 whitespace-wrap";
-
 function Register({ callback }) {
+  const { setAlert } = useContext(JukeContext);
   const { register, handleSubmit, getValues, formState } = useForm({
     mode: "onBlur",
     reValidateMode: "onChange",
@@ -27,30 +30,27 @@ function Register({ callback }) {
       "confirm-password": "",
     },
   });
-
   const { errors } = formState;
+  const [disabled, setDisabled] = useState(false);
+
+  const checkUnique = (field, message) => async (value) => {
+    let json;
+    try {
+      json = await API.fetch(`users/exists?${field}=${value}`);
+    } catch (e) {
+      setAlert({ message: "We're having some trouble connecting to Juke..." });
+    }
+    return !json.exists || message;
+  };
 
   async function onSubmit(data, e) {
     e.preventDefault();
+    setDisabled(true);
     console.log("onSubmit");
-    await signUp(data)
-      .then(() => {
-        callback();
-      })
-      .catch((err) => {
-        const inputError = err.info;
-        inputError.displayName = inputError.display_name;
-        errorDispatch({ inputError });
-      });
+    await signUp(data).then(() => {
+      callback();
+    });
   }
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      window.formState = formState;
-    }, 2000);
-
-    return () => clearInterval(id);
-  }, []);
 
   return (
     <form
@@ -76,18 +76,13 @@ function Register({ callback }) {
           required: "Required",
           minLength: { value: 3, message: "Minimum Length: 3" },
           maxLength: { value: 24, message: "Maximum Length: 3" },
-          validate: async (value) => {
-            const json = await API.fetch(`users/exists?display_name=${value}`);
-            console.log(json);
-            return !json.exists || "That display name is taken :(";
-          },
+          validate: checkUnique(
+            "display_name",
+            "That display name is taken :("
+          ),
         })}
       />
-      <ErrorMessage
-        errors={errors}
-        name="user.display_name"
-        render={({ message }) => <p className={errorClass}>{message}</p>}
-      />
+      <Error errors={errors} name="user.display_name" />
 
       <label htmlFor="user.email" className={labelClass}>
         Email
@@ -100,18 +95,10 @@ function Register({ callback }) {
         ref={register({
           required: "Required",
           pattern: { value: emailRegex, message: "Invalid Email" },
-          validate: async (value) => {
-            const json = await API.fetch(`users/exists?email=${value}`);
-            console.log(json);
-            return !json.exists || "Already in use. Log in instead?";
-          },
+          validate: checkUnique("email", "Already in use. Log in instead?"),
         })}
       />
-      <ErrorMessage
-        errors={errors}
-        name="user.email"
-        render={({ message }) => <p className={errorClass}>{message}</p>}
-      />
+      <Error errors={errors} name="user.email" />
 
       <label htmlFor="user.password" className={labelClass}>
         Password
@@ -126,11 +113,7 @@ function Register({ callback }) {
           minLength: { value: 8, message: "Minimum Length: 8" },
         })}
       />
-      <ErrorMessage
-        errors={errors}
-        name="user.password"
-        render={({ message }) => <p className={errorClass}>{message}</p>}
-      />
+      <Error errors={errors} name="user.password" />
 
       <label htmlFor="confirm-password" className={labelClass}>
         Confirm Password
@@ -145,16 +128,8 @@ function Register({ callback }) {
             value === getValues("user.password") || "Passwords don't match",
         })}
       />
-      <ErrorMessage
-        errors={errors}
-        name="confirm-password"
-        render={({ message }) => <p className={errorClass}>{message}</p>}
-      />
-      <input
-        className={`self-center text-sm text-white font-medium px-6 py-2 my-4 whitespace-nowrap transition duration-300 bg-blue-400 hover:bg-blue-600 focus:bg-blue-600 hover:shadow cursor-pointer`}
-        type="submit"
-        value="Submit"
-      />
+      <Error errors={errors} name="confirm-password" />
+      <SubmitButton disabled={disabled} label="Submit" />
       <span className="text-sm text-center">
         Already have an account?
         <Link href="/login">

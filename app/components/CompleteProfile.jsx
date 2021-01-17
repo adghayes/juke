@@ -1,13 +1,16 @@
-import { inputReducer, SubmitButton, TextArea } from "./FormHelpers";
+import { SubmitButton, TextArea } from "./FormHelpers";
 import Thumbnailer from "./Thumbnailer";
 
 import useUser from "../hooks/useUser";
-import { useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 
 import Uploader from "../lib/uploader";
 import { patchUser } from "../lib/api-user";
-import { getAvatar } from "../lib/thumbnails";
+import { defaultAvatar, getAvatar } from "../lib/thumbnails";
 import { redirectUnlessUser } from "../hooks/useRedirect";
+import Link from "next/link";
+import API from "../lib/api";
+import { JukeContext } from "../pages/_app";
 
 const thumbnailInfo =
   "Your thumbnail is what people see on your profile page, when you post " +
@@ -15,38 +18,63 @@ const thumbnailInfo =
 
 function CompleteProfile({ callback }) {
   redirectUnlessUser();
-  const { user, loggedOut, loading } = useUser();
+  const { setAlert } = useContext(JukeContext);
+  const { user, loading } = useUser();
 
-  const [input, inputDispatch] = useReducer(inputReducer, {
-    bio: "",
-    thumbnail: null,
-  });
+  const [bio, setBio] = useState("");
+  const [thumbnail, setThumbnail] = useState(undefined);
+  const [editingThumbnail, setEditingThumbnail] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   useEffect(() => {
     if (user && user.bio) {
-      inputDispatch({ bio: user.bio });
+      setBio(user.bio);
     }
   }, [user]);
 
-  if (loggedOut) return "redirecting...";
   if (loading)
     return <p className="font-bold text-2xl animate-pulse">loading...</p>;
 
   async function onSubmit(e) {
     e.preventDefault();
-    if (!input.bio && !input.thumbnail) {
+    if (editingThumbnail) {
+      setAlert({
+        message: (
+          <>
+            Keep or discard your changes to your avatar
+            <span role="img" aria-label="ribbon">
+              {" "}
+              🎀
+            </span>
+          </>
+        ),
+      });
+      return;
+    }
+
+    if (!bio && !thumbnail) {
       return callback();
     }
 
-    const payload = {
-      bio: input.bio,
-    };
-
-    if (input.thumbnail) {
-      const avatarUpload = new Uploader(input.thumbnail);
-      payload.avatar = await avatarUpload.start();
+    try {
+      setDisabled(true);
+      const payload = { bio };
+      if (typeof thumbnail !== "undefined") {
+        if (thumbnail) {
+          const avatarUpload = new Uploader(thumbnail);
+          payload.avatar = await avatarUpload.start();
+        } else {
+          payload.avatar = null;
+        }
+      }
+      await patchUser(user.id, payload);
+      setThumbnail(undefined);
+    } catch (e) {
+      setAlert({
+        message: "Oops, we had a problem updating your data. Try again?",
+      });
     }
-    patchUser(user.id, payload);
+    setDisabled(false);
     if (callback) callback();
   }
 
@@ -56,24 +84,33 @@ function CompleteProfile({ callback }) {
       className="flex flex-col items-center px-8 py-4 bg-white rounded-xl"
       onSubmit={onSubmit}
     >
-      <h1 className="text-3xl py-2">Complete Profile</h1>
+      <h1 className="text-3xl">Complete Profile</h1>
+      <p className="text-xs mb-2">
+        or{" "}
+        <Link href="/stream">
+          <a className="hover:underline font-medium">start listening</a>
+        </Link>
+      </p>
       <div className="flex flex-col items-center space-between divide-x-8 divide-white">
         <Thumbnailer
+          thumbnail={thumbnail}
+          setThumbnail={setThumbnail}
+          editing={editingThumbnail}
+          setEditing={setEditingThumbnail}
           label="Avatar"
-          thumbnail={input.thumbnail}
-          placeholder={getAvatar(user.avatar)}
-          inputDispatch={inputDispatch}
+          oldThumbnail={getAvatar(user)}
+          placeholder={defaultAvatar()}
           info={thumbnailInfo}
         />
         <TextArea
           label="Bio"
           name="bio"
-          value={input.bio}
+          value={bio}
           placeholder="tell everyone a little about you or your music..."
-          inputDispatch={inputDispatch}
+          setValue={setBio}
         />
       </div>
-      <SubmitButton disabled={false} value="Done!" />
+      <SubmitButton disabled={disabled} label="Submit" />
     </form>
   );
 }

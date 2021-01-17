@@ -32,10 +32,10 @@ RSpec.describe '/sessions', type: :request do
         end.to change(Session, :count).by(0)
       end
 
-      it 'renders a JSON response with errors for the new session' do
+      it 'returns unauthorized' do
         post session_url,
              params: { user: invalid_attributes }, as: :json
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

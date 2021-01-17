@@ -1,10 +1,14 @@
 import API from "./api";
 
-export function getAvatar(path) {
-  if (path) {
-    return API.url(path);
+export function defaultAvatar() {
+  return "/thumbnail.jpg";
+}
+
+export function getAvatar(user) {
+  if (user && user.avatar) {
+    return API.url(user.avatar);
   } else {
-    return "/thumbnail.jpg";
+    return defaultAvatar();
   }
 }
 

@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
       @token = log_in_user(@user)
       render :show, status: :created
     else
-      render json: { error: 'invalid credentials' }, status: :unprocessable_entity
+      head status: :unauthorized
     end
   end
 

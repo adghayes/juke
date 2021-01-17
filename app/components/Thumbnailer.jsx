@@ -6,10 +6,18 @@ const size = 192;
 const defaultScale = 1;
 const buttonClass =
   "relative text-xs my-1 py-0.5 px-1 bg-blue-400 overflow-hidden text-white font-light " +
-  "hover:bg-blue-600 focus:bg-blue-600";
+  "hover:bg-blue-600 focus:bg-blue-600 mx-2";
 
-function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
-  const [editing, setEditing] = useState(false);
+function Thumbnailer({
+  label,
+  thumbnail,
+  setThumbnail,
+  editing,
+  setEditing,
+  oldThumbnail,
+  placeholder,
+  info,
+}) {
   const [border, setBorder] = useState(1);
   const [scale, setScale] = useState(defaultScale);
   const fileInput = useRef(null);
@@ -19,23 +27,39 @@ function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
     setBorder(0);
   }, []);
 
-  function reset(e) {
-    inputDispatch({ thumbnail: blob });
+  useEffect(() => {
+    fileInput.current.value = "";
     setScale(defaultScale);
+  }, [oldThumbnail]);
+
+  function reset(e) {
+    fileInput.current.value = "";
+    setScale(defaultScale);
+    setThumbnail(undefined);
   }
 
   function cancel(e) {
-    setEditing(false);
+    fileInput.current.value = "";
     setScale(defaultScale);
+    setEditing(false);
+  }
+
+  function replace(e) {
+    setThumbnail(undefined);
+    setEditing(true);
   }
 
   function confirm() {
     const name = fileInput.current.files[0].name;
     editor.current.getImage().toBlob((blob) => {
       blob.name = name;
-      inputDispatch({ thumbnail: blob });
+      setThumbnail(blob);
       setEditing(false);
     }, "image/jpeg");
+  }
+
+  function revert() {
+    setThumbnail(null);
   }
 
   return (
@@ -54,7 +78,11 @@ function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
             <AvatarEditor
               ref={editor}
               image={
-                editing || thumbnail ? fileInput.current.files[0] : placeholder
+                editing || thumbnail
+                  ? fileInput.current.files[0]
+                  : typeof thumbnail === "undefined"
+                  ? oldThumbnail
+                  : placeholder
               }
               width={size}
               height={size}
@@ -70,7 +98,7 @@ function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
               }`}
             ></div>
           </div>
-          <div className="flex flex-row justify-around w-full">
+          <div className="flex flex-row justify-center w-full">
             <button
               type="button"
               className={`${buttonClass} ${editing ? "hidden" : ""}`}
@@ -81,17 +109,26 @@ function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
                 ref={fileInput}
                 accept="image/*"
                 className={"absolute inset-0 z-50 opacity-0 text-xs"}
-                onChange={(e) => setEditing(true)}
+                onChange={replace}
               />
             </button>
             <button
               type="button"
               className={`${buttonClass} ${
-                editing || !thumbnail ? "hidden" : ""
+                !editing && (thumbnail || thumbnail === null) ? "" : "hidden"
               }`}
               onClick={reset}
             >
               Reset
+            </button>
+            <button
+              type="button"
+              className={`${buttonClass} ${
+                thumbnail && !editing ? "" : "hidden"
+              }`}
+              onClick={() => setEditing(true)}
+            >
+              Edit
             </button>
             <button
               type="button"
@@ -106,6 +143,19 @@ function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
               onClick={cancel}
             >
               Cancel
+            </button>
+            <button
+              type="button"
+              className={`${buttonClass} ${
+                !editing &&
+                typeof thumbnail === "undefined" &&
+                oldThumbnail !== placeholder
+                  ? ""
+                  : "hidden"
+              }`}
+              onClick={revert}
+            >
+              Revert To Default
             </button>
             <div
               className={`flex flex-col items-center ${
@@ -123,7 +173,7 @@ function Thumbnailer({ label, thumbnail, inputDispatch, info, placeholder }) {
                 step="0.01"
                 value={scale}
                 onChange={(e) => setScale(e.target.valueAsNumber)}
-                className="w-16"
+                className="w-16 mx-1"
               />
             </div>
           </div>

@@ -2,61 +2,80 @@ import { login } from "../lib/auth";
 import { useState, useReducer, useEffect } from "react";
 import Router from "next/router";
 import Link from "next/link";
-import { TextField, SubmitButton, inputReducer } from "./FormHelpers";
+import { labelClass, textInputClass, SubmitButton, Error } from "./FormHelpers";
+import { useForm } from "react-hook-form";
 
-const initialInput = {
-  email: "",
-  password: "",
-};
+function Login() {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    clearErrors,
+    formState,
+  } = useForm();
+  const { errors } = formState;
+  const [disabled, setDisabled] = useState(false);
+  const [attempts, setAttempts] = useState(0);
 
-function Login(props) {
-  const [input, inputDispatch] = useReducer(inputReducer, initialInput);
-  const { email, password } = input;
-  const [error, setError] = useState(false);
-
-  function handleSubmit(e) {
+  function onSubmit(data, e) {
+    setDisabled(true);
     e.preventDefault();
-    login(email, password)
+    login(data.user.email, data.user.password)
       .then(() => {
         Router.replace("/stream");
       })
       .catch(() => {
-        setError(true);
+        setAttempts(attempts + 1);
+        setError("credentials", {
+          type: "manual",
+          message:
+            attempts % 2 == 0
+              ? `We don't recognize that combination`
+              : `Nope...`,
+        });
+        console.log("sup");
+        setDisabled(false);
       });
   }
 
   return (
     <form
-      onSubmit={handleSubmit}
-      className={`flex flex-col items-center px-8 py-4 bg-white rounded-xl`}
+      onSubmit={handleSubmit(onSubmit)}
+      className={`flex flex-col items-stretch px-8 py-4 bg-white rounded-xl`}
     >
-      <div className="flex px-2 pb-2 rounded-full w-full items-center justify-center">
-        <h1 className="font-bold text-2xl px-2">JUKE</h1>
+      <div className="flex px-2 rounded-full place-items-center">
+        <h1 className="font-bold text-2xl px-2">LOGIN</h1>
         <img src="/jukeColor.svg" alt="Juke Logo" className="w-32" />
       </div>
-      {error ? (
-        <strong className="text-center text-red-700 font-medium text-xs whitespace-wrap w-56 pb-2">
-          We don't recognize that combination of email and password...
-        </strong>
-      ) : null}
-      <TextField
+      <div className="self-center">
+        <Error errors={errors} name="credentials" />
+      </div>
+      <label htmlFor="user.email" className={labelClass}>
+        Email
+      </label>
+      <input
+        onChange={() => clearErrors()}
+        className={textInputClass}
         type="text"
-        name="email"
-        label="Email"
-        value={email}
-        inputDispatch={inputDispatch}
         autoComplete="email"
+        name="user.email"
+        ref={register}
       />
-      <TextField
+
+      <label htmlFor="user.password" className={labelClass}>
+        Password
+      </label>
+      <input
+        onChange={() => clearErrors()}
+        className={textInputClass}
         type="password"
-        name="password"
-        label="Password"
-        value={password}
-        inputDispatch={inputDispatch}
         autoComplete="current-password"
+        name="user.password"
+        ref={register}
       />
-      <SubmitButton disabled={false} value="Log In" />
-      <span className="text-sm pt-6 text-center">
+
+      <SubmitButton disabled={disabled} label="Log In" />
+      <span className="text-sm text-center">
         No Account?
         <Link href="/register">
           <a className="px-3 hover:underline focus:underline focus:outline-none font-bold whitespace-nowrap">

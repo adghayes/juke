@@ -33,7 +33,7 @@ function App({ Component, pageProps }) {
         </Head>
 
         <Header />
-        <AccountAlert message={myAlert} close={() => setAlert(null)} />
+        <AccountAlert alert={myAlert} close={() => setAlert(null)} />
         <div
           id="view"
           className={`fixed top-11 left-0 right-0 ${

@@ -33,6 +33,7 @@ module.exports = {
     extend: {
       backgroundColor: ["checked"],
       borderColor: ["checked"],
+      borderRadius: ["focus"],
     },
   },
   plugins: [],

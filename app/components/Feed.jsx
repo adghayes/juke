@@ -17,7 +17,7 @@ function Attribution({ track }) {
   return (
     <div className=" flex inline-flex items-center py-2 flex-start self-start text-sm">
       <img
-        src={getAvatar(track.owner.avatar)}
+        src={getAvatar(track.owner)}
         alt="Your user avatar"
         width="24"
         height="24"

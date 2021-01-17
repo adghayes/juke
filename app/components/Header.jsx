@@ -104,9 +104,11 @@ function LibraryLink() {
       onClick={(e) => {
         if (!user) {
           e.preventDefault();
-          setAlert(
-            "Your library is empty because you don't have an account yet..."
-          );
+          setAlert({
+            message:
+              "Your library is empty because you don't have an account yet...",
+            buttons: true,
+          });
         }
       }}
     />
@@ -125,7 +127,10 @@ function UploadLink() {
       onClick={(e) => {
         if (!user) {
           e.preventDefault();
-          setAlert("Uploading is something you need an account for...");
+          setAlert({
+            message: "Uploading is something you need an account for...",
+            buttons: true,
+          });
         }
       }}
     />
@@ -165,7 +170,7 @@ function ProfileLabel({ user }) {
   return (
     <span className="inline-flex items-center justify-center">
       <img
-        src={getAvatar(user.avatar)}
+        src={getAvatar(user)}
         alt="Your user avatar"
         width="24"
         height="24"

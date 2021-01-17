@@ -16,7 +16,10 @@ export default function useLiked(user, track) {
     return [
       undefined,
       () => {
-        setAlert("Get an account so we can keep track of the songs you like!");
+        setAlert({
+          message: "Get an account so we can keep track of the songs you like!",
+          buttons: true,
+        });
       },
       numLikes,
     ];
