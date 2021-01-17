@@ -83,23 +83,15 @@ export function Info({ info }) {
   );
 }
 
-export function Errors({ messages }) {
+export function Errors({ message }) {
   return (
-    <ul className="h-8 pl-2">
-      {messages ? (
-        messages.map((message, idx) => {
-          return (
-            <li key={idx}>
-              <strong className="text-red-700 font-medium text-xs whitespace-wrap">
-                {message}
-              </strong>
-            </li>
-          );
-        })
-      ) : (
-        <div></div>
-      )}
-    </ul>
+    <div className="h-8 pl-2 bg-transparent">
+      {message ? (
+        <strong className="text-red-700 font-medium text-xs whitespace-wrap">
+          {message}
+        </strong>
+      ) : null}
+    </div>
   );
 }
 

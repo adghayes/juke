@@ -41,14 +41,17 @@ class UsersController < ApplicationController
   end
 
   def exists
-    query = params.require(:user).permit(:email, :display_name)
+    query = {}
+    query[:email] = params[:email] if params[:email]
+    query[:display_name] = params[:display_name] if params[:display_name]
+
     if query.length.positive?
       render json: {
         user: query,
         exists: User.exists?(query)
       }
     else
-      head :unprocessable_entity
+      head :bad_request
     end
   end
 

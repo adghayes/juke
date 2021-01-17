@@ -49,15 +49,7 @@ export async function logout() {
   return fetch(API.url("session"), fetchOptions);
 }
 
-export async function register(user) {
-  const payload = {
-    user: {
-      email: user.email,
-      display_name: user.displayName,
-      password: user.password,
-    },
-  };
-
+export async function signUp(payload) {
   return fetch(API.url("users"), {
     method: "POST",
     headers: API.contentHeader,
@@ -73,7 +65,7 @@ export async function register(user) {
     })
     .then((data) => {
       setToken(data.token);
-      mutate("user", data.user, false);
+      mutate("user", data.user, true);
       return data.user;
     });
 }
