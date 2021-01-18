@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Card from "../components/Card";
 import Upload from "../components/Upload";
 import SubmitTrack from "../components/SubmitTrack";
+import Spinner from "../components/Spinner";
 import Uploader from "../lib/uploader";
 import { postTrack, patchTrack, getTrack } from "../lib/api-track";
 import Link from "next/link";
@@ -47,7 +48,7 @@ export default function UploadPage(props) {
         return () => clearTimeout(pollId);
       } else if (track.processing === "done" && user) {
         mutate(`users/${user.slug}/tracks`);
-        mutate("feed");
+        mutate(`feed`);
       }
     }
   }, [track]);
@@ -59,10 +60,10 @@ export default function UploadPage(props) {
   async function onFileSelect(file) {
     transitionTo(1);
 
-    const fileUpload = new Uploader(file, { onUploadProgress });
     const track = await postTrack({ submitted: false, uploaded: false });
     setTrack(track);
 
+    const fileUpload = new Uploader(file, { onUploadProgress });
     const blobId = await fileUpload.start();
     setTrack(await patchTrack({ original: blobId, uploaded: true }, track.id));
   }
@@ -88,11 +89,11 @@ function TrackStatus({ track }) {
   const status = track && track.processing;
 
   return (
-    <div className="flex flex-col items-center bg-white rounded-xl shadow-xl p-8">
+    <div className="flex flex-col items-center bg-white rounded-xl shadow-xl p-4 sm:p-8 text-sm text-center sm:text-base">
       <h1 className="text-2xl lg:text-4xl font-bold pb-1">
         {statusHeader(status)}
       </h1>
-      <p className="pb-8">{statusSubHeader(status)}</p>
+      <p className="pb-4">{statusSubHeader(status)}</p>
       {statusIcon(status)}
       <div className="pt-4">{statusMessage(status)}</div>
     </div>
@@ -144,15 +145,7 @@ function statusIcon(status) {
         />
       );
     default:
-      return (
-        <div className="spinner rounded-full w-32 h-32 border-8 animate-spin">
-          <style jsx>{`
-            .spinner {
-              border-top-color: rgba(236, 72, 153);
-            }
-          `}</style>
-        </div>
-      );
+      return <Spinner />;
   }
 }
 

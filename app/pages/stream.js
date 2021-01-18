@@ -7,9 +7,9 @@ export default function Stream({}) {
 
   return (
     <div className="bg-gradient-to-b from-blue-200 via-purple-200 to-pink-200 min-h-screen w-screen">
-      <div className="lg:min-w-min max-w-screen-lg xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-row justify-between p-4">
+      <div className="max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white flex flex-row justify-between p-4">
         <main className="p-2 w-full lg:w-auto lg:flex-grow flex flex-col max-w-full items-start">
-          <p className="p-1 text-xl md:text-4xl self-start">
+          <p className="p-1 text-xl md:text-4xl self-start font-bold text-pink-600">
             Hear the latest tracks on Juke!
           </p>
           <Feed width={null} />

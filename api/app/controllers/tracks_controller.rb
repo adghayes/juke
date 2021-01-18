@@ -3,7 +3,7 @@
 class TracksController < ApplicationController
   include AudioHelper
 
-  before_action :require_logged_in, only: %i[create update like unlike]
+  before_action :require_logged_in, only: %i[create update like unlike exists]
   before_action :require_valid_jwt, only: :streams
   before_action :set_track, only: %i[show update streams listen]
 
@@ -80,6 +80,18 @@ class TracksController < ApplicationController
       head :ok
     else
       head :unprocessable_entity
+    end
+  end
+
+  def exists
+    if params[:title]
+      query = { title: URI.decode(params[:title]), owner_id: current_user.id }
+      render json: {
+        user: query,
+        exists: Track.exists?(query)
+      }
+    else
+      head :bad_request
     end
   end
 

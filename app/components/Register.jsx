@@ -1,11 +1,5 @@
 import { signUp } from "../lib/auth";
-import {
-  Info,
-  SubmitButton,
-  Error,
-  labelClass,
-  textInputClass,
-} from "./FormHelpers";
+import { TextField, SubmitButton } from "./FormHelpers";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useContext, useState } from "react";
@@ -36,18 +30,24 @@ function Register({ callback }) {
   const checkUnique = (field, message) => async (value) => {
     let json;
     try {
-      json = await API.fetch(`users/exists?${field}=${value}`);
+      json = await API.fetch(
+        `users/exists?${field}=${encodeURIComponent(value)}`
+      );
+      const available = !json.exists;
+      return available || message;
     } catch (e) {
-      setAlert({ message: "We're having some trouble connecting to Juke..." });
+      setAlert({
+        message:
+          "We're having some trouble connecting to Juke... try again another time please!",
+      });
     }
-    return !json.exists || message;
+    return true;
   };
 
   async function onSubmit(data, e) {
     e.preventDefault();
     setDisabled(true);
-    console.log("onSubmit");
-    await signUp(data).then(() => {
+    await signUp({ user: data.user }).then(() => {
       callback();
     });
   }
@@ -63,72 +63,61 @@ function Register({ callback }) {
         <img src="/jukeColor.svg" alt="Juke Logo" className="w-32" />
       </h1>
 
-      <label htmlFor="user.display_name" className={labelClass}>
-        <span>Display Name</span>
-        <Info info={displayInfo} />
-      </label>
-      <input
-        className={textInputClass}
-        type="text"
-        autoComplete="username"
+      <TextField
         name="user.display_name"
-        ref={register({
+        label="Display Name"
+        inputRef={register({
           required: "Required",
           minLength: { value: 3, message: "Minimum Length: 3" },
-          maxLength: { value: 24, message: "Maximum Length: 3" },
+          maxLength: { value: 20, message: "Maximum Length: 3" },
           validate: checkUnique(
             "display_name",
             "That display name is taken :("
           ),
         })}
-      />
-      <Error errors={errors} name="user.display_name" />
-
-      <label htmlFor="user.email" className={labelClass}>
-        Email
-      </label>
-      <input
-        className={textInputClass}
+        autoComplete="off"
         type="text"
-        autoComplete="email"
+        errors={errors}
+        info={displayInfo}
+      />
+
+      <TextField
         name="user.email"
-        ref={register({
+        label="Email"
+        inputRef={register({
           required: "Required",
           pattern: { value: emailRegex, message: "Invalid Email" },
           validate: checkUnique("email", "Already in use. Log in instead?"),
         })}
+        autoComplete="email"
+        type="email"
+        errors={errors}
       />
-      <Error errors={errors} name="user.email" />
 
-      <label htmlFor="user.password" className={labelClass}>
-        Password
-      </label>
-      <input
-        className={textInputClass}
-        type="password"
-        autoComplete="new-password"
+      <TextField
         name="user.password"
-        ref={register({
+        label="Password"
+        inputRef={register({
           required: "Required",
           minLength: { value: 8, message: "Minimum Length: 8" },
         })}
-      />
-      <Error errors={errors} name="user.password" />
-
-      <label htmlFor="confirm-password" className={labelClass}>
-        Confirm Password
-      </label>
-      <input
-        className={textInputClass}
-        type="password"
         autoComplete="new-password"
+        type="password"
+        errors={errors}
+      />
+
+      <TextField
         name="confirm-password"
-        ref={register({
+        label="Confirm Password"
+        inputRef={register({
           validate: (value) =>
             value === getValues("user.password") || "Passwords don't match",
         })}
+        autoComplete="new-password"
+        type="password"
+        errors={errors}
       />
-      <Error errors={errors} name="confirm-password" />
+
       <SubmitButton disabled={disabled} label="Submit" />
       <span className="text-sm text-center">
         Already have an account?

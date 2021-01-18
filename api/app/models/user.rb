@@ -25,8 +25,7 @@ class User < ApplicationRecord
   validates :email, uniqueness: { message: "That's already taken", case_sensitive: false },
                     format: { with: URI::MailTo::EMAIL_REGEXP, message: 'Invalid email address' }
   validates :display_name, uniqueness: { message: "That's already taken" },
-                           length: { minimum: 3, maximum: 24 }, exclusion: { in: %w[upload stream login register you],
-                                                                             message: '%{value} is reserved.' }
+                           length: { minimum: 3, maximum: 20 }
   validates :password_digest, presence: true
   validates :password, length: { minimum: 8, allow_nil: true }
   validates :bio, length: { maximum: 160 }

@@ -1,80 +1,80 @@
-import { useReducer, useState } from "react";
-import {
-  TextField,
-  TextArea,
-  SubmitButton,
-  inputReducer,
-  Info,
-} from "./FormHelpers";
-import Thumbnailer from "./Thumbnailer";
+import { useContext, useState } from "react";
+import { TextArea, SubmitButton, Info, TextField } from "./FormHelpers";
+import Thumbnailer, { editingThumbnailAlert } from "./Thumbnailer";
 import Uploader from "../lib/uploader";
 import { patchTrack } from "../lib/api-track";
+import { useForm, Controller } from "react-hook-form";
+import { JukeContext } from "../pages/_app";
+import { getThumbnail, defaultThumbnail } from "../lib/thumbnails";
+import API from "../lib/api";
 
 const processingInfo =
   `We convert your music into formats suitable ` +
   `for streaming. If you enable downloads on your track, however, it is the ` +
   `original that will be downloaded.`;
 
+const processingMessage = {
+  none: "",
+  started: "Processing...",
+  error: "Processing Error!",
+  done: "Done Processing",
+};
+
+const processingClass = {
+  none: "",
+  started: "font-bold text-black animate-pulse",
+  error: "font-bold text-red",
+  done: "font-bold text-gray-500",
+};
+
 const downloadInfo =
   `If you check this, other users will be able to download your ` +
   `track with a click!`;
 
 export default function SubmitTrack({ uploadProgress, track, callback }) {
+  const { setAlert } = useContext(JukeContext);
+  const [disabled, setDisabled] = useState(false);
+  const [editingThumbnail, setEditingThumbnail] = useState(false);
+  const [thumbnail, setThumbnail] = useState(undefined);
+  const { register, formState, control, handleSubmit } = useForm({
+    defaultValues: {
+      "track.description": "",
+      "track.title": "",
+      "track.downloadable": false,
+    },
+  });
+  const { errors } = formState;
+
   const uploadComplete =
     track && ["done", "started", "error"].includes(track.processing);
-  const [disabled, setDisabled] = useState(false);
-  const [input, inputDispatch] = useReducer(inputReducer, {
-    thumbnail: null,
-    title: "",
-    description: "",
-    downloadable: false,
-  });
 
-  const [titleErrors, setTitleErrors] = useState([]);
-  function syncTitleErrors(title) {
-    setTitleErrors(title.length ? [] : ["Must have a title!"]);
-  }
-
-  async function onSubmit(e) {
-    setDisabled(true);
+  async function onSubmit(data, e) {
     e.preventDefault();
-    const payload = {
-      submitted: true,
-      description: input.description,
-      title: input.title,
-      downloadable: input.downloadable,
-    };
-
-    if (input.thumbnail) {
-      const thumbnailUpload = new Uploader(input.thumbnail);
-      payload.thumbnail = await thumbnailUpload.start();
+    if (editingThumbnail) {
+      setAlert(editingThumbnailAlert);
+      return;
     }
-    const resBody = await patchTrack(payload, track.id);
-    if (resBody.id) {
+
+    const payload = { ...data.track, submitted: true };
+    setDisabled(true);
+    try {
+      payload.thumbnail = thumbnail
+        ? await new Uploader(thumbnail).start()
+        : thumbnail;
+      await patchTrack(payload, track.id);
+      setThumbnail(undefined);
       if (callback) callback();
-    } else {
-      setTitleErrors(resBody.title);
-      setDisabled(false);
+    } catch (e) {
+      setAlert({
+        message: "Oops, we had a problem updating your data. Try again?",
+      });
     }
+    setDisabled(false);
   }
-
-  const processingMessage = {
-    none: "",
-    started: "Processing...",
-    error: "Processing Error!",
-    done: "Done Processing",
-  };
-
-  const processingClass = {
-    none: "",
-    started: "font-bold text-black animate-pulse",
-    error: "font-bold text-red",
-    done: "font-bold text-gray-500",
-  };
 
   return (
     <form
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col items-center bg-white rounded-xl shadow-xl px-4 pb-6 pt-2"
     >
       <div className="flex flex-row w-full justify-between text-xs">
@@ -108,43 +108,67 @@ export default function SubmitTrack({ uploadProgress, track, callback }) {
       <div className="flex flex-col sm:flex-row divide-white py-8 px-4">
         <Thumbnailer
           label="Thumbnail"
-          thumbnail={input.thumbnail}
-          placeholder="/child-mike.jpg"
-          inputDispatch={inputDispatch}
+          thumbnail={thumbnail}
+          setThumbnail={setThumbnail}
+          editing={editingThumbnail}
+          setEditing={setEditingThumbnail}
+          oldThumbnail={getThumbnail(track)}
+          placeholder={defaultThumbnail()}
         />
-        <div className="w-16 h-1"></div>
+        <div className="w-16 h-1 self-center"></div>
         <div className="flex flex-col">
           <TextField
-            type="text"
-            name="title"
+            name="track.title"
             label="Title"
-            value={input.title}
-            inputDispatch={inputDispatch}
-            errors={titleErrors}
-            syncErrors={syncTitleErrors}
+            inputRef={register({
+              required: "Required",
+              validate: async (value) => {
+                let json;
+                try {
+                  json = await API.fetch(
+                    `tracks/exists?title=${encodeURIComponent(value)}`
+                  );
+                } catch (e) {
+                  setAlert({
+                    message: "We're having some trouble connecting to Juke...",
+                  });
+                }
+                return !json.exists || message;
+              },
+            })}
+            autoComplete="off"
+            type="text"
+            errors={errors}
           />
-          <TextArea
-            label="Description"
-            name="description"
-            value={input.description}
-            placeholder="what is this song about? how did you make it?"
-            inputDispatch={inputDispatch}
+          <Controller
+            control={control}
+            name="track.description"
+            render={({ onChange, value, ref }) => (
+              <TextArea
+                value={value}
+                onChange={onChange}
+                inputRef={ref}
+                label="Description"
+                name="track.description"
+                placeholder="what is this song about? how did you make it?"
+              />
+            )}
           />
-          <label className="inline-flex items-center justify-center pt-2">
+          <div className="inline-flex flex-row items-center justify-start">
             <input
-              checked={input.downloadable}
+              ref={register}
+              name="track.downloadable"
               type="checkbox"
               className="mx-2"
-              onChange={(e) =>
-                inputDispatch({ downloadable: e.target.checked })
-              }
             />
-            <span className="font-medium">Easy Download</span>
+            <label className="px-1" htmlFor="track.downloadable">
+              Easy Download
+            </label>
             <Info info={downloadInfo} />
-          </label>
+          </div>
         </div>
       </div>
-      <SubmitButton disabled={!input.title || disabled} value="Submit" />
+      <SubmitButton disabled={disabled} label="Submit" />
     </form>
   );
 }

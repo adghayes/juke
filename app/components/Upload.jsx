@@ -1,4 +1,7 @@
+import { useContext, useState } from "react";
 import Dropzone from "react-dropzone";
+import { JukeContext } from "../pages/_app";
+import { SubmitButton } from "./FormHelpers";
 
 const accept = [
   ".wav",
@@ -21,8 +24,16 @@ const accept = [
 ];
 
 function Upload({ onFileSelect }) {
+  const { setAlert } = useContext(JukeContext);
+  const [disabled, setDisabled] = useState(false);
+
   function onDropAccepted(acceptedFiles) {
+    setDisabled(true);
     onFileSelect(acceptedFiles[0]);
+  }
+
+  function onDropRejected() {
+    setAlert({ message: "Sorry, we can't accept that file..." });
   }
 
   return (
@@ -32,8 +43,10 @@ function Upload({ onFileSelect }) {
       </h1>
       <Dropzone
         onDropAccepted={onDropAccepted}
+        onDropRejected={onDropRejected}
         accept={accept}
         maxFiles={1}
+        maxSize={50000000}
         multiple={false}
       >
         {({ getRootProps, getInputProps }) => (
@@ -49,15 +62,7 @@ function Upload({ onFileSelect }) {
               }
             >
               <p className="whitespace-nowrap">Drag and Drop or</p>
-              <button
-                type="button"
-                className={
-                  `bg-blue-400 py-1.5 px-6 my-1 text-white ` +
-                  `font-medium hover:bg-blue-700 focus:bg-blue-700 focus:outline-none`
-                }
-              >
-                Click
-              </button>
+              <SubmitButton disabled={disabled} label="Click" type="button" />
               <p className="whitespace-nowrap">to select a file</p>
             </div>
           </section>
@@ -65,7 +70,7 @@ function Upload({ onFileSelect }) {
       </Dropzone>
       <p className="text-xs px-6 pb-1 italic text-center">
         We accept most types of audio files, although we recommend you upload in
-        a lossless format like FLAC or ALAC.
+        a lossless format like FLAC or ALAC. Maximum file size: 50MB
       </p>
     </div>
   );

@@ -12,10 +12,14 @@ export function getAvatar(user) {
   }
 }
 
-export function getThumbnail(path) {
-  if (path) {
-    return API.url(path);
+export function defaultThumbnail() {
+  return "/child-mike.jpg";
+}
+
+export function getThumbnail(track) {
+  if (track && track.thumbnail) {
+    return API.url(track.thumbnail);
   } else {
-    return "/child-mike.jpg";
+    return defaultThumbnail();
   }
 }

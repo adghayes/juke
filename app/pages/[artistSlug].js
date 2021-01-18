@@ -30,7 +30,7 @@ export default function ArtistPage({ forceUser }) {
   const router = useRouter();
   const { artistSlug } = router.query;
 
-  const { user, loading } = useUser();
+  const { user } = useUser();
   const isUser = forceUser || (user && user.slug === artistSlug);
 
   const artistKey = !artistSlug || isUser ? null : `users/${artistSlug}`;
@@ -39,8 +39,9 @@ export default function ArtistPage({ forceUser }) {
   });
 
   const [openTab, setOpenTab] = useState("tracks");
+
   useEffect(() => {
-    if (!loading && location.hash) {
+    if (location.hash) {
       const hashTab = location.hash.replace("#", "");
       if (Object.keys(tabs).includes(hashTab)) {
         if (!tabs[hashTab].private || isUser) {
@@ -48,14 +49,14 @@ export default function ArtistPage({ forceUser }) {
         }
       }
     }
-  }, [loading]);
+  }, [isUser]);
 
   if (error) return <Error statusCode={error.status} />;
   const artist = isUser ? user : data;
 
   return (
     <div className="bg-gradient-to-tl from-green-200 to-purple-300 min-h-screen w-screen">
-      <div className="max-w-screen-lg lg:min-w-min xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-col md:flex-row md:justify-betewen p-4">
+      <div className="max-w-screen-lg lg:min-w-min xl:max-w-screen-xl mx-auto min-h-screen bg-white flex flex-col md:flex-row md:justify-between p-4">
         <aside className="pr-4 md:border-r flex flex-col items-stretch divide-y flex-none">
           <div className="py-4 flex flex-col items-center">
             <img
@@ -68,13 +69,13 @@ export default function ArtistPage({ forceUser }) {
             </p>
             <p className="text-center">{artist && artist.bio}</p>
           </div>
-          <ul className="text-3xl divide-y border-b text-left">
+          <ul className="text-3xl text-left">
             {Object.entries(tabs).map(([tabId, tabProps]) =>
               !tabProps.private || isUser ? (
                 <li key={tabId}>
                   <a
                     href={`#${tabId}`}
-                    className={`block py-2 ${
+                    className={`block py-2 border-b ${
                       tabId === openTab ? "text-pink-600 font-bold" : ""
                     }`}
                     onClick={() => setOpenTab(tabId)}

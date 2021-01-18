@@ -42,8 +42,8 @@ class UsersController < ApplicationController
 
   def exists
     query = {}
-    query[:email] = params[:email] if params[:email]
-    query[:display_name] = params[:display_name] if params[:display_name]
+    query[:email] = URI.decode(params[:email]) if params[:email]
+    query[:display_name] = URI.decode(params[:display_name]) if params[:display_name]
 
     if query.length.positive?
       render json: {

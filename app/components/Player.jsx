@@ -55,7 +55,7 @@ function Player({ track, queue, maxWidth }) {
       } items-center border overflow-hidden relative`}
     >
       <img
-        src={getThumbnail(track.thumbnail)}
+        src={getThumbnail(track)}
         alt={`thumbnail for ${track.title} by ${track.owner.display_name}`}
         className="w-48 h-48"
       />

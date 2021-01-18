@@ -5,7 +5,7 @@ export default function AccountAlert({ alert, close }) {
     <div
       className={
         `z-40 fixed -top-8 left-1/2 transform-gpu -translate-x-1/2 transition-transform duration-1000 bg-white p-2 shadow-xl ` +
-        `rounded-xl flex flex-col items-center justify-around ${
+        `rounded-xl flex flex-col items-center justify-around max-w-prose ${
           !!alert ? "translate-y-full" : "opacity-0 -translate-y-full"
         }`
       }

@@ -30,7 +30,7 @@ export async function login(email, password) {
     .then((res) => {
       if (res.ok) return res.json();
 
-      throw new Error("invalid credentials");
+      throw new Error("credentials");
     })
     .then((data) => {
       setToken(data.token);

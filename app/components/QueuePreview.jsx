@@ -35,14 +35,14 @@ export default function QueuePreview({
       <div className="relative">
         <ul className="flex flex-col items-stretch border-gray-300 divide-y divide-gray-300">
           {[...Array(length).keys()].map((i) => {
+            const track = queue && queue.tracks[i];
             return (
-              <li className="h-14" key={i}>
-                {queue && queue.tracks[i] ? (
-                  <PreviewItem
-                    track={queue.tracks[i]}
-                    queue={queue}
-                    jukebox={jukebox}
-                  />
+              <li
+                className={`h-14 ${track ? "" : "bg-gray-200 opacity-80"}`}
+                key={i}
+              >
+                {track ? (
+                  <PreviewItem track={track} queue={queue} jukebox={jukebox} />
                 ) : null}
               </li>
             );
@@ -72,7 +72,7 @@ function PreviewItem({ track, queue, jukebox }) {
       className="h-full flex flex-row justify-start items-center px-1.5 py-1"
     >
       <div className="relative w-10 h-10 flex-none rounded overflow-hidden">
-        <img src={getThumbnail(track.thumbnail)} alt="" />
+        <img src={getThumbnail(track)} alt="" />
         {hover || current ? (
           <button
             type="button"

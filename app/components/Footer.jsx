@@ -181,7 +181,7 @@ function Footer() {
       </div>
       <div className="flex flex-row items-center sm:w-48 md:w-72 sm:px-4">
         <img
-          src={getThumbnail(track && track.thumbnail)}
+          src={getThumbnail(track)}
           alt=""
           className="w-12 h-12 mx-3 sm:w-8 sm:h-8 sm:mx-2 rounded"
         />

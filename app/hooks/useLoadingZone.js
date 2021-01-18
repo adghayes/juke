@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Spinner from "../components/Spinner";
 
 export default function useLoadingZone(queue) {
   const zone = useRef(null);
@@ -46,18 +47,6 @@ export default function useLoadingZone(queue) {
     >
       {spinner ? <Spinner /> : null}
       {complete ? <div className="w-3/4 h-0.5 my-12 border-t"></div> : null}
-    </div>
-  );
-}
-
-function Spinner() {
-  return (
-    <div className="spinner rounded-full w-16 h-16 my-12 border-8 animate-spin">
-      <style jsx>{`
-        .spinner {
-          border-top-color: rgba(236, 72, 153);
-        }
-      `}</style>
     </div>
   );
 }

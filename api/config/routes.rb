@@ -9,6 +9,10 @@ Rails.application.routes.draw do
       delete :like, to: 'tracks#unlike'
       post :listen, to: 'tracks#listen'
     end
+
+    collection do
+      get 'exists'
+    end
   end
 
   get '/tracks/:artist/:track', to: 'tracks#show'

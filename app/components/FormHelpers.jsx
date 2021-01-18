@@ -47,19 +47,22 @@ export function Info({ info }) {
 
 export function Error({ errors, name }) {
   return (
-    <ErrorMessage
-      errors={errors}
-      name={name}
-      render={({ message }) => (
-        <p className="text-xs text-red-700 whitespace-wrap">{message}</p>
-      )}
-    />
+    <div className="flex-shrink-0">
+      <ErrorMessage
+        errors={errors}
+        name={name}
+        render={({ message }) => (
+          <p className="text-xs text-red-700 whitespace-wrap">{message}</p>
+        )}
+      />
+    </div>
   );
 }
 
-export function SubmitButton({ disabled, label }) {
+export function SubmitButton({ disabled, label, type }) {
   return (
     <button
+      type={type || "submit"}
       className={`self-center flex justify-center items-center ${
         disabled ? "pl-1.5 pr-3" : "px-6"
       } py-2 my-4 ${formButtonClass}`}
@@ -79,25 +82,67 @@ export function SubmitButton({ disabled, label }) {
 
 const maxLength = 160;
 
-export function TextArea({ label, name, value, setValue, placeholder }) {
+export function TextArea({
+  value,
+  onChange,
+  inputRef,
+  label,
+  name,
+  placeholder,
+}) {
   return (
-    <label className="flex flex-col">
-      <span className="inline-flex items-center py-1 font-medium">{label}</span>
+    <div className="flex flex-col">
+      <label
+        htmlFor={name}
+        className="inline-flex items-center py-1 font-medium"
+      >
+        {label}
+      </label>
       <textarea
         value={value}
         cols="30"
         rows="6"
+        ref={inputRef}
         placeholder={placeholder}
+        name={name}
         className={
-          "resize-none border border-gray-500 px-2 py-1 hover:bg-white bg-gray-100 rounded-xl " +
-          "text-xs focus:outline-none focus:border-black focus:bg-white mx-1"
+          "resize-none border hover:bg-gray-100 mb-2 text-sm focus:ring-2 rounded px-1 py-0.5 outline-none"
         }
-        onChange={(e) => setValue(e.target.value)}
+        onChange={onChange}
         maxLength={maxLength}
       />
       <span className="self-end text-xs">
         {value.length}/{maxLength}
       </span>
-    </label>
+    </div>
+  );
+}
+
+export function TextField({
+  name,
+  label,
+  inputRef,
+  type,
+  errors,
+  autoComplete,
+  onChange,
+  info,
+}) {
+  return (
+    <>
+      <label htmlFor={name} className={labelClass}>
+        <span>{label}</span>
+        {info ? <Info info={info} /> : null}
+      </label>
+      <input
+        className={textInputClass}
+        type={type}
+        name={name}
+        ref={inputRef}
+        autoComplete={autoComplete}
+        onChange={onChange}
+      />
+      {errors ? <Error errors={errors} name={name} /> : null}
+    </>
   );
 }

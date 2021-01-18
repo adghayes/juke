@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
       @token = log_in_user(@user)
       render :show, status: :created
     else
-      head status: :unauthorized
+      head :unauthorized
     end
   end
 

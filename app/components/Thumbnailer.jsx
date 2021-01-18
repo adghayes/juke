@@ -183,4 +183,16 @@ function Thumbnailer({
   );
 }
 
+export const editingThumbnailAlert = {
+  message: (
+    <>
+      Keep or discard your changes to your avatar
+      <span role="img" aria-label="ribbon">
+        {" "}
+        🎀
+      </span>
+    </>
+  ),
+};
+
 export default Thumbnailer;

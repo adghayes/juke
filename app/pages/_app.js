@@ -12,6 +12,7 @@ export const JukeContext = React.createContext({});
 function App({ Component, pageProps }) {
   const jukebox = useRef(new Jukebox({}));
   const [myAlert, setAlert] = useState(null);
+  const [footerVisible, setFooterVisible] = useState(false);
 
   const [juke, setJuke] = useState({
     setAlert,
@@ -23,6 +24,12 @@ function App({ Component, pageProps }) {
     jukebox.current.setJuke = setJuke;
     window.jukebox = jukebox.current;
   }, []);
+
+  useEffect(() => {
+    if (jukebox.current.track) {
+      setTimeout(() => setFooterVisible(true), 1000);
+    }
+  }, [!!jukebox.current.track]);
 
   return (
     <JukeContext.Provider value={juke}>
@@ -37,7 +44,7 @@ function App({ Component, pageProps }) {
         <div
           id="view"
           className={`fixed top-11 left-0 right-0 ${
-            jukebox.current.track ? " bottom-16 sm:bottom-12" : "bottom-0"
+            footerVisible ? " bottom-16 sm:bottom-12" : "bottom-0"
           } overflow-y-scroll overflow-x-hidden`}
         >
           <Component {...pageProps} />

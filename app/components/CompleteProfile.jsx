@@ -1,5 +1,5 @@
 import { SubmitButton, TextArea } from "./FormHelpers";
-import Thumbnailer from "./Thumbnailer";
+import Thumbnailer, { editingThumbnailAlert } from "./Thumbnailer";
 
 import useUser from "../hooks/useUser";
 import { useContext, useEffect, useReducer, useState } from "react";
@@ -9,7 +9,6 @@ import { patchUser } from "../lib/api-user";
 import { defaultAvatar, getAvatar } from "../lib/thumbnails";
 import { redirectUnlessUser } from "../hooks/useRedirect";
 import Link from "next/link";
-import API from "../lib/api";
 import { JukeContext } from "../pages/_app";
 
 const thumbnailInfo =
@@ -38,17 +37,7 @@ function CompleteProfile({ callback }) {
   async function onSubmit(e) {
     e.preventDefault();
     if (editingThumbnail) {
-      setAlert({
-        message: (
-          <>
-            Keep or discard your changes to your avatar
-            <span role="img" aria-label="ribbon">
-              {" "}
-              🎀
-            </span>
-          </>
-        ),
-      });
+      setAlert(editingThumbnailAlert);
       return;
     }
 
@@ -59,13 +48,11 @@ function CompleteProfile({ callback }) {
     try {
       setDisabled(true);
       const payload = { bio };
-      if (typeof thumbnail !== "undefined") {
-        if (thumbnail) {
-          const avatarUpload = new Uploader(thumbnail);
-          payload.avatar = await avatarUpload.start();
-        } else {
-          payload.avatar = null;
-        }
+      if (thumbnail) {
+        const avatarUpload = new Uploader(thumbnail);
+        payload.avatar = await avatarUpload.start();
+      } else {
+        payload.avatar = thumbnail;
       }
       await patchUser(user.id, payload);
       setThumbnail(undefined);
@@ -88,7 +75,7 @@ function CompleteProfile({ callback }) {
       <p className="text-xs mb-2">
         or{" "}
         <Link href="/stream">
-          <a className="hover:underline font-medium">start listening</a>
+          <a className="hover:underline font-medium">start listening...</a>
         </Link>
       </p>
       <div className="flex flex-col items-center space-between divide-x-8 divide-white">
@@ -107,7 +94,7 @@ function CompleteProfile({ callback }) {
           name="bio"
           value={bio}
           placeholder="tell everyone a little about you or your music..."
-          setValue={setBio}
+          onChange={(e) => setBio(e.target.value)}
         />
       </div>
       <SubmitButton disabled={disabled} label="Submit" />

@@ -1,7 +1,8 @@
-import Player from "../components/Player.jsx";
-import useRect from "../hooks/useRect.js";
-import useQueue from "../hooks/useQueue.js";
-import useUser from "../hooks/useUser.js";
+import Player from "../components/Player";
+import Spinner from "../components/Spinner";
+import useRect from "../hooks/useRect";
+import useQueue from "../hooks/useQueue";
+import useUser from "../hooks/useUser";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -29,22 +30,28 @@ export default function Home() {
           </Link>
         </section>
         <Spotlight />
-        <p className="self-stretch text-xs text-center p-2 mt-4 border-t border-b">Juke was seeded with tracks found on{' '}
-          <a className="font-medium hover:underline" href="http://dig.ccmixter.org/" target="_blank">Dig CC Mixter</a>
-          . They are processed and redistributed under non-commercial Creative Commons licenses
+        <p className="self-stretch text-xs text-center p-2 mt-4 border-t border-b">
+          Juke was seeded with tracks found on{" "}
+          <a
+            className="font-medium hover:underline"
+            href="http://dig.ccmixter.org/"
+            target="_blank"
+          >
+            Dig CC Mixter
+          </a>
+          . They are processed and redistributed under non-commercial Creative
+          Commons licenses
         </p>
       </main>
     </div>
   );
 }
-useQueue;
 
 function Spotlight() {
   const queue = useQueue("feed");
   const { loggedOut } = useUser();
   const [rect, rectRef] = useRect(500);
   const track = queue && queue.tracks[0];
-
   return (
     <section
       ref={rectRef}
@@ -59,8 +66,8 @@ function Spotlight() {
                   <strong>{track.owner.display_name}</strong>
                 </i>
               </a>
-            </Link>
-            {' '}posted our most recent track...
+            </Link>{" "}
+            posted our most recent track...
           </p>
           <Player track={track} maxWidth={rect && rect.width} />
           <p className="px-4 md:text-xl py-4 text-center">
@@ -79,7 +86,9 @@ function Spotlight() {
             ) : null}
           </p>
         </>
-      ) : null}
+      ) : (
+        <Spinner />
+      )}
     </section>
   );
 }

@@ -105,8 +105,7 @@ function LibraryLink() {
         if (!user) {
           e.preventDefault();
           setAlert({
-            message:
-              "Your library is empty because you don't have an account yet...",
+            message: "Your library is empty because you're not logged in...",
             buttons: true,
           });
         }
@@ -176,7 +175,9 @@ function ProfileLabel({ user }) {
         height="24"
         className="rounded-full"
       />
-      <span className="pl-2">{user.display_name}</span>
+      <span className="pl-2 truncate max-w-12 md:max-w-8">
+        {user.display_name}
+      </span>
     </span>
   );
 }
@@ -197,7 +198,7 @@ function Dropdown() {
           <StreamLink />
           <LibraryLink />
           <UploadLink />
-          <ProfileLinks />
+          <ProfileLinks padding="px-2" />
         </ul>
       ) : null}
     </div>

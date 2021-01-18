@@ -1,9 +1,11 @@
-import { login } from "../lib/auth";
-import { useState, useReducer, useEffect } from "react";
 import Router from "next/router";
 import Link from "next/link";
-import { labelClass, textInputClass, SubmitButton, Error } from "./FormHelpers";
+
+import { login } from "../lib/auth";
+import { useContext, useState } from "react";
+import { SubmitButton, Error, TextField } from "./FormHelpers";
 import { useForm } from "react-hook-form";
+import { JukeContext } from "../pages/_app";
 
 function Login() {
   const {
@@ -16,6 +18,7 @@ function Login() {
   const { errors } = formState;
   const [disabled, setDisabled] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const { setAlert } = useContext(JukeContext);
 
   function onSubmit(data, e) {
     setDisabled(true);
@@ -24,16 +27,22 @@ function Login() {
       .then(() => {
         Router.replace("/stream");
       })
-      .catch(() => {
-        setAttempts(attempts + 1);
-        setError("credentials", {
-          type: "manual",
-          message:
-            attempts % 2 == 0
-              ? `We don't recognize that combination`
-              : `Nope...`,
-        });
-        console.log("sup");
+      .catch((e) => {
+        if (e.message === "credentials") {
+          setAttempts(attempts + 1);
+          setError("credentials", {
+            type: "manual",
+            message:
+              attempts % 2 == 0
+                ? `We don't recognize that combination...`
+                : `Nope...`,
+          });
+        } else {
+          setAlert({
+            message:
+              "We're having some trouble connecting to Juke... try again another time please!",
+          });
+        }
         setDisabled(false);
       });
   }
@@ -50,31 +59,25 @@ function Login() {
       <div className="self-center">
         <Error errors={errors} name="credentials" />
       </div>
-      <label htmlFor="user.email" className={labelClass}>
-        Email
-      </label>
-      <input
-        onChange={() => clearErrors()}
-        className={textInputClass}
-        type="text"
-        autoComplete="email"
+      <TextField
         name="user.email"
-        ref={register}
+        label="Email"
+        inputRef={register({ required: "Required" })}
+        autoComplete="email"
+        type="text"
+        onChange={() => clearErrors("credentials")}
+        errors={errors}
       />
-
-      <label htmlFor="user.password" className={labelClass}>
-        Password
-      </label>
-      <input
-        onChange={() => clearErrors()}
-        className={textInputClass}
-        type="password"
-        autoComplete="current-password"
+      <TextField
         name="user.password"
-        ref={register}
+        label="Password"
+        inputRef={register({ required: "Required" })}
+        autoComplete="current-password"
+        type="password"
+        onChange={() => clearErrors("credentials")}
+        errors={errors}
       />
-
-      <SubmitButton disabled={disabled} label="Log In" />
+      <SubmitButton disabled={disabled} label="Submit" />
       <span className="text-sm text-center">
         No Account?
         <Link href="/register">
