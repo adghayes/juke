@@ -76,7 +76,7 @@ function SearchBar() {
           placeholder="Click for Github"
           value={query}
           onChange={handleChange}
-          className="flex-grow text-sm mx-4 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white"
+          className="flex-grow text-sm mx-4 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white cursor-pointer"
         />
       </a>
       <FontAwesomeIcon

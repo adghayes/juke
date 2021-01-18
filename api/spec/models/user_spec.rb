@@ -37,7 +37,7 @@ RSpec.describe User, type: :model do
         .with_message("That's already taken")
     end
 
-    it { should validate_length_of(:display_name).is_at_least(3).is_at_most(24) }
+    it { should validate_length_of(:display_name).is_at_least(3).is_at_most(20) }
 
     it do
       should validate_uniqueness_of(:display_name)
