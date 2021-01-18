@@ -24,7 +24,7 @@ FactoryBot.define do
   end
 
   sequence :display_name do |n|
-    "#{Faker::Internet.username(specifier: 3..20)}#{n}"
+    "#{Faker::Internet.username(specifier: 3..16)}#{n}"
   end
 
   factory :user do

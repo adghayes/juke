@@ -2,12 +2,12 @@ default: &default
   peaks:
     count: 2304
     quality: 0.5
-  specs: 
+  specs:
     - format: webm
-      audio: 
+      audio:
         bitrate: 96
       video: false
-      options: 
+      options:
         - "-dash 1"
       extension: webm
     - format: mp3
@@ -26,18 +26,17 @@ default: &default
 development:
   <<: *default
 
-
 test:
   <<: *default
   peaks:
     count: 576
     quality: 0.5
-  specs: 
+  specs:
     - format: webm
-      audio: 
+      audio:
         bitrate: 96
       video: false
-      options: 
+      options:
         - "-dash 1"
       extension: webm
   host: http://localhost:3000
@@ -45,5 +44,5 @@ test:
 production:
   <<: *default
   client: {}
-  function: ffmpeg-dev-transcode
+  function: ffmpeg-prod-transcode
   host: <%= ENV['HOST'] %>

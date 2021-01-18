@@ -57,6 +57,9 @@ class Track < ApplicationRecord
   has_many :plays,
            dependent: :destroy
 
+  has_many :recents,
+           dependent: :destroy
+
   has_one :stats,
           class_name: :TrackStats,
           foreign_key: :id,

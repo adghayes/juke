@@ -22,7 +22,6 @@ function App({ Component, pageProps }) {
 
   useEffect(() => {
     jukebox.current.setJuke = setJuke;
-    window.jukebox = jukebox.current;
   }, []);
 
   useEffect(() => {
@@ -43,9 +42,9 @@ function App({ Component, pageProps }) {
         <AccountAlert alert={myAlert} close={() => setAlert(null)} />
         <div
           id="view"
-          className={`fixed top-11 left-0 right-0 ${
+          className={`fixed top-11 left-0 right-0 overflow-y-scroll overflow-x-hidden ${
             footerVisible ? " bottom-16 sm:bottom-12" : "bottom-0"
-          } overflow-y-scroll overflow-x-hidden`}
+          } `}
         >
           <Component {...pageProps} />
         </div>

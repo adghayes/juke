@@ -69,10 +69,10 @@ export default function ArtistPage({ forceUser }) {
             </p>
             <p className="text-center">{artist && artist.bio}</p>
           </div>
-          <ul className="text-3xl text-left">
+          <ul className="text-3xl text-left" role="tablist">
             {Object.entries(tabs).map(([tabId, tabProps]) =>
               !tabProps.private || isUser ? (
-                <li key={tabId}>
+                <li key={tabId} role="tab">
                   <a
                     href={`#${tabId}`}
                     className={`block py-2 border-b ${
@@ -87,7 +87,10 @@ export default function ArtistPage({ forceUser }) {
             )}
           </ul>
         </aside>
-        <main className="md:pl-4 flex flex-col items-center w-full max-w-full md:w-auto md:flex-grow ">
+        <main
+          className="md:pl-4 flex flex-col items-center w-full max-w-full md:w-auto md:flex-grow"
+          role="tabpanel"
+        >
           {openTab === "profile" ? (
             <EditProfile />
           ) : artist ? (

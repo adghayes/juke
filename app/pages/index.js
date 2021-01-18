@@ -15,6 +15,7 @@ export default function Home() {
             src="/alexandre-st-louis-IlfpKwRMln0-unsplash.jpg"
             height={900}
             width={2480}
+            alt="Man playing guitar over head in black and white"
           />
           <p
             className={`absolute top-3 sm:top-8 xl:top-16 left-4 xs:left-12 sm:left-16 text-white 
@@ -30,7 +31,10 @@ export default function Home() {
           </Link>
         </section>
         <Spotlight />
-        <p className="self-stretch text-xs text-center p-2 mt-4 border-t border-b">
+        <p
+          role="contentinfo"
+          className="self-stretch text-xs text-center p-2 mt-4 border-t border-b"
+        >
           Juke was seeded with tracks found on{" "}
           <a
             className="font-medium hover:underline"
@@ -57,7 +61,7 @@ function Spotlight() {
       ref={rectRef}
       className="flex flex-col justify-center items-center"
     >
-      {queue ? (
+      {queue && rect ? (
         <>
           <p className="p-4 md:text-xl">
             <Link href={`/${track.owner.slug}`}>

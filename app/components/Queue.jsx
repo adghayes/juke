@@ -18,7 +18,11 @@ export default function Queue({
   const [tileView, setTileView] = useState(false);
 
   return (
-    <div ref={rectRef} className="p-1 flex flex-col items-center w-full">
+    <div
+      role="feed"
+      ref={rectRef}
+      className="p-1 flex flex-col items-center w-full"
+    >
       {!disableTileView ? (
         <div className="flex flex-row justify-end self-stretch px-8 py-2 text-gray-800">
           <button
@@ -37,9 +41,7 @@ export default function Queue({
       ) : null}
       <ul
         className={`flex ${
-          tileView
-            ? "flex-row flex-wrap justify-center w-full"
-            : "flex-col"
+          tileView ? "flex-row flex-wrap justify-center w-full" : "flex-col"
         }`}
       >
         {!!queue & !!rect

@@ -31,6 +31,7 @@
 #
 
 audio_path = File.join(Rails.root, 'spec', 'attachments', 'cantina.mp3')
+image_path = File.join(Rails.root, 'spec', 'attachments', 'goku.jpeg')
 
 FactoryBot.define do
   factory :track do
@@ -43,7 +44,7 @@ FactoryBot.define do
         original { File.open(audio_path) }
         original_name { nil }
         streams { [File.open(audio_path)] }
-        thumbnail { nil }
+        thumbnail { File.open(image_path) }
         metadata do
           src = streams[0] || original
 
