@@ -16,7 +16,6 @@
     "@hookform/error-message": "^0.0.5",
     "@rails/activestorage": "^6.1.0",
     "autoprefixer": "^10.1.0",
-    "formik": "^2.2.6",
     "howler": "^2.2.1",
     "lodash": "^4.17.20",
     "lodash.debounce": "^4.0.8",
