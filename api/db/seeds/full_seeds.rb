@@ -51,7 +51,7 @@ original_keys.shuffle!
         title: title,
         uploaded: true,
         original: original,
-        original_name: 
+        original_name: original_name,
         streams: [],
         thumbnail: thumbnail,
         downloadable: Faker::Boolean.boolean(true_ratio: 0.2),
