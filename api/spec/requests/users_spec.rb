@@ -28,13 +28,13 @@ RSpec.describe 'Users', type: :request do
       it 'creates a new user' do
         post '/users', params: valid_create, as: :json
         created = User.find_by(email: valid_create[:user][:email])
-        expect(created).to_not be_nil
+        expect(created).not_to be_nil
       end
 
       it 'logs in the new user' do
         post '/users', params: valid_create, as: :json
         created = User.find_by(email: valid_create[:user][:email])
-        expect(created.sessions.where(active: true).to_a).to_not be_empty
+        expect(created.sessions.where(active: true).to_a).not_to be_empty
       end
 
       it 'responds with new user data' do
@@ -81,7 +81,7 @@ RSpec.describe 'Users', type: :request do
     end
 
     describe '/users/[:id]' do
-      before(:each) do
+      before do
         @user = FactoryBot.create(:user_with_recents)
         get "/users/#{@user.slug}"
         @body = JSON.parse(response.body)
@@ -99,7 +99,8 @@ RSpec.describe 'Users', type: :request do
   end
 
   describe 'PATCH /update' do
-    before(:each) { @user = FactoryBot.create(:user) }
+    before { @user = FactoryBot.create(:user) }
+
     context 'wrong user' do
       it 'is forbidden' do
         patch "/users/#{FactoryBot.create(:user).id}",

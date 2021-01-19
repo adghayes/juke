@@ -1,4 +1,4 @@
-# [Juke](https://juke.adghayes.vercel.app) - Soundcloud Clone
+# [Juke](https://juke-music.vercel.app) - Soundcloud Clone
 
 Live at https://juke-music.vercel.app/. Check it out!
 

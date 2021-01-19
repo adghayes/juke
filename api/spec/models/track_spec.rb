@@ -35,9 +35,10 @@ RSpec.describe Track, type: :model do
 
   describe 'validations' do
     context 'when submitted' do
-      it { should validate_presence_of(:title) }
+      it { is_expected.to validate_presence_of(:title) }
+
       it do
-        should validate_uniqueness_of(:title)
+        expect(subject).to validate_uniqueness_of(:title)
           .scoped_to(:owner_id)
           .with_message('You already have a track with that title')
       end
@@ -45,32 +46,33 @@ RSpec.describe Track, type: :model do
 
     context 'when processed' do
       subject { FactoryBot.create(:track_live) }
-      it { should validate_presence_of(:peaks) }
-      it { should validate_presence_of(:duration) }
+
+      it { is_expected.to validate_presence_of(:peaks) }
+      it { is_expected.to validate_presence_of(:duration) }
     end
 
-    it { should validate_length_of(:description).is_at_most(160) }
+    it { is_expected.to validate_length_of(:description).is_at_most(160) }
   end
 
   describe 'associations' do
-    it { should belong_to(:owner) }
-    it { should have_many(:likes) }
-    it { should have_many(:plays) }
-    it { should have_one(:stats) }
-    it { should have_one_attached(:thumbnail) }
-    it { should have_one_attached(:original) }
-    it { should have_many_attached(:streams) }
+    it { is_expected.to belong_to(:owner) }
+    it { is_expected.to have_many(:likes) }
+    it { is_expected.to have_many(:plays) }
+    it { is_expected.to have_one(:stats) }
+    it { is_expected.to have_one_attached(:thumbnail) }
+    it { is_expected.to have_one_attached(:original) }
+    it { is_expected.to have_many_attached(:streams) }
   end
 
   describe '#should_generate_new_friendly_id?' do
     context 'title is not changed' do
-      it 'should be false' do
+      it 'is false' do
         expect(track.should_generate_new_friendly_id?).to be false
       end
     end
 
     context 'title has changed' do
-      it 'should be true' do
+      it 'is true' do
         track.title = "#{track.title} changed"
         expect(track.should_generate_new_friendly_id?).to be true
       end
@@ -79,19 +81,19 @@ RSpec.describe Track, type: :model do
 
   describe '#live?' do
     context 'submitted and unprocessed track' do
-      it 'should be false' do
+      it 'is false' do
         expect(track.live?).to be(false)
       end
     end
 
     context 'processed and unsubmitted track' do
-      it 'should be true' do
+      it 'is true' do
         expect(FactoryBot.create(:track_live, submitted: false).live?).to be(false)
       end
     end
 
     context 'processed and submitted track' do
-      it 'should be true' do
+      it 'is true' do
         expect(FactoryBot.create(:track_live).live?).to be(true)
       end
     end

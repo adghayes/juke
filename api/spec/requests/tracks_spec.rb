@@ -75,7 +75,7 @@ RSpec.describe 'Tracks', type: :request do
     it 'creates like if there is none' do
       post like_track_url(track.id), headers: auth_header
       like = Like.find_by(user: user, track: track)
-      expect(like).to_not be_nil
+      expect(like).not_to be_nil
     end
 
     it 'does nothing if like exists' do
@@ -153,7 +153,7 @@ RSpec.describe 'Tracks', type: :request do
         post streams_track_url(track.id), headers: jwt_header,
                                           params: { status: 422 }
         expect(track.reload.processing).to eq('error')
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -180,7 +180,7 @@ RSpec.describe 'Tracks', type: :request do
         }
       end
 
-      before(:each) do
+      before do
         post streams_track_url(track.id),
              headers: jwt_header,
              params: params,

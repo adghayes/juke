@@ -14,8 +14,8 @@ end
 tracks = []
 num_tracks.times do
   tracks.push FactoryBot.create(:track_live,
-                    owner: users.sample,
-                    created_at: Faker::Time.backward(days: 14))
+                                owner: users.sample,
+                                created_at: Faker::Time.backward(days: 14))
 end
 
 seed_dependents users, tracks

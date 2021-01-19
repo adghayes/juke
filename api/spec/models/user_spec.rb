@@ -25,44 +25,44 @@ RSpec.describe User, type: :model do
 
   describe 'validations' do
     describe 'validates email format' do
-      it { should allow_value('user@gmail.com').for(:email) }
-      it { should_not allow_value('').for(:email) }
-      it { should_not allow_value('mrman.com').for(:email) }
-      it { should_not allow_value('@email.com').for(:email) }
+      it { is_expected.to allow_value('user@gmail.com').for(:email) }
+      it { is_expected.not_to allow_value('').for(:email) }
+      it { is_expected.not_to allow_value('mrman.com').for(:email) }
+      it { is_expected.not_to allow_value('@email.com').for(:email) }
     end
 
     it do
-      should validate_uniqueness_of(:email)
+      expect(subject).to validate_uniqueness_of(:email)
         .case_insensitive
         .with_message("That's already taken")
     end
 
-    it { should validate_length_of(:display_name).is_at_least(3).is_at_most(20) }
+    it { is_expected.to validate_length_of(:display_name).is_at_least(3).is_at_most(20) }
 
     it do
-      should validate_uniqueness_of(:display_name)
+      expect(subject).to validate_uniqueness_of(:display_name)
         .with_message("That's already taken")
     end
 
-    it { should validate_presence_of(:password_digest) }
+    it { is_expected.to validate_presence_of(:password_digest) }
 
-    it { should validate_length_of(:password).is_at_least(8).allow_nil }
+    it { is_expected.to validate_length_of(:password).is_at_least(8).allow_nil }
 
-    it { should validate_length_of(:bio).is_at_most(160) }
+    it { is_expected.to validate_length_of(:bio).is_at_most(160) }
   end
 
   describe 'associations' do
-    it { should have_many(:sessions) }
-    it { should have_many(:tracks) }
-    it { should have_many(:likes) }
-    it { should have_many(:recents) }
-    it { should have_many(:liked_tracks) }
-    it { should have_many(:recent_tracks) }
-    it { should have_one_attached(:avatar) }
+    it { is_expected.to have_many(:sessions) }
+    it { is_expected.to have_many(:tracks) }
+    it { is_expected.to have_many(:likes) }
+    it { is_expected.to have_many(:recents) }
+    it { is_expected.to have_many(:liked_tracks) }
+    it { is_expected.to have_many(:recent_tracks) }
+    it { is_expected.to have_one_attached(:avatar) }
   end
 
   describe '#password=' do
-    it 'should change the value of the password and password digest' do
+    it 'changes the value of the password and password digest' do
       init_password = user.password
       init_digest = user.password_digest
       user.password = 'new_password'
@@ -83,15 +83,15 @@ RSpec.describe User, type: :model do
 
   describe '::find_by_credentials' do
     it 'identifies a user by credentials' do
-      expect(User.find_by_credentials(user.email, user.password)).to eq user
+      expect(described_class.find_by_credentials(user.email, user.password)).to eq user
     end
 
     it 'returns nil for password mismatch' do
-      expect(User.find_by_credentials(user.email, 'wrong_password')).to be nil
+      expect(described_class.find_by_credentials(user.email, 'wrong_password')).to be nil
     end
 
     it 'returns nil for non-existent email' do
-      expect(User.find_by_credentials(Faker::Internet.unique.safe_email, 'password')).to be nil
+      expect(described_class.find_by_credentials(Faker::Internet.unique.safe_email, 'password')).to be nil
     end
   end
 

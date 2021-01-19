@@ -45,4 +45,4 @@ def seed_file(s3_client, key)
     file.rewind
     yield(file)
   end
-end 
+end

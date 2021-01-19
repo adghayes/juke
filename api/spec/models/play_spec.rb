@@ -19,5 +19,5 @@
 require 'rails_helper'
 
 RSpec.describe Play, type: :model do
-  it { should belong_to(:track) }
+  it { is_expected.to belong_to(:track) }
 end

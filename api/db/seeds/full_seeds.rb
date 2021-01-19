@@ -6,8 +6,7 @@ require_relative './seeds_helper'
 @num_seed_tracks = ENV['NUM_SEED_TRACKS'].to_i
 @num_seed_bots = @num_seed_tracks / 3
 
-
-Rails.application.default_url_options = {host: Rails.application.config.transcoder.host } 
+Rails.application.default_url_options = { host: Rails.application.config.transcoder.host }
 
 processor_class = Struct.new(:none) { include AudioHelper }
 processor = processor_class.new
@@ -30,9 +29,9 @@ end
   avatar_key = image_keys.sample
   seed_file(s3_client, avatar_key) do |avatar|
     @seed_bots.push FactoryBot.create(:user,
-      display_name: "Seedbot #{i + 1}",
-      avatar: avatar,
-      created_at: Faker::Time.backward(days: 14))
+                                      display_name: "Seedbot #{i + 1}",
+                                      avatar: avatar,
+                                      created_at: Faker::Time.backward(days: 14))
   end
 end
 
@@ -47,18 +46,18 @@ original_keys.shuffle!
   seed_file(s3_client, original_key) do |original|
     seed_file(s3_client, thumbnail_key) do |thumbnail|
       track = FactoryBot.create(:track_live,
-        owner: @seed_bots.sample,
-        title: title,
-        uploaded: true,
-        original: original,
-        original_name: original_name,
-        streams: [],
-        thumbnail: thumbnail,
-        downloadable: Faker::Boolean.boolean(true_ratio: 0.2),
-        processing: "none",
-        duration: nil,
-        peaks: nil,
-        created_at: Faker::Time.backward(days: 14))
+                                owner: @seed_bots.sample,
+                                title: title,
+                                uploaded: true,
+                                original: original,
+                                original_name: original_name,
+                                streams: [],
+                                thumbnail: thumbnail,
+                                downloadable: Faker::Boolean.boolean(true_ratio: 0.2),
+                                processing: 'none',
+                                duration: nil,
+                                peaks: nil,
+                                created_at: Faker::Time.backward(days: 14))
 
       processor.process_audio track
       @seed_tracks.push track
@@ -75,5 +74,4 @@ end
 
 seed_dependents @users, @seed_tracks
 
-Rails.application.default_url_options = {} 
-
+Rails.application.default_url_options = {}

@@ -26,11 +26,11 @@ RSpec.describe Like, type: :model do
   subject(:like) { FactoryBot.create(:like) }
 
   describe 'validations' do
-    it { should validate_uniqueness_of(:user).scoped_to(:track_id) }
+    it { is_expected.to validate_uniqueness_of(:user).scoped_to(:track_id) }
   end
 
   describe 'associations' do
-    it { should belong_to(:user) }
-    it { should belong_to(:track) }
+    it { is_expected.to belong_to(:user) }
+    it { is_expected.to belong_to(:track) }
   end
 end

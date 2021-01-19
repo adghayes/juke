@@ -26,9 +26,9 @@ end
   avatar_key = image_keys.sample
   seed_file(s3_client, avatar_key) do |avatar|
     @seed_bots.push FactoryBot.create(:user,
-      display_name: "Seedbot #{i + 1}",
-      avatar: avatar,
-      created_at: Faker::Time.backward(days: 14))
+                                      display_name: "Seedbot #{i + 1}",
+                                      avatar: avatar,
+                                      created_at: Faker::Time.backward(days: 14))
   end
 end
 
@@ -43,13 +43,13 @@ stream_keys.shuffle!
     seed_file(s3_client, thumbnail_key) do |thumbnail|
       downloadable = Faker::Boolean.boolean(true_ratio: 0.2)
       track = FactoryBot.create(:track_live,
-        owner: @seed_bots.sample,
-        title: title,
-        streams: [stream],
-        thumbnail: thumbnail,
-        downloadable: downloadable,
-        created_at: Faker::Time.backward(days: 14))
-      
+                                owner: @seed_bots.sample,
+                                title: title,
+                                streams: [stream],
+                                thumbnail: thumbnail,
+                                downloadable: downloadable,
+                                created_at: Faker::Time.backward(days: 14))
+
       @seed_tracks.push track
     end
   end

@@ -12,7 +12,8 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     origins(%r{http://lvh\.me(:\d+)?}, %r{https://.*\.vercel\.app})
 
     resource '*',
-             headers: %w[accept accept-encoding authorization cache-control connection host origin pragma referer sec-fetch-dest sec-fetch-mode sec-fetch-site user-agent x-requested-with],
+             headers: %w[accept accept-encoding authorization cache-control connection host origin pragma referer
+                         sec-fetch-dest sec-fetch-mode sec-fetch-site user-agent x-requested-with],
              methods: %i[get post put patch delete options head],
              credentials: true,
              max_age: 24 * 3600
