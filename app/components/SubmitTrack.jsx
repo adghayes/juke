@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { TextArea, SubmitButton, Info, TextField } from "./FormHelpers";
 import Thumbnailer, { editingThumbnailAlert } from "./Thumbnailer";
 import Uploader from "../lib/uploader";
@@ -47,6 +47,12 @@ export default function SubmitTrack({ uploadProgress, track, callback }) {
 
   const uploadComplete =
     track && ["done", "started", "error"].includes(track.processing);
+
+  useEffect(() => {
+    if (track && track.processing === "error") {
+      callback();
+    }
+  }, [track]);
 
   async function onSubmit(data, e) {
     e.preventDefault();

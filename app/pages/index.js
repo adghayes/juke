@@ -61,7 +61,7 @@ function Spotlight() {
       ref={rectRef}
       className="flex flex-col justify-center items-center"
     >
-      {queue && rect ? (
+      {track && rect ? (
         <>
           <p className="p-4 md:text-xl">
             <Link href={`/${track.owner.slug}`}>
