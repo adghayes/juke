@@ -73,7 +73,7 @@ function Spotlight() {
             </Link>{" "}
             posted our most recent track...
           </p>
-          <Player track={track} maxWidth={rect && rect.width} />
+          <Player track={track} queue={queue} maxWidth={rect && rect.width} />
           <p className="px-4 md:text-xl py-4 text-center">
             and yours could be next...{" "}
             {loggedOut ? (

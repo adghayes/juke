@@ -1,26 +1,26 @@
-import { useContext, useState, useRef, useEffect } from "react";
-import { JukeContext } from "../pages/_app";
-import { getThumbnail } from "../lib/thumbnails";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlay,
-  faPause,
-  faStepForward,
-  faStepBackward,
-  faHeart,
-} from "@fortawesome/free-solid-svg-icons";
+import { useState, useRef, useEffect } from "react";
 import useUser from "../hooks/useUser";
 import useLiked from "../hooks/useLiked";
+import useJukebox from "../hooks/useJukebox";
+import { getThumbnail } from "../lib/thumbnails";
 
-const buttonClass = "w-5 mx-2 sm:mx-3";
+const buttonClass = "flex items-center p-1.5";
 const frameInterval = 12;
+const rangeKeys = [
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowUp",
+  "ArrowRight",
+  "PageUp",
+  "PageDown",
+];
 
 function normalize(num) {
   return Math.max(Math.min(num, 1), 0);
 }
 
-function Footer() {
-  const { jukebox } = useContext(JukeContext);
+export default function Footer() {
+  const jukebox = useJukebox();
   const track = jukebox.track;
   const { user } = useUser();
   const [liked, toggleLiked] = useLiked(user, track);
@@ -116,24 +116,25 @@ function Footer() {
   return (
     <footer
       className={
-        "z-30 fixed bottom-0 w-screen h-16 sm:h-12 bg-gray-700 flex justify-around items-center text-white py-2" +
+        "z-30 fixed bottom-0 w-screen h-16 sm:h-12 bg-gray-700 flex justify-between items-center text-white py-2 px-8 " +
         "transition transform-gpu duration-1000 " +
         (track ? "" : "translate-y-full")
       }
     >
-      <div className="flex flex-row justify-center sm:w-48">
+      <div className="flex flex-row items-center justify-center sm:px-2">
         <button
           type="button"
           className={buttonClass}
           onClick={() => jukebox.stepBack()}
+          aria-label="Volume"
         >
-          <FontAwesomeIcon icon={faStepBackward} />
+          <ion-icon name="play-skip-back" class="text-xl"></ion-icon>
         </button>
         <button type="button" className={buttonClass} onClick={togglePlay}>
           {jukebox.playing ? (
-            <FontAwesomeIcon icon={faPause} />
+            <ion-icon name="pause" class="text-xl"></ion-icon>
           ) : (
-            <FontAwesomeIcon icon={faPlay} />
+            <ion-icon name="play" class="text-xl"></ion-icon>
           )}
         </button>
         <button
@@ -141,10 +142,14 @@ function Footer() {
           className={buttonClass}
           onClick={() => jukebox.stepForward()}
         >
-          <FontAwesomeIcon icon={faStepForward} />
+          <ion-icon name="play-skip-forward" class="text-xl"></ion-icon>
         </button>
+        <Repeat jukebox={jukebox} />
       </div>
-      <div className="flex-row items-center justify-center hidden sm:flex flex-grow">
+      <div
+        className="flex-row items-center justify-center hidden sm:flex flex-grow"
+        draggable="false"
+      >
         <span className="text-xs w-6 select-none">
           {track && readableCurrent}
         </span>
@@ -179,7 +184,8 @@ function Footer() {
           {track && jukebox.readableDuration()}
         </span>
       </div>
-      <div className="flex flex-row items-center sm:w-48 md:w-72 sm:px-4">
+      <Volume jukebox={jukebox} />
+      <div className="flex flex-row items-center sm:w-48 md:w-72">
         <img
           src={getThumbnail(track)}
           alt=""
@@ -196,11 +202,150 @@ function Footer() {
           className={`${buttonClass} ${liked ? "text-pink-500" : "text-white"}`}
           onClick={toggleLiked}
         >
-          <FontAwesomeIcon icon={faHeart} />
+          <ion-icon name="heart" class="text-xl"></ion-icon>
         </button>
       </div>
     </footer>
   );
 }
 
-export default Footer;
+function Repeat({ jukebox }) {
+  return (
+    <button
+      type="button"
+      className={`${buttonClass} relative ${
+        jukebox.repeat === "none" ? "" : " text-pink-500"
+      }`}
+      onClick={() => jukebox.repeatMode()}
+    >
+      <ion-icon name="repeat" class="text-xl"></ion-icon>
+      {jukebox.repeat === "track" ? (
+        <i className="absolute rounded-full right-1 bottom-2 w-1.5 h-1.5 text-xs font-bold">
+          1
+        </i>
+      ) : null}
+    </button>
+  );
+}
+
+function Volume({ jukebox }) {
+  const [volume, setVolume] = useState(1);
+  const [unmuteVolume, setUnmuteVolume] = useState(1);
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
+  const [sliderState, setSliderState] = useState("hidden");
+  const track = useRef(null);
+
+  function selectedVolume(e) {
+    const { top, bottom } = track.current.getBoundingClientRect();
+    const ratio = normalize((e.clientY - top) / (bottom - top));
+    return 1 - ratio;
+  }
+
+  function toggleMute() {
+    if (volume > 0) {
+      setUnmuteVolume(volume);
+      setVolume(0);
+    } else {
+      setVolume(unmuteVolume);
+    }
+  }
+
+  function adjustVolume(amount) {
+    setVolume(normalize(volume + amount));
+  }
+
+  function handleKeyDown(e) {
+    if (rangeKeys.includes(e.key)) {
+      e.preventDefault();
+      if (["ArrowDown", "ArrowLeft"].includes(e.key)) {
+        adjustVolume(-0.0625);
+      } else if (["ArrowUp", "ArrowRight"].includes(e.key)) {
+        adjustVolume(0.0625);
+      } else if (e.key === "PageUp") {
+        adjustVolume(0.25);
+      } else if (e.key === "PageDown") {
+        adjustVolume(-0.25);
+      }
+    }
+  }
+
+  useEffect(() => {
+    jukebox.volume(volume);
+  }, [volume]);
+
+  useEffect(() => {
+    setSliderState("opacity-0");
+    let id;
+    if (hover || focus) {
+      id = setTimeout(() => setSliderState("opacity-100"), 100);
+    } else {
+      id = setTimeout(() => setSliderState("hidden"), 500);
+    }
+    return () => clearTimeout(id);
+  }, [hover || focus]);
+
+  return (
+    <div
+      className="relative py-2"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onKeyDown={handleKeyDown}
+    >
+      <button
+        type="button"
+        className={buttonClass}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
+        onClick={toggleMute}
+        role="slider"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow={volume * 100}
+      >
+        <ion-icon name={volumeIconName(volume)} class="text-xl"></ion-icon>
+      </button>
+
+      <div
+        className={
+          "border border-gray-400 rounded shadow-xl absolute bg-gray-700 z-40 h-32 w-8 bottom-11 left-0 flex justify-center items-center cursor-pointer transition-opacity duration-300 " +
+          sliderState
+        }
+        onClick={(e) => {
+          setVolume(selectedVolume(e));
+        }}
+      >
+        <div className="bg-gray-300 h-24 w-1 rounded relative" ref={track}>
+          <div
+            className="bg-pink-500 absolute bottom-0 left-0 right-0 rounded"
+            style={{ height: `${volume * 100}%` }}
+          ></div>
+          <div
+            className="bg-pink-500 absolute h-3 w-3 rounded-full transform -translate-x-1/3 translate-y-1/2"
+            style={{ bottom: `${volume * 100}%` }}
+          >
+            <div
+              draggable="true"
+              className="absolute inset-0 rounded-full bg-transparent z-50 select-none"
+              onDrag={(e) =>
+                e.clientY > 0 ? setVolume(selectedVolume(e)) : null
+              }
+            ></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function volumeIconName(volume) {
+  if (volume === 0) {
+    return "volume-mute";
+  } else if (volume < 1 / 3) {
+    return "volume-low";
+  } else if (volume < 2 / 3) {
+    return "volume-medium";
+  } else {
+    return "volume-high";
+  }
+}

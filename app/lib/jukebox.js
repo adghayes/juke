@@ -2,28 +2,29 @@ import { Howl, Howler } from "howler";
 import API from "./api";
 import { listen } from "./api-track";
 
-const formats = ["webm", "ogg", "m4a", "aac", "mp3", "mp4"]
+const formats = ["webm", "ogg", "m4a", "aac", "mp3", "mp4"];
 
 export default class Jukebox {
   constructor() {
     this.navigationHistory = [];
+    this.repeat = "none";
   }
 
   dispatch() {
     this.setJuke((juke) => ({ ...juke, id: juke.id + 1 }));
   }
 
-  src(track){
-    const options = track.src.map(API.url)
-    const ordered = []
-    formats.forEach(format => {
-      options.forEach(option => {
-        if(option.endsWith(format)) {
-          ordered.push(option)
+  src(track) {
+    const options = track.src.map(API.url);
+    const ordered = [];
+    formats.forEach((format) => {
+      options.forEach((option) => {
+        if (option.endsWith(format)) {
+          ordered.push(option);
         }
-      })
-    })
-    return ordered
+      });
+    });
+    return ordered;
   }
 
   set(track) {
@@ -52,7 +53,7 @@ export default class Jukebox {
   }
 
   async _ensureNext() {
-    const nextTrack = this.queue && this.queue.tracks[this.currentIndex() + 1];
+    const nextTrack = this.queue && this.queue.tracks[this._currentIndex() + 1];
     if (!nextTrack && this.queue && this.queue.pushNext) {
       this.queue = await this.queue.pushNext();
     }
@@ -94,16 +95,30 @@ export default class Jukebox {
     this.playing ? this.play() : this.dispatch();
   }
 
-  currentIndex() {
+  _currentIndex() {
     return this.queue.tracks.findIndex((track) => track.id === this.track.id);
+  }
+
+  repeatMode() {
+    switch (this.repeat) {
+      case "none":
+        this.repeat = "queue";
+        break;
+      case "queue":
+        this.repeat = "track";
+        break;
+      case "track":
+        this.repeat = "none";
+    }
+    this.dispatch();
   }
 
   stepBack() {
     if (!this.queue) return;
 
-    const previousTrack = this.queue.tracks[this.currentIndex() - 1];
+    const previousTrack = this.queue.tracks[this._currentIndex() - 1];
     if (this.seek() > 10) {
-      this.seek(0);
+      this.play(this.track);
     } else if (previousTrack) {
       this._stepTo(previousTrack);
     } else {
@@ -113,13 +128,23 @@ export default class Jukebox {
   }
 
   stepForward() {
-    if (!this.track || !this.queue) return;
+    if (!this.track) return;
 
-    const nextTrack = this.queue.tracks[this.currentIndex() + 1];
-    if (nextTrack) {
-      this._stepTo(nextTrack);
+    if (this.repeat === "track") {
+      this.seek(0);
+      if (this.playing) this.play();
     } else {
-      this.pause();
+      if (!this.queue) return;
+
+      const nextTrack = this.queue.tracks[this._currentIndex() + 1];
+
+      if (nextTrack) {
+        this._stepTo(nextTrack);
+      } else if (this.repeat === "queue") {
+        this._stepTo(this.queue.tracks[0]);
+      } else {
+        this.pause();
+      }
     }
   }
 
