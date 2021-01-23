@@ -8,10 +8,13 @@ export default class Jukebox {
   constructor() {
     this.navigationHistory = [];
     this.repeat = "none";
+    this.id = 0;
   }
 
   dispatch() {
-    this.setJuke((juke) => ({ ...juke, id: juke.id + 1 }));
+    this.id += 1;
+    this.setJuke((juke) => ({ ...juke, id: this.id }));
+    window.jukebox = this;
   }
 
   src(track) {
@@ -29,6 +32,7 @@ export default class Jukebox {
 
   set(track) {
     if (!track) throw new Error("won't set track to falsy value");
+    console.log("set " + track.title);
 
     if (!this.track || track.id !== this.track.id) {
       this._pausePlayback();
@@ -37,7 +41,8 @@ export default class Jukebox {
         src: this.src(track),
         html5: true,
         onend: () => {
-          this.stepForward.bind(this)();
+          console.log("onend " + track.title);
+          this.stepForward();
         },
       });
       this.track = track;
@@ -65,6 +70,7 @@ export default class Jukebox {
     if (queue) this.queue = queue;
     if (track) this.set(track);
 
+    console.log("play " + this.track.title);
     this.sound.play();
     this.timer.start();
     this.playing = true;
@@ -72,7 +78,11 @@ export default class Jukebox {
   }
 
   _pausePlayback() {
-    if (this.sound) this.sound.pause();
+    if (this.track) console.log("pausing playback on " + this.track.title);
+
+    if (this.sound) {
+      this.sound.pause();
+    }
     if (this.timer) this.timer.stop();
   }
 
@@ -91,7 +101,9 @@ export default class Jukebox {
   }
 
   _stepTo(track) {
+    console.log("stepTo " + track.title);
     this.set(track);
+    console.log("going to continue with " + this.track.title);
     this.playing ? this.play() : this.dispatch();
   }
 
@@ -122,8 +134,8 @@ export default class Jukebox {
     } else if (previousTrack) {
       this._stepTo(previousTrack);
     } else {
+      console.log("stepBack no previous");
       this.seek(0);
-      this.pause();
     }
   }
 
@@ -131,13 +143,12 @@ export default class Jukebox {
     if (!this.track) return;
 
     if (this.repeat === "track") {
+      console.log("repeat startover");
       this.seek(0);
-      if (this.playing) this.play();
     } else {
+      console.log("queue stepforward");
       if (!this.queue) return;
-
       const nextTrack = this.queue.tracks[this._currentIndex() + 1];
-
       if (nextTrack) {
         this._stepTo(nextTrack);
       } else if (this.repeat === "queue") {
@@ -151,8 +162,11 @@ export default class Jukebox {
   seek(val) {
     if (this.sound) {
       if (val !== undefined) {
-        let newPosition = this.sound.seek(val * this.track.duration);
-        if (!this.playing) this.dispatch();
+        console.log("seeking to " + val + " with track " + this.track.title);
+        let newPosition = this.sound.seek(val);
+        if (!this.playing) {
+          this.dispatch();
+        }
         return newPosition;
       } else {
         return this.sound.seek();

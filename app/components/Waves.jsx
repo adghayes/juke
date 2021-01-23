@@ -195,7 +195,7 @@ export default function Waves({
 
   function onClick(e) {
     if (active) {
-      jukebox.seek(getRatio(e));
+      jukebox.seek(track.duration * getRatio(e));
     } else {
       jukebox.play(track);
     }
