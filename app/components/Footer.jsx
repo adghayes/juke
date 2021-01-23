@@ -122,7 +122,7 @@ function Repeat({ jukebox }) {
       className={`${buttonClass} hidden md:flex relative ${
         jukebox.repeat === "none" ? "" : " text-pink-500"
       }`}
-      onClick={() => jukebox.repeatMode()}
+      onClick={() => jukebox.toggleRepeat()}
     >
       <ion-icon name="repeat" class="text-xl"></ion-icon>
       {jukebox.repeat === "track" ? (
@@ -157,15 +157,15 @@ function Elapsed({ jukebox }) {
       console.log("attaching global keypress listener");
       document.body.onkeydown = (e) => {
         if (e.key === "ArrowRight") {
-          skip(10);
+          skip(5);
         } else if (e.key === "ArrowLeft") {
-          skip(-10);
+          skip(-5);
         }
       };
 
       return () => (document.body.onkeydown = null);
     }
-  }, [track]);
+  }, [!!track]);
 
   useEffect(() => {
     const animationStep = () => {
@@ -196,7 +196,6 @@ function Elapsed({ jukebox }) {
   function seek(e) {
     const newTime = getRatio(e) * track.duration;
     jukebox.seek(newTime);
-    setTime(newTime);
   }
 
   function startDrag(e) {
@@ -218,23 +217,20 @@ function Elapsed({ jukebox }) {
   }
 
   function skip(seconds) {
-    const mark =
-      jukebox.track.duration *
-      normalize((jukebox.seek() + seconds) / jukebox.track.duration);
-    jukebox.seek(mark);
+    jukebox.seek(jukebox.seek() + seconds);
   }
 
   function handleKeyDown(e) {
     if (rangeKeys.includes(e.key)) {
       e.stopPropagation();
       if (["ArrowDown", "ArrowLeft"].includes(e.key)) {
-        skip(-10);
+        skip(-5);
       } else if (["ArrowUp", "ArrowRight"].includes(e.key)) {
-        skip(10);
+        skip(5);
       } else if (e.key === "PageUp") {
-        skip(track.duration / 4);
+        skip(track.duration / 5);
       } else if (e.key === "PageDown") {
-        skip(-track.duration / 4);
+        skip(-track.duration / 5);
       }
     }
   }

@@ -40,10 +40,6 @@ function App({ Component, pageProps }) {
             type="module"
             src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"
           ></script>
-          <script
-            noModule=""
-            src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.js"
-          ></script>
         </Head>
 
         <Header />

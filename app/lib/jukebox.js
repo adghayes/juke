@@ -1,3 +1,4 @@
+import { faTshirt } from "@fortawesome/free-solid-svg-icons";
 import { Howl, Howler } from "howler";
 import API from "./api";
 import { listen } from "./api-track";
@@ -11,13 +12,13 @@ export default class Jukebox {
     this.id = 0;
   }
 
-  dispatch() {
+  _dispatch() {
     this.id += 1;
     this.setJuke((juke) => ({ ...juke, id: this.id }));
     window.jukebox = this;
   }
 
-  src(track) {
+  _src(track) {
     const options = track.src.map(API.url);
     const ordered = [];
     formats.forEach((format) => {
@@ -30,31 +31,37 @@ export default class Jukebox {
     return ordered;
   }
 
-  set(track) {
-    if (!track) throw new Error("won't set track to falsy value");
-    console.log("set " + track.title);
+  _pauseSound() {
+    if (this.sound) this.sound.pause();
+    if (this.timer) this.timer.stop();
+  }
 
-    if (!this.track || track.id !== this.track.id) {
-      this._pausePlayback();
+  _load(track) {
+    if (!track) throw new Error("can't load without a track");
 
-      this.sound = new Howl({
-        src: this.src(track),
-        html5: true,
-        onend: () => {
-          console.log("onend " + track.title);
-          this.stepForward();
-        },
-      });
-      this.track = track;
-      const listenedMark = Math.min(5000, (this.track.duration / 2) * 1000);
-      this.timer = new Timer(listenedMark, () => {
-        listen(track);
-      });
+    this._pauseSound();
+    const sound = new Howl({
+      src: this._src(track),
+      html5: true,
+    });
 
-      this.navigationHistory.push(track.id);
+    sound.on("end", () => {
+      if (sound === this.sound) {
+        console.log("onend => onTrackEnd");
+        this.onTrackEnd();
+      }
+    });
 
-      this._ensureNext();
-    }
+    this.sound = sound;
+    this.track = track;
+
+    const listenedMark = Math.min(5000, (this.track.duration / 2) * 1000);
+    this.timer = new Timer(listenedMark, () => {
+      listen(track);
+    });
+
+    this.navigationHistory.push(track.id);
+    this._ensureNext();
   }
 
   async _ensureNext() {
@@ -64,32 +71,30 @@ export default class Jukebox {
     }
   }
 
+  onTrackEnd() {
+    if (this.repeat === "track") {
+      this.seek(0);
+      this.play();
+    } else {
+      this.stepForward();
+    }
+  }
+
   play(track, queue) {
-    if (!track && !this.track) throw new Error("play what track?");
-
+    if (!track && !this.track) throw new Error("no track to play");
+    if (track && !(this.track && this.track.id === track.id)) this._load(track);
     if (queue) this.queue = queue;
-    if (track) this.set(track);
 
-    console.log("play " + this.track.title);
     this.sound.play();
     this.timer.start();
     this.playing = true;
-    this.dispatch();
-  }
-
-  _pausePlayback() {
-    if (this.track) console.log("pausing playback on " + this.track.title);
-
-    if (this.sound) {
-      this.sound.pause();
-    }
-    if (this.timer) this.timer.stop();
+    this._dispatch();
   }
 
   pause() {
-    this._pausePlayback();
+    this._pauseSound();
     this.playing = false;
-    this.dispatch();
+    this._dispatch();
   }
 
   toggle(track, queue) {
@@ -100,18 +105,11 @@ export default class Jukebox {
     }
   }
 
-  _stepTo(track) {
-    console.log("stepTo " + track.title);
-    this.set(track);
-    console.log("going to continue with " + this.track.title);
-    this.playing ? this.play() : this.dispatch();
-  }
-
   _currentIndex() {
     return this.queue.tracks.findIndex((track) => track.id === this.track.id);
   }
 
-  repeatMode() {
+  toggleRepeat() {
     switch (this.repeat) {
       case "none":
         this.repeat = "queue";
@@ -122,52 +120,51 @@ export default class Jukebox {
       case "track":
         this.repeat = "none";
     }
-    this.dispatch();
+    this._dispatch();
+    return this.repeat;
   }
 
   stepBack() {
-    if (!this.queue) return;
+    if (!this.track) return;
 
-    const previousTrack = this.queue.tracks[this._currentIndex() - 1];
-    if (this.seek() > 10) {
-      this.play(this.track);
-    } else if (previousTrack) {
-      this._stepTo(previousTrack);
-    } else {
-      console.log("stepBack no previous");
-      this.seek(0);
+    if (this.queue && this.seek() < 5) {
+      const previousTrack = this.queue.tracks[this._currentIndex() - 1];
+      if (previousTrack) {
+        this.play(previousTrack);
+        return true;
+      }
     }
+
+    this.seek(0);
+    return false;
   }
 
   stepForward() {
-    if (!this.track) return;
+    if (!this.track || !this.queue) return;
 
-    if (this.repeat === "track") {
-      console.log("repeat startover");
-      this.seek(0);
+    const nextTrack = this.queue.tracks[this._currentIndex() + 1];
+    if (nextTrack) {
+      this.play(nextTrack);
+    } else if (this.repeat === "queue") {
+      this.play(this.queue.tracks[0]);
     } else {
-      console.log("queue stepforward");
-      if (!this.queue) return;
-      const nextTrack = this.queue.tracks[this._currentIndex() + 1];
-      if (nextTrack) {
-        this._stepTo(nextTrack);
-      } else if (this.repeat === "queue") {
-        this._stepTo(this.queue.tracks[0]);
-      } else {
-        this.pause();
-      }
+      this.pause();
+      this.seek(0);
     }
   }
 
   seek(val) {
-    if (this.sound) {
+    if (this.sound && this.sound.duration()) {
       if (val !== undefined) {
-        console.log("seeking to " + val + " with track " + this.track.title);
-        let newPosition = this.sound.seek(val);
-        if (!this.playing) {
-          this.dispatch();
+        if (val > this.sound.duration() - 0.125) {
+          console.log("onSeek => onTrackEnd");
+          this.onTrackEnd();
+          return 0;
+        } else {
+          let newPosition = this.sound.seek(Math.max(val, 0));
+          if (!this.playing) this._dispatch();
+          return newPosition;
         }
-        return newPosition;
       } else {
         return this.sound.seek();
       }
