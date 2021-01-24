@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { ErrorMessage } from "@hookform/error-message";
 
 export function inputReducer(state, editedFields) {
@@ -70,10 +68,7 @@ export function SubmitButton({ disabled, label, type }) {
       disabled={disabled}
     >
       {disabled ? (
-        <FontAwesomeIcon
-          icon={faSpinner}
-          className="text-white w-5 px-1 animate-spin"
-        />
+        <ion-icon name="sync" class="text-white text-lg animate-spin px-0.5" />
       ) : null}
       <span className="text-sm text-white font-medium">{label}</span>
     </button>

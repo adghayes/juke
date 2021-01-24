@@ -40,13 +40,17 @@ function App({ Component, pageProps }) {
             type="module"
             src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"
           ></script>
+          <script
+            noModule=""
+            src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.js"
+          ></script>
         </Head>
 
         <Header />
         <AccountAlert alert={myAlert} close={() => setAlert(null)} />
         <div
           id="view"
-          className={`fixed top-11 left-0 right-0 overflow-y-scroll overflow-x-hidden ${
+          className={`fixed top-11 left-0 right-0 overflow-y-auto overflow-x-hidden ${
             footerDisplace ? " bottom-16 sm:bottom-12" : "bottom-0"
           } `}
         >

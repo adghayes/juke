@@ -1,5 +1,10 @@
 module.exports = {
-  purge: ["./pages/*.js", "./components/*.jsx", "./hooks/*.jsx"],
+  purge: [
+    "./pages/*.js",
+    "./pages/**/*.js",
+    "./components/*.jsx",
+    "./hooks/*.jsx",
+  ],
   darkMode: false, // or 'media' or 'class'
   theme: {
     screens: {
@@ -31,6 +36,11 @@ module.exports = {
         8: "8rem",
         12: "12rem",
         4: "4rem",
+      },
+      transitionDuration: {
+        2000: "2000ms",
+        5000: "5000ms",
+        10000: "10000ms",
       },
     },
   },

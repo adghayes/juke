@@ -1,10 +1,9 @@
-import { faPause, faPlay } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useEffect, useState } from "react";
 import useQueue from "../hooks/useQueue";
 import useUser from "../hooks/useUser";
 import { getThumbnail } from "../lib/thumbnails";
 import { JukeContext } from "../pages/_app";
+import Link from "next/link";
 
 export default function QueuePreview({
   title,
@@ -29,7 +28,7 @@ export default function QueuePreview({
 
   return (
     <section className="lg:w-64 xl:w-72 my-8 mx-4 border-gray-300 border rounded flex flex-col items-stretch overflow-hidden">
-      <h2 className="text-lg font-bold px-4 py-2 bg-gradient-to-t from-gray-600 via-gray-700 to-gray-600 text-white border-b border-gray-300">
+      <h2 className="text-lg font-semibold px-4 py-2 bg-gradient-to-t from-gray-700 via-gray-700 to-gray-600 text-white border-b border-gray-300">
         {title}
       </h2>
       <div className="relative">
@@ -49,7 +48,7 @@ export default function QueuePreview({
           })}
         </ul>
         <p
-          className={`absolute inset-0 p-2 z-40 bg-gray-200 opacity-80 flex items-center justify-center text-center ${
+          className={`absolute inset-0 p-2 z-40 bg-gray-200 opacity-80 flex items-center justify-center text-center text-sm ${
             overlay ? "" : "hidden"
           }`}
         >
@@ -76,19 +75,27 @@ function PreviewItem({ track, queue, jukebox }) {
         {hover || current ? (
           <button
             type="button"
-            className="absolute top-1 left-1 rounded-full bg-gray-700 h-8 w-8 flex justify-center items-center p-2 text-white"
+            className="absolute top-1 left-1 rounded-full bg-gray-700 h-8 w-8 flex justify-center items-center text-white"
             onClick={() => jukebox.toggle(track, queue)}
           >
-            <FontAwesomeIcon
-              icon={playing ? faPause : faPlay}
-              className={playing ? "w-4" : "w-4 pl-0.5"}
+            <ion-icon
+              name={playing ? "pause" : "play"}
+              class={"text-lg text-white " + (playing ? "" : "pl-0.5")}
             />
           </button>
         ) : null}
       </div>
       <div className="flex flex-col justify-center items-start h-full p-2 text-xs">
-        <p className="font-medium truncate w-48">{track.title}</p>
-        <p className="font-light truncate w-48">{track.owner.display_name}</p>
+        <Link href={`/${track.owner.slug}/${track.slug}`}>
+          <a className="truncate w-48 text-gray-900 hover:text-black focus:text-black focus:underline outline-none">
+            {track.title}
+          </a>
+        </Link>
+        <Link href={`/${track.owner.slug}`}>
+          <a className="truncate w-48 font-light text-gray-600 hover:text-black focus:text-black focus:underline outline-none">
+            {track.owner.display_name}
+          </a>
+        </Link>
       </div>
     </div>
   );

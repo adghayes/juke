@@ -2,8 +2,6 @@ import useQueue from "../hooks/useQueue";
 import Player from "../components/Player";
 import useRect from "../hooks/useRect";
 import useLoadingZone from "../hooks/useLoadingZone";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faList, faThLarge } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 export default function Queue({
@@ -23,19 +21,21 @@ export default function Queue({
       ref={rectRef}
       className="p-1 flex flex-col items-center w-full"
     >
-      {!disableTileView ? (
-        <div className="flex flex-row justify-end self-stretch px-8 py-2 text-gray-800">
+      {!disableTileView && rect && rect.width > 450 ? (
+        <div className="flex flex-row items-center justify-end self-stretch px-8 py-2 text-gray-800">
           <button
-            className={`p-1 mx-1 ${tileView ? "" : "bg-gray-300"}`}
+            className={`p-1 flex place-center ${tileView ? "" : "bg-gray-300"}`}
             onClick={() => setTileView(false)}
           >
-            <FontAwesomeIcon icon={faList} className="w-6" />
+            <ion-icon name="list" class="text-3xl" />
           </button>
           <button
-            className={`p-1 mx-1 ${tileView ? "bg-gray-300" : ""}`}
+            className={`p-1 mx-1 flex place-center ${
+              tileView ? "bg-gray-300" : ""
+            }`}
             onClick={() => setTileView(true)}
           >
-            <FontAwesomeIcon icon={faThLarge} className="w-6" />
+            <ion-icon name="grid" class="text-3xl" />
           </button>
         </div>
       ) : null}

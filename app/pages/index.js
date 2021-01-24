@@ -65,17 +65,15 @@ function Spotlight() {
         <>
           <p className="p-4 md:text-xl">
             <Link href={`/${track.owner.slug}`}>
-              <a className="hover:underline">
-                <i>
-                  <strong>{track.owner.display_name}</strong>
-                </i>
+              <a className="hover:underline focus:underline font-semibold">
+                {track.owner.display_name}
               </a>
             </Link>{" "}
             posted our most recent track...
           </p>
           <Player track={track} queue={queue} maxWidth={rect && rect.width} />
           <p className="px-4 md:text-xl py-4 text-center">
-            and yours could be next...{" "}
+            and yours could be next!{" "}
             {loggedOut ? (
               <span className="px-2 font-normal whitespace-nowrap">
                 <Link href="/register">
@@ -85,7 +83,7 @@ function Spotlight() {
                 <Link href="/login">
                   <a className="font-bold hover:underline">log in</a>
                 </Link>
-                <span> to upload</span>
+                <span> to upload...</span>
               </span>
             ) : null}
           </p>

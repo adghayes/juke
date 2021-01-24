@@ -30,6 +30,7 @@ function Upload({ onFileSelect }) {
   function onDropAccepted(acceptedFiles) {
     setDisabled(true);
     onFileSelect(acceptedFiles[0]);
+    setDisabled(false);
   }
 
   function onDropRejected() {

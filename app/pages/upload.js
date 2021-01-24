@@ -8,8 +8,6 @@ import Uploader from "../lib/uploader";
 import { postTrack, patchTrack, getTrack } from "../lib/api-track";
 import Link from "next/link";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { redirectUnlessUser } from "../hooks/useRedirect";
 import { mutate } from "swr";
 
@@ -68,6 +66,14 @@ export default function UploadPage(props) {
     setTrack(await patchTrack({ original: blobId, uploaded: true }, track.id));
   }
 
+  function restart() {
+    transitionTo(0);
+    setTimeout(() => {
+      setTrack(null);
+      setUploadProgress(0);
+    }, 500);
+  }
+
   const phases = [
     <Upload onFileSelect={onFileSelect} />,
     <SubmitTrack
@@ -75,7 +81,7 @@ export default function UploadPage(props) {
       track={track}
       callback={() => transitionTo(2)}
     />,
-    <TrackStatus track={track} />,
+    <TrackStatus track={track} restart={() => restart()} />,
   ];
 
   return (
@@ -85,7 +91,7 @@ export default function UploadPage(props) {
   );
 }
 
-function TrackStatus({ track }) {
+function TrackStatus({ track, restart }) {
   const status = track && track.processing;
 
   return (
@@ -95,7 +101,7 @@ function TrackStatus({ track }) {
       </h1>
       <p className="pb-4">{statusSubHeader(status)}</p>
       {statusIcon(status)}
-      <div className="pt-4">{statusMessage(status)}</div>
+      <div className="pt-4">{statusMessage(status, restart)}</div>
     </div>
   );
 }
@@ -129,27 +135,17 @@ function statusSubHeader(status) {
 function statusIcon(status) {
   switch (status) {
     case "error":
-      return (
-        <FontAwesomeIcon
-          icon={faTimes}
-          color="white"
-          className="bg-red-600 rounded-full p-4 w-32 h-32"
-        />
-      );
+      return <ion-icon name="alert-circle" class="text-9xl text-red-600" />;
     case "done":
       return (
-        <FontAwesomeIcon
-          icon={faCheck}
-          color="white"
-          className="bg-green-600 rounded-full p-4 w-32 h-32"
-        />
+        <ion-icon name="checkmark-circle" class="text-9xl text-green-600" />
       );
     default:
       return <Spinner />;
   }
 }
 
-function statusMessage(status) {
+function statusMessage(status, restart) {
   switch (status) {
     case "done":
       return (
@@ -168,7 +164,11 @@ function statusMessage(status) {
       return (
         <p>
           If you don't think anything was wrong with your file, try{" "}
-          <a href="/upload" className="font-medium hover:underline">
+          <a
+            href="#"
+            onClick={() => restart()}
+            className="font-medium hover:underline"
+          >
             uploading again
           </a>
         </p>

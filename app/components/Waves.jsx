@@ -100,7 +100,7 @@ export default function Waves({
         refresh();
       }
     }
-  }, [ctx, bars, hover, active, jukebox, jukebox.playing, active]);
+  }, [ctx, bars, hover, jukebox.id]);
 
   function refresh() {
     playPosition.current = jukebox.seek();

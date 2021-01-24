@@ -1,6 +1,4 @@
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faBars } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useState } from "react";
 import useUser from "../hooks/useUser";
 import { logout } from "../lib/auth";
@@ -79,10 +77,9 @@ function SearchBar() {
           className="flex-grow text-sm mx-4 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white cursor-pointer"
         />
       </a>
-      <FontAwesomeIcon
-        icon={faSearch}
-        fixedWidth
-        className="text-gray-500 absolute h-4  right-5 sm:right-10"
+      <ion-icon
+        name="search"
+        class="text-xl text-gray-500 absolute right-5 sm:right-9"
       />
     </div>
   );
@@ -187,8 +184,11 @@ function Dropdown() {
 
   return (
     <div className="relative flex items-center h-7">
-      <button className="mr-4" onClick={() => setOpen((state) => !state)}>
-        <FontAwesomeIcon icon={faBars} fixedWidth className="text-white w-5" />
+      <button
+        className="flex items-center"
+        onClick={() => setOpen((state) => !state)}
+      >
+        <ion-icon name="menu" class="text-white text-3xl pr-2" />
       </button>
       {open ? (
         <ul

@@ -1,4 +1,3 @@
-import { faTshirt } from "@fortawesome/free-solid-svg-icons";
 import { Howl, Howler } from "howler";
 import API from "./api";
 import { listen } from "./api-track";
@@ -10,6 +9,7 @@ export default class Jukebox {
     this.navigationHistory = [];
     this.repeat = "none";
     this.id = 0;
+    this.mediaSession = undefined;
   }
 
   _dispatch() {
@@ -48,7 +48,7 @@ export default class Jukebox {
     sound.on("end", () => {
       if (sound === this.sound) {
         console.log("onend => onTrackEnd");
-        this.onTrackEnd();
+        this._onTrackEnd();
       }
     });
 
@@ -71,7 +71,7 @@ export default class Jukebox {
     }
   }
 
-  onTrackEnd() {
+  _onTrackEnd() {
     if (this.repeat === "track") {
       this.seek(0);
       this.play();
@@ -80,10 +80,54 @@ export default class Jukebox {
     }
   }
 
+  _startMediaSession() {
+    if ("mediaSession" in navigator) {
+      this.mediaSession = true;
+      navigator.mediaSession.setActionHandler("play", () =>
+        this.play.bind(this)()
+      );
+      navigator.mediaSession.setActionHandler("pause", () =>
+        this.pause.bind(this)()
+      );
+      navigator.mediaSession.setActionHandler("stop", () =>
+        this.stop.bind(this)()
+      );
+      navigator.mediaSession.setActionHandler(
+        "seekbackward",
+        ({ seekOffset }) => {
+          this.skip.bind(this)(-(seekOffset || 5));
+        }
+      );
+      navigator.mediaSession.setActionHandler(
+        "seekforward",
+        ({ seekOffset }) => {
+          this.skip.bind(this)(seekOffset || 5);
+        }
+      );
+      navigator.mediaSession.setActionHandler("seekto", ({ seekTime }) => {
+        if (seekTime) this.seek.bind(this)(seekTime);
+      });
+      navigator.mediaSession.setActionHandler("previoustrack", () => {
+        this.stepBack.bind(this)();
+      });
+      navigator.mediaSession.setActionHandler("nexttrack", () => {
+        this.stepForward.bind(this)();
+      });
+    } else {
+      this.mediaSession = false;
+    }
+  }
+
   play(track, queue) {
     if (!track && !this.track) throw new Error("no track to play");
+
     if (track && !(this.track && this.track.id === track.id)) this._load(track);
+
     if (queue) this.queue = queue;
+
+    if (this.mediaSession === undefined) {
+      this._startMediaSession();
+    }
 
     this.sound.play();
     this.timer.start();
@@ -95,6 +139,11 @@ export default class Jukebox {
     this._pauseSound();
     this.playing = false;
     this._dispatch();
+  }
+
+  _stop() {
+    this.pause();
+    this.seek(0);
   }
 
   toggle(track, queue) {
@@ -148,8 +197,7 @@ export default class Jukebox {
     } else if (this.repeat === "queue") {
       this.play(this.queue.tracks[0]);
     } else {
-      this.pause();
-      this.seek(0);
+      this._stop();
     }
   }
 
@@ -158,7 +206,7 @@ export default class Jukebox {
       if (val !== undefined) {
         if (val > this.sound.duration() - 0.125) {
           console.log("onSeek => onTrackEnd");
-          this.onTrackEnd();
+          this._onTrackEnd();
           return 0;
         } else {
           let newPosition = this.sound.seek(Math.max(val, 0));
@@ -170,6 +218,10 @@ export default class Jukebox {
       }
     }
     return 0;
+  }
+
+  skip(seconds) {
+    this.seek(this.seek() + seconds);
   }
 
   queueAlert(queue) {

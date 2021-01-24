@@ -53,7 +53,7 @@ original_keys.shuffle!
                                 original_name: original_name,
                                 streams: [],
                                 thumbnail: thumbnail,
-                                downloadable: Faker::Boolean.boolean(true_ratio: 0.2),
+                                downloadable: Faker::Boolean.boolean(true_ratio: 0.8),
                                 processing: 'none',
                                 duration: nil,
                                 peaks: nil,

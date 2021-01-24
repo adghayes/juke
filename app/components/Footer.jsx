@@ -91,16 +91,20 @@ export default function Footer() {
           className="w-12 h-12 mx-3 sm:w-8 sm:h-8 sm:mx-2 rounded"
         />
         <div className="flex flex-col text-sm sm:text-xs w-32 xs:w-40">
-          <span className="text-gray-200 truncate">
-            {track ? (
+          {track ? (
+            <>
               <Link href={`/${track.owner.slug}`}>
-                <a className="hover:underline focus:underline outline-none">
+                <a className="hover:underline focus:underline outline-none text-gray-200 truncate">
                   {track.owner.display_name}
                 </a>
               </Link>
-            ) : null}
-          </span>
-          <span className="text-white truncate">{track && track.title}</span>
+              <Link href={`/${track.owner.slug}/${track.slug}`}>
+                <a className="hover:underline focus:underline outline-none text-white truncate">
+                  {track && track.title}
+                </a>
+              </Link>
+            </>
+          ) : null}
         </div>
         <button
           type="button"
@@ -157,9 +161,9 @@ function Elapsed({ jukebox }) {
       console.log("attaching global keypress listener");
       document.body.onkeydown = (e) => {
         if (e.key === "ArrowRight") {
-          skip(5);
+          jukebox.skip(5);
         } else if (e.key === "ArrowLeft") {
-          skip(-5);
+          jukebox.skip(-5);
         }
       };
 
@@ -216,21 +220,17 @@ function Elapsed({ jukebox }) {
     };
   }
 
-  function skip(seconds) {
-    jukebox.seek(jukebox.seek() + seconds);
-  }
-
   function handleKeyDown(e) {
     if (rangeKeys.includes(e.key)) {
       e.stopPropagation();
       if (["ArrowDown", "ArrowLeft"].includes(e.key)) {
-        skip(-5);
+        jukebox.skip(-5);
       } else if (["ArrowUp", "ArrowRight"].includes(e.key)) {
-        skip(5);
+        jukebox.skip(5);
       } else if (e.key === "PageUp") {
-        skip(track.duration / 5);
+        jukebox.skip(track.duration / 5);
       } else if (e.key === "PageDown") {
-        skip(-track.duration / 5);
+        jukebox.skip(-track.duration / 5);
       }
     }
   }
