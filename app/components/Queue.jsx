@@ -10,7 +10,7 @@ export default function Queue({
   disableTileView,
   LabelComponent,
 }) {
-  const [rect, rectRef] = useRect(200);
+  const [rect, rectRef] = useRect(1000 / 12);
   const queue = useQueue(queueKey);
   const LoadingZone = useLoadingZone(queue);
   const [tileView, setTileView] = useState(false);
@@ -24,13 +24,15 @@ export default function Queue({
       {!disableTileView && rect && rect.width > 450 ? (
         <div className="flex flex-row items-center justify-end self-stretch px-8 py-2 text-gray-800">
           <button
-            className={`p-1 flex place-center ${tileView ? "" : "bg-gray-300"}`}
+            className={`p-1 rounded flex place-center ${
+              tileView ? "" : "bg-gray-300"
+            }`}
             onClick={() => setTileView(false)}
           >
             <ion-icon name="list" class="text-3xl" />
           </button>
           <button
-            className={`p-1 mx-1 flex place-center ${
+            className={`p-1 mx-1 rounded flex place-center ${
               tileView ? "bg-gray-300" : ""
             }`}
             onClick={() => setTileView(true)}
@@ -40,9 +42,11 @@ export default function Queue({
         </div>
       ) : null}
       <ul
-        className={`flex ${
-          tileView ? "flex-row flex-wrap justify-center w-full" : "flex-col"
-        }`}
+        className={
+          tileView
+            ? "grid gap-x-2 gap-y-1 w-full justify-center tile-grid"
+            : "flex flex-col"
+        }
       >
         {!!queue & !!rect
           ? queue.tracks.map((track) => (
@@ -69,6 +73,12 @@ export default function Queue({
       ) : (
         LoadingZone
       )}
+      <style jsx>{`
+        .tile-grid {
+          grid-template-columns: repeat(auto-fit, minmax(224px, max-content));
+          padding: initial;
+        }
+      `}</style>
     </div>
   );
 }

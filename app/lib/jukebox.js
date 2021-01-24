@@ -36,8 +36,14 @@ export default class Jukebox {
     if (this.timer) this.timer.stop();
   }
 
+  _playSound() {
+    if (this.sound && !this.sound.playing()) this.sound.play();
+    if (this.timer) this.timer.start();
+  }
+
   _load(track) {
     if (!track) throw new Error("can't load without a track");
+    console.log("loading");
 
     this._pauseSound();
     const sound = new Howl({
@@ -129,8 +135,7 @@ export default class Jukebox {
       this._startMediaSession();
     }
 
-    this.sound.play();
-    this.timer.start();
+    this._playSound();
     this.playing = true;
     this._dispatch();
   }

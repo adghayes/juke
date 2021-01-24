@@ -20,14 +20,13 @@ export function Info({ info }) {
 
   return (
     <div className="relative flex items-center">
-      <i
+      <div
         onMouseEnter={() => setOpen(true)}
         onMouseLeave={() => setOpen(false)}
-        className={`bg-gray-300 text-xs rounded-full text-white text-center 
-                    w-min px-1.5 mx-1 hover:bg-gray-400 font-serif font-bold`}
+        className={`flex items-center cursor-pointer text-gray-300 text-xl bg-white rounded-full mx-1 hover:text-gray-400`}
       >
-        {"i"}
-      </i>
+        <ion-icon name="information-circle"></ion-icon>
+      </div>
       <p
         className={`absolute text-xs z-30 left-16 -top-2 bg-white shadow-lg 
                 w-48 h-max p-4 rounded-xl border-2 border-gray-300 border 

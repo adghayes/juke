@@ -5,10 +5,10 @@ import Link from "next/link";
 import useLiked from "../hooks/useLiked";
 import useJukebox from "../hooks/useJukebox";
 
-export default function TilePlayer({ track, queue, image }) {
+export default function TilePlayer({ track, queue }) {
   const jukebox = useJukebox();
   const { user } = useUser();
-  const [liked, toggleLiked, numLikes] = useLiked(user, track);
+  const [liked, toggleLiked] = useLiked(user, track);
   const [hoverArt, setHoverArt] = useState(false);
 
   let active = jukebox.track && jukebox.track.id === track.id;
@@ -27,11 +27,11 @@ export default function TilePlayer({ track, queue, image }) {
           className="absolute inset-0"
         />
         <button
+          aria-label={playing ? "Pause" : "Play"}
           className={
-            "text-white bg-gray-700 rounded-full w-16 h-16 flex-none flex items-center justify-center absolute top-16 right-16 " +
-            (hoverArt || playing ? "opacity-100" : "opacity-0") +
-            " focus:opacity-100 transition-opacity focus:outline-none transform " +
-            (playing ? "focus:ring-2" : "")
+            "text-white bg-gradient-to-br from-gray-500 shadow-xl  to-gray-700 rounded-full w-16 h-16 flex items-center justify-center absolute top-16 right-16 " +
+            (hoverArt || playing ? "opacity-100 focus:ring-2" : "opacity-0") +
+            " focus:opacity-100 transition-opacity focus:outline-none transform "
           }
           onClick={() => jukebox.toggle(track, queue)}
         >
@@ -45,6 +45,7 @@ export default function TilePlayer({ track, queue, image }) {
       <div className="flex flex-col self-start text-sm px-2 py-1.5 w-48">
         <span className="inline-flex items-center font-medium">
           <button
+            aria-label={liked ? "Unlike" : "Like"}
             onClick={toggleLiked}
             className={
               "flex items-center text-lg " +

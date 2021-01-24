@@ -91,7 +91,7 @@ export default function SubmitTrack({ uploadProgress, track, callback }) {
         >
           {uploadComplete ? "Uploaded" : "Uploading..."}
         </span>
-        <span className={"inline-flex"}>
+        <span className="inline-flex items-center">
           <span className={`${processingClass}`}>
             {track && processingMessage[track.processing]}
           </span>

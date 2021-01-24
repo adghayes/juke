@@ -1,12 +1,5 @@
-import {
-  useContext,
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useLayoutEffect,
-} from "react";
-import { JukeContext } from "../pages/_app";
+import { useEffect, useState, useRef, useMemo, useLayoutEffect } from "react";
+import useJukebox from "../hooks/useJukebox";
 
 const base64 =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -48,7 +41,7 @@ export default function Waves({
   barSpacing,
   lowerBarAlpha,
 }) {
-  const { jukebox } = useContext(JukeContext);
+  const jukebox = useJukebox();
   let active = jukebox.track && jukebox.track.id === track.id;
 
   const canvasElement = useRef(null);
