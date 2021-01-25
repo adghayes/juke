@@ -28,18 +28,16 @@ export default function TilePlayer({ track, queue }) {
         />
         <button
           aria-label={playing ? "Pause" : "Play"}
-          className={
-            "text-white bg-gradient-to-br from-gray-500 shadow-xl  to-gray-700 rounded-full w-16 h-16 flex items-center justify-center absolute top-16 right-16 " +
-            (hoverArt || playing ? "opacity-100 focus:ring-2" : "opacity-0") +
-            " focus:opacity-100 transition-opacity focus:outline-none transform "
-          }
+          className="z-20 bg-gradient-to-br from-gray-500 to-gray-700 shadow-xl rounded-full w-16 h-16 flex justify-center items-center focus:ring-2 focus:outline-none"
           onClick={() => jukebox.toggle(track, queue)}
         >
-          {playing ? (
-            <ion-icon name="pause" class="text-white text-4xl" />
-          ) : (
-            <ion-icon name="play" class="ml-1 text-white text-4xl" />
-          )}
+          <div
+            className={
+              "flex items-center text-white text-4xl" + (playing ? "" : " ml-1")
+            }
+          >
+            <ion-icon name={playing ? "pause" : "play"} />
+          </div>
         </button>
       </div>
       <div className="flex flex-col self-start text-sm px-2 py-1.5 w-48">

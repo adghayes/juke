@@ -1,5 +1,6 @@
 import debounce from "lodash.debounce";
 import { useEffect, useRef, useState } from "react";
+import ResizeObserver from "resize-observer-polyfill";
 
 export default function useRect(wait) {
   const rectRef = useRef(null);

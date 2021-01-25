@@ -75,13 +75,17 @@ function PreviewItem({ track, queue, jukebox }) {
         {hover || current ? (
           <button
             type="button"
-            className="absolute top-1 left-1 rounded-full bg-gray-700 h-8 w-8 flex justify-center items-center text-white"
+            className="absolute top-1 left-1 rounded-full bg-gray-700 h-8 w-8 flex justify-center items-center"
             onClick={() => jukebox.toggle(track, queue)}
           >
-            <ion-icon
-              name={playing ? "pause" : "play"}
-              class={"text-lg text-white " + (playing ? "" : "pl-0.5")}
-            />
+            <div
+              className={
+                "flex items-center text-lg text-white" +
+                (playing ? "" : " ml-0.5")
+              }
+            >
+              <ion-icon name={playing ? "pause" : "play"} />
+            </div>
           </button>
         ) : null}
       </div>

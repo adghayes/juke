@@ -77,10 +77,9 @@ function SearchBar() {
           className="flex-grow text-sm mx-4 md:mx-8 px-2 py-0.5 bg-gray-200 rounded focus:bg-white cursor-pointer"
         />
       </a>
-      <ion-icon
-        name="search"
-        class="text-xl text-gray-500 absolute right-5 sm:right-9"
-      />
+      <div className="text-xl text-gray-500 absolute right-5 sm:right-9 flex items-center">
+        <ion-icon name="search" />
+      </div>
     </div>
   );
 }

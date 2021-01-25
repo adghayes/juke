@@ -27,14 +27,17 @@ export default function WavePlayer({ track, queue, barCount }) {
         <div className={`flex flex-row items-center divide-white my-1 `}>
           <button
             aria-label={playing ? "Pause" : "Play"}
-            className="text-white bg-gray-700 rounded-full w-14 h-14 flex-none flex items-center justify-center focus:ring-2 ring-pink-500 focus:outline-none"
+            className="bg-gray-700 rounded-full w-14 h-14 flex-none flex items-center justify-center focus:ring-2 focus:outline-none"
             onClick={() => jukebox.toggle(track, queue)}
           >
-            {playing ? (
-              <ion-icon name="pause" class="text-white text-4xl" />
-            ) : (
-              <ion-icon name="play" class="ml-1 text-white text-4xl" />
-            )}
+            <div
+              className={
+                "flex items-center text-white text-4xl" +
+                (playing ? "" : " ml-1")
+              }
+            >
+              <ion-icon name={playing ? "pause" : "play"} />
+            </div>
           </button>
           <div className="flex flex-col text-sm px-2 self-auto">
             <Link href={`/${track.owner.slug}`}>

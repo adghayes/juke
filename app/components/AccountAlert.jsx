@@ -15,6 +15,7 @@ export default function AccountAlert({ alert, close }) {
         type="button"
         className="self-end text-3xl leading-4"
         onClick={close}
+        tabIndex={!!alert ? "0" : "-1"}
       >
         <p>&times;</p>
       </button>

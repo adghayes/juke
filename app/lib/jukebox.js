@@ -43,7 +43,6 @@ export default class Jukebox {
 
   _load(track) {
     if (!track) throw new Error("can't load without a track");
-    console.log("loading");
 
     this._pauseSound();
     const sound = new Howl({
@@ -53,7 +52,6 @@ export default class Jukebox {
 
     sound.on("end", () => {
       if (sound === this.sound) {
-        console.log("onend => onTrackEnd");
         this._onTrackEnd();
       }
     });
@@ -210,7 +208,6 @@ export default class Jukebox {
     if (this.sound && this.sound.duration()) {
       if (val !== undefined) {
         if (val > this.sound.duration() - 0.125) {
-          console.log("onSeek => onTrackEnd");
           this._onTrackEnd();
           return 0;
         } else {

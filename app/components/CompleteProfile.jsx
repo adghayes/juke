@@ -78,7 +78,7 @@ function CompleteProfile({ callback }) {
           <a className="hover:underline font-medium">start listening...</a>
         </Link>
       </p>
-      <div className="flex flex-col items-center space-between divide-x-8 divide-white">
+      <div className="flex flex-col items-center space-between">
         <Thumbnailer
           thumbnail={thumbnail}
           setThumbnail={setThumbnail}

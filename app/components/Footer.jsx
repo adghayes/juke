@@ -158,7 +158,6 @@ function Elapsed({ jukebox }) {
 
   useEffect(() => {
     if (track) {
-      console.log("attaching global keypress listener");
       document.body.onkeydown = (e) => {
         if (e.key === "ArrowRight") {
           jukebox.skip(5);
