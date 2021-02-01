@@ -26,7 +26,7 @@ if current_user == track.owner
   json.submitted track.submitted
 end
 
-json.download rails_blob_url(track.original, disposition: 'attachment') if track.downloadable
+json.download rails_blob_url(track.original, disposition: 'attachment') if track.downloadable && track.original.attached?
 
 json.num_likes track.stats.likes_count
 json.num_plays track.stats.play_count

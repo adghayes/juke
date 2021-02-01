@@ -42,7 +42,6 @@ class Track < ApplicationRecord
                                   message: 'You already have a track with that title',
                                   conditions: -> { where(submitted: true) } }
 
-  validate :require_original, if: :downloadable
   validate :require_streams, if: :processed?
   validates :duration, presence: { if: :processed? }
   validates :peaks, presence: { if: :processed? }
